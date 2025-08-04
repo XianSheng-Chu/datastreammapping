@@ -4,208 +4,7 @@
         "this": {
             "class": "Select",
             "args": {
-                "distinct": {
-                    "class": "Distinct",
-                    "args": {}
-                },
                 "expressions": [
-                    {
-                        "class": "Alias",
-                        "args": {
-                            "this": {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "user_id",
-                                            "quoted": false
-                                        }
-                                    },
-                                    "table": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "a",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            "alias": {
-                                "class": "Identifier",
-                                "args": {
-                                    "this": "id",
-                                    "quoted": false
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "class": "Column",
-                        "args": {
-                            "this": {
-                                "class": "Identifier",
-                                "args": {
-                                    "this": "user_id",
-                                    "quoted": false
-                                }
-                            },
-                            "table": {
-                                "class": "Identifier",
-                                "args": {
-                                    "this": "b",
-                                    "quoted": false
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "class": "Alias",
-                        "args": {
-                            "this": {
-                                "class": "Concat",
-                                "args": {
-                                    "expressions": [
-                                        {
-                                            "class": "Column",
-                                            "args": {
-                                                "this": {
-                                                    "class": "Identifier",
-                                                    "args": {
-                                                        "this": "first_name",
-                                                        "quoted": false
-                                                    }
-                                                },
-                                                "table": {
-                                                    "class": "Identifier",
-                                                    "args": {
-                                                        "this": "a",
-                                                        "quoted": false
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        {
-                                            "class": "Literal",
-                                            "args": {
-                                                "this": " ",
-                                                "is_string": true
-                                            }
-                                        },
-                                        {
-                                            "class": "Column",
-                                            "args": {
-                                                "this": {
-                                                    "class": "Identifier",
-                                                    "args": {
-                                                        "this": "last_name",
-                                                        "quoted": false
-                                                    }
-                                                },
-                                                "table": {
-                                                    "class": "Identifier",
-                                                    "args": {
-                                                        "this": "a",
-                                                        "quoted": false
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    ],
-                                    "safe": true,
-                                    "coalesce": true
-                                }
-                            },
-                            "alias": {
-                                "class": "Identifier",
-                                "args": {
-                                    "this": "source_names",
-                                    "quoted": false
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "class": "Alias",
-                        "args": {
-                            "this": {
-                                "class": "Case",
-                                "args": {
-                                    "ifs": [
-                                        {
-                                            "class": "If",
-                                            "args": {
-                                                "this": {
-                                                    "class": "EQ",
-                                                    "args": {
-                                                        "this": {
-                                                            "class": "Column",
-                                                            "args": {
-                                                                "this": {
-                                                                    "class": "Identifier",
-                                                                    "args": {
-                                                                        "this": "emp_id",
-                                                                        "quoted": false
-                                                                    }
-                                                                },
-                                                                "table": {
-                                                                    "class": "Identifier",
-                                                                    "args": {
-                                                                        "this": "b",
-                                                                        "quoted": false
-                                                                    }
-                                                                }
-                                                            }
-                                                        },
-                                                        "expression": {
-                                                            "class": "Literal",
-                                                            "args": {
-                                                                "this": "01101",
-                                                                "is_string": true
-                                                            }
-                                                        }
-                                                    }
-                                                },
-                                                "true": {
-                                                    "class": "Literal",
-                                                    "args": {
-                                                        "this": "22331",
-                                                        "is_string": true
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    ],
-                                    "default": {
-                                        "class": "Column",
-                                        "args": {
-                                            "this": {
-                                                "class": "Identifier",
-                                                "args": {
-                                                    "this": "emp_id",
-                                                    "quoted": false
-                                                }
-                                            },
-                                            "table": {
-                                                "class": "Identifier",
-                                                "args": {
-                                                    "this": "a",
-                                                    "quoted": false
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            "alias": {
-                                "class": "Identifier",
-                                "args": {
-                                    "this": "user_emp_id",
-                                    "quoted": false
-                                }
-                            }
-                        }
-                    },
                     {
                         "class": "Alias",
                         "args": {
@@ -222,7 +21,7 @@
                                     "table": {
                                         "class": "Identifier",
                                         "args": {
-                                            "this": "b",
+                                            "this": "er",
                                             "quoted": false
                                         }
                                     }
@@ -231,171 +30,193 @@
                             "alias": {
                                 "class": "Identifier",
                                 "args": {
-                                    "this": "new_emp_id",
+                                    "this": "employee_identifier",
                                     "quoted": false
                                 }
                             }
-                        }
-                    },
-                    {
-                        "class": "Column",
-                        "args": {
-                            "this": {
-                                "class": "Identifier",
-                                "args": {
-                                    "this": "emp_name",
-                                    "quoted": false
-                                }
-                            },
-                            "table": {
-                                "class": "Identifier",
-                                "args": {
-                                    "this": "b",
-                                    "quoted": false
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "class": "Window",
-                        "args": {
-                            "this": {
-                                "class": "Max",
-                                "args": {
-                                    "this": {
-                                        "class": "Column",
-                                        "args": {
-                                            "this": {
-                                                "class": "Identifier",
-                                                "args": {
-                                                    "this": "emp_id",
-                                                    "quoted": false
-                                                }
-                                            },
-                                            "table": {
-                                                "class": "Identifier",
-                                                "args": {
-                                                    "this": "b",
-                                                    "quoted": false
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            "partition_by": [
-                                {
-                                    "class": "Column",
-                                    "args": {
-                                        "this": {
-                                            "class": "Identifier",
-                                            "args": {
-                                                "this": "user_id",
-                                                "quoted": false
-                                            }
-                                        },
-                                        "table": {
-                                            "class": "Identifier",
-                                            "args": {
-                                                "this": "a",
-                                                "quoted": false
-                                            }
-                                        }
-                                    }
-                                }
-                            ],
-                            "over": "OVER"
                         }
                     },
                     {
                         "class": "Alias",
                         "args": {
                             "this": {
-                                "class": "Window",
+                                "class": "Column",
                                 "args": {
                                     "this": {
-                                        "class": "RowNumber",
-                                        "args": {}
-                                    },
-                                    "partition_by": [
-                                        {
-                                            "class": "Column",
-                                            "args": {
-                                                "this": {
-                                                    "class": "Identifier",
-                                                    "args": {
-                                                        "this": "dept_id",
-                                                        "quoted": false
-                                                    }
-                                                },
-                                                "table": {
-                                                    "class": "Identifier",
-                                                    "args": {
-                                                        "this": "dept",
-                                                        "quoted": false
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    ],
-                                    "order": {
-                                        "class": "Order",
+                                        "class": "Identifier",
                                         "args": {
-                                            "expressions": [
-                                                {
-                                                    "class": "Ordered",
-                                                    "args": {
-                                                        "this": {
-                                                            "class": "Column",
-                                                            "args": {
-                                                                "this": {
-                                                                    "class": "Identifier",
-                                                                    "args": {
-                                                                        "this": "user_id",
-                                                                        "quoted": false
-                                                                    }
-                                                                }
-                                                            }
-                                                        },
-                                                        "desc": true,
-                                                        "nulls_first": true
-                                                    }
-                                                },
-                                                {
-                                                    "class": "Ordered",
-                                                    "args": {
-                                                        "this": {
-                                                            "class": "Column",
-                                                            "args": {
-                                                                "this": {
-                                                                    "class": "Identifier",
-                                                                    "args": {
-                                                                        "this": "emp_id",
-                                                                        "quoted": false
-                                                                    }
-                                                                },
-                                                                "table": {
-                                                                    "class": "Identifier",
-                                                                    "args": {
-                                                                        "this": "a",
-                                                                        "quoted": false
-                                                                    }
-                                                                }
-                                                            }
-                                                        },
-                                                        "nulls_first": false
-                                                    }
-                                                }
-                                            ]
+                                            "this": "emp_name",
+                                            "quoted": false
                                         }
                                     },
-                                    "over": "OVER"
+                                    "table": {
+                                        "class": "Identifier",
+                                        "args": {
+                                            "this": "er",
+                                            "quoted": false
+                                        }
+                                    }
                                 }
                             },
                             "alias": {
                                 "class": "Identifier",
                                 "args": {
-                                    "this": "rn",
+                                    "this": "employee_name",
+                                    "quoted": false
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "class": "Alias",
+                        "args": {
+                            "this": {
+                                "class": "Column",
+                                "args": {
+                                    "this": {
+                                        "class": "Identifier",
+                                        "args": {
+                                            "this": "emp_salary",
+                                            "quoted": false
+                                        }
+                                    },
+                                    "table": {
+                                        "class": "Identifier",
+                                        "args": {
+                                            "this": "er",
+                                            "quoted": false
+                                        }
+                                    }
+                                }
+                            },
+                            "alias": {
+                                "class": "Identifier",
+                                "args": {
+                                    "this": "annual_salary",
+                                    "quoted": false
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "class": "Alias",
+                        "args": {
+                            "this": {
+                                "class": "Column",
+                                "args": {
+                                    "this": {
+                                        "class": "Identifier",
+                                        "args": {
+                                            "this": "sal_rank",
+                                            "quoted": false
+                                        }
+                                    },
+                                    "table": {
+                                        "class": "Identifier",
+                                        "args": {
+                                            "this": "er",
+                                            "quoted": false
+                                        }
+                                    }
+                                }
+                            },
+                            "alias": {
+                                "class": "Identifier",
+                                "args": {
+                                    "this": "salary_rank",
+                                    "quoted": false
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "class": "Alias",
+                        "args": {
+                            "this": {
+                                "class": "Column",
+                                "args": {
+                                    "this": {
+                                        "class": "Identifier",
+                                        "args": {
+                                            "this": "dep_name",
+                                            "quoted": false
+                                        }
+                                    },
+                                    "table": {
+                                        "class": "Identifier",
+                                        "args": {
+                                            "this": "ds",
+                                            "quoted": false
+                                        }
+                                    }
+                                }
+                            },
+                            "alias": {
+                                "class": "Identifier",
+                                "args": {
+                                    "this": "department_name",
+                                    "quoted": false
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "class": "Alias",
+                        "args": {
+                            "this": {
+                                "class": "Column",
+                                "args": {
+                                    "this": {
+                                        "class": "Identifier",
+                                        "args": {
+                                            "this": "avg_sal",
+                                            "quoted": false
+                                        }
+                                    },
+                                    "table": {
+                                        "class": "Identifier",
+                                        "args": {
+                                            "this": "ds",
+                                            "quoted": false
+                                        }
+                                    }
+                                }
+                            },
+                            "alias": {
+                                "class": "Identifier",
+                                "args": {
+                                    "this": "department_avg_salary",
+                                    "quoted": false
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "class": "Alias",
+                        "args": {
+                            "this": {
+                                "class": "Column",
+                                "args": {
+                                    "this": {
+                                        "class": "Identifier",
+                                        "args": {
+                                            "this": "status_flag",
+                                            "quoted": false
+                                        }
+                                    },
+                                    "table": {
+                                        "class": "Identifier",
+                                        "args": {
+                                            "this": "er",
+                                            "quoted": false
+                                        }
+                                    }
+                                }
+                            },
+                            "alias": {
+                                "class": "Identifier",
+                                "args": {
+                                    "this": "status_indicator",
                                     "quoted": false
                                 }
                             }
@@ -407,263 +228,14 @@
                             "this": {
                                 "class": "Literal",
                                 "args": {
-                                    "this": "1",
-                                    "is_string": false
-                                }
-                            },
-                            "alias": {
-                                "class": "Identifier",
-                                "args": {
-                                    "this": "bvz_id",
-                                    "quoted": false
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "class": "Alias",
-                        "args": {
-                            "this": {
-                                "class": "Literal",
-                                "args": {
-                                    "this": "\u538b\u6d4b\u533a",
+                                    "this": "Direct Report",
                                     "is_string": true
                                 }
                             },
                             "alias": {
                                 "class": "Identifier",
                                 "args": {
-                                    "this": "bvz_name",
-                                    "quoted": false
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "class": "Literal",
-                        "args": {
-                            "this": "testVale",
-                            "is_string": true
-                        }
-                    },
-                    {
-                        "class": "Alias",
-                        "args": {
-                            "this": {
-                                "class": "CurrentTimestamp",
-                                "args": {}
-                            },
-                            "alias": {
-                                "class": "Identifier",
-                                "args": {
-                                    "this": "last_update_date",
-                                    "quoted": false
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "class": "Alias",
-                        "args": {
-                            "this": {
-                                "class": "Anonymous",
-                                "args": {
-                                    "this": "fun1",
-                                    "expressions": [
-                                        {
-                                            "class": "Literal",
-                                            "args": {
-                                                "this": "a",
-                                                "is_string": true
-                                            }
-                                        }
-                                    ]
-                                }
-                            },
-                            "alias": {
-                                "class": "Identifier",
-                                "args": {
-                                    "this": "user_name",
-                                    "quoted": false
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "class": "Alias",
-                        "args": {
-                            "this": {
-                                "class": "Anonymous",
-                                "args": {
-                                    "this": "fun2",
-                                    "expressions": [
-                                        {
-                                            "class": "Column",
-                                            "args": {
-                                                "this": {
-                                                    "class": "Identifier",
-                                                    "args": {
-                                                        "this": "emp_id",
-                                                        "quoted": false
-                                                    }
-                                                },
-                                                "table": {
-                                                    "class": "Identifier",
-                                                    "args": {
-                                                        "this": "b",
-                                                        "quoted": false
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    ]
-                                }
-                            },
-                            "alias": {
-                                "class": "Identifier",
-                                "args": {
-                                    "this": "emp_user_name",
-                                    "quoted": false
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "class": "Column",
-                        "args": {
-                            "this": {
-                                "class": "Identifier",
-                                "args": {
-                                    "this": "contract_number",
-                                    "quoted": false
-                                }
-                            },
-                            "table": {
-                                "class": "Identifier",
-                                "args": {
-                                    "this": "dim",
-                                    "quoted": false
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "class": "Column",
-                        "args": {
-                            "this": {
-                                "class": "Star",
-                                "args": {}
-                            },
-                            "table": {
-                                "class": "Identifier",
-                                "args": {
-                                    "this": "dim",
-                                    "quoted": false
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "class": "Star",
-                        "args": {}
-                    },
-                    {
-                        "class": "Column",
-                        "args": {
-                            "this": {
-                                "class": "Identifier",
-                                "args": {
-                                    "this": "status",
-                                    "quoted": false
-                                }
-                            },
-                            "table": {
-                                "class": "Identifier",
-                                "args": {
-                                    "this": "a",
-                                    "quoted": false
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "class": "Window",
-                        "args": {
-                            "this": {
-                                "class": "Count",
-                                "args": {
-                                    "this": {
-                                        "class": "Star",
-                                        "args": {}
-                                    },
-                                    "big_int": true
-                                }
-                            },
-                            "partition_by": [
-                                {
-                                    "class": "Column",
-                                    "args": {
-                                        "this": {
-                                            "class": "Identifier",
-                                            "args": {
-                                                "this": "user_id",
-                                                "quoted": false
-                                            }
-                                        },
-                                        "table": {
-                                            "class": "Identifier",
-                                            "args": {
-                                                "this": "a",
-                                                "quoted": false
-                                            }
-                                        }
-                                    }
-                                },
-                                {
-                                    "class": "Literal",
-                                    "args": {
-                                        "this": "1",
-                                        "is_string": false
-                                    }
-                                }
-                            ],
-                            "over": "OVER"
-                        }
-                    },
-                    {
-                        "class": "Alias",
-                        "args": {
-                            "this": {
-                                "class": "Placeholder",
-                                "args": {}
-                            },
-                            "alias": {
-                                "class": "Identifier",
-                                "args": {
-                                    "this": "test_value",
-                                    "quoted": false
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "class": "Alias",
-                        "args": {
-                            "this": {
-                                "class": "Parameter",
-                                "args": {
-                                    "this": {
-                                        "class": "Var",
-                                        "args": {
-                                            "this": "P_START_DATE"
-                                        }
-                                    }
-                                }
-                            },
-                            "alias": {
-                                "class": "Identifier",
-                                "args": {
-                                    "this": "start_date",
+                                    "this": "employee_type",
                                     "quoted": false
                                 }
                             }
@@ -674,224 +246,13 @@
                     "class": "From",
                     "args": {
                         "this": {
-                            "class": "Subquery",
+                            "class": "Table",
                             "args": {
                                 "this": {
-                                    "class": "Select",
+                                    "class": "Identifier",
                                     "args": {
-                                        "expressions": [
-                                            {
-                                                "class": "Column",
-                                                "args": {
-                                                    "this": {
-                                                        "class": "Identifier",
-                                                        "args": {
-                                                            "this": "user_id",
-                                                            "quoted": false
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                "class": "Column",
-                                                "args": {
-                                                    "this": {
-                                                        "class": "Identifier",
-                                                        "args": {
-                                                            "this": "first_name",
-                                                            "quoted": false
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                "class": "Column",
-                                                "args": {
-                                                    "this": {
-                                                        "class": "Identifier",
-                                                        "args": {
-                                                            "this": "status",
-                                                            "quoted": false
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            {
-                                                "class": "Column",
-                                                "args": {
-                                                    "this": {
-                                                        "class": "Identifier",
-                                                        "args": {
-                                                            "this": "emp_id",
-                                                            "quoted": false
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        ],
-                                        "from": {
-                                            "class": "From",
-                                            "args": {
-                                                "this": {
-                                                    "class": "Table",
-                                                    "args": {
-                                                        "this": {
-                                                            "class": "Identifier",
-                                                            "args": {
-                                                                "this": "source_t",
-                                                                "quoted": false
-                                                            }
-                                                        },
-                                                        "db": {
-                                                            "class": "Identifier",
-                                                            "args": {
-                                                                "this": "user1",
-                                                                "quoted": false
-                                                            }
-                                                        },
-                                                        "alias": {
-                                                            "class": "TableAlias",
-                                                            "args": {
-                                                                "this": {
-                                                                    "class": "Identifier",
-                                                                    "args": {
-                                                                        "this": "a",
-                                                                        "quoted": false
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        "joins": [
-                                            {
-                                                "class": "Join",
-                                                "args": {
-                                                    "this": {
-                                                        "class": "Table",
-                                                        "args": {
-                                                            "this": {
-                                                                "class": "Identifier",
-                                                                "args": {
-                                                                    "this": "source_t_cte",
-                                                                    "quoted": false
-                                                                }
-                                                            },
-                                                            "alias": {
-                                                                "class": "TableAlias",
-                                                                "args": {
-                                                                    "this": {
-                                                                        "class": "Identifier",
-                                                                        "args": {
-                                                                            "this": "b",
-                                                                            "quoted": false
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    },
-                                                    "side": "left",
-                                                    "on": {
-                                                        "class": "EQ",
-                                                        "args": {
-                                                            "this": {
-                                                                "class": "Column",
-                                                                "args": {
-                                                                    "this": {
-                                                                        "class": "Identifier",
-                                                                        "args": {
-                                                                            "this": "user_id",
-                                                                            "quoted": false
-                                                                        }
-                                                                    },
-                                                                    "table": {
-                                                                        "class": "Identifier",
-                                                                        "args": {
-                                                                            "this": "a",
-                                                                            "quoted": false
-                                                                        }
-                                                                    }
-                                                                }
-                                                            },
-                                                            "expression": {
-                                                                "class": "Column",
-                                                                "args": {
-                                                                    "this": {
-                                                                        "class": "Identifier",
-                                                                        "args": {
-                                                                            "this": "cust_id",
-                                                                            "quoted": false
-                                                                        }
-                                                                    },
-                                                                    "table": {
-                                                                        "class": "Identifier",
-                                                                        "args": {
-                                                                            "this": "b",
-                                                                            "quoted": false
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        ],
-                                        "with": {
-                                            "class": "With",
-                                            "args": {
-                                                "expressions": [
-                                                    {
-                                                        "class": "CTE",
-                                                        "args": {
-                                                            "this": {
-                                                                "class": "Select",
-                                                                "args": {
-                                                                    "expressions": [
-                                                                        {
-                                                                            "class": "Star",
-                                                                            "args": {}
-                                                                        }
-                                                                    ],
-                                                                    "from": {
-                                                                        "class": "From",
-                                                                        "args": {
-                                                                            "this": {
-                                                                                "class": "Table",
-                                                                                "args": {
-                                                                                    "this": {
-                                                                                        "class": "Identifier",
-                                                                                        "args": {
-                                                                                            "this": "source_t_cte1",
-                                                                                            "quoted": false
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            },
-                                                            "alias": {
-                                                                "class": "TableAlias",
-                                                                "args": {
-                                                                    "this": {
-                                                                        "class": "Identifier",
-                                                                        "args": {
-                                                                            "this": "source_t_cte",
-                                                                            "quoted": false
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                ]
-                                            }
-                                        }
+                                        "this": "EmployeeRanking",
+                                        "quoted": false
                                     }
                                 },
                                 "alias": {
@@ -900,7 +261,7 @@
                                         "this": {
                                             "class": "Identifier",
                                             "args": {
-                                                "this": "a",
+                                                "this": "er",
                                                 "quoted": false
                                             }
                                         }
@@ -920,7 +281,7 @@
                                     "this": {
                                         "class": "Identifier",
                                         "args": {
-                                            "this": "source_emp_t",
+                                            "this": "DepartmentSummary",
                                             "quoted": false
                                         }
                                     },
@@ -930,7 +291,7 @@
                                             "this": {
                                                 "class": "Identifier",
                                                 "args": {
-                                                    "this": "b",
+                                                    "this": "ds",
                                                     "quoted": false
                                                 }
                                             }
@@ -947,14 +308,14 @@
                                             "this": {
                                                 "class": "Identifier",
                                                 "args": {
-                                                    "this": "emp_id",
+                                                    "this": "dep_id",
                                                     "quoted": false
                                                 }
                                             },
                                             "table": {
                                                 "class": "Identifier",
                                                 "args": {
-                                                    "this": "a",
+                                                    "this": "er",
                                                     "quoted": false
                                                 }
                                             }
@@ -966,102 +327,329 @@
                                             "this": {
                                                 "class": "Identifier",
                                                 "args": {
-                                                    "this": "emp_id",
+                                                    "this": "dep_id",
                                                     "quoted": false
                                                 }
                                             },
                                             "table": {
                                                 "class": "Identifier",
                                                 "args": {
-                                                    "this": "b",
+                                                    "this": "ds",
                                                     "quoted": false
                                                 }
                                             }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "class": "Join",
-                        "args": {
-                            "this": {
-                                "class": "Table",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "dim_contract",
-                                            "quoted": false
-                                        }
-                                    },
-                                    "db": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "user1",
-                                            "quoted": false
-                                        }
-                                    },
-                                    "alias": {
-                                        "class": "TableAlias",
-                                        "args": {
-                                            "this": {
-                                                "class": "Identifier",
-                                                "args": {
-                                                    "this": "dim",
-                                                    "quoted": false
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "class": "Join",
-                        "args": {
-                            "this": {
-                                "class": "Table",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "dept",
-                                            "quoted": false
-                                        }
-                                    },
-                                    "db": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "user2",
-                                            "quoted": false
-                                        }
-                                    },
-                                    "catalog": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "ctr",
-                                            "quoted": false
                                         }
                                     }
                                 }
                             }
                         }
                     }
+                ]
+            }
+        },
+        "distinct": false,
+        "expression": {
+            "class": "Select",
+            "args": {
+                "expressions": [
+                    {
+                        "class": "Alias",
+                        "args": {
+                            "this": {
+                                "class": "Null",
+                                "args": {}
+                            },
+                            "alias": {
+                                "class": "Identifier",
+                                "args": {
+                                    "this": "employee_identifier",
+                                    "quoted": false
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "class": "Alias",
+                        "args": {
+                            "this": {
+                                "class": "Literal",
+                                "args": {
+                                    "this": "TOTAL",
+                                    "is_string": true
+                                }
+                            },
+                            "alias": {
+                                "class": "Identifier",
+                                "args": {
+                                    "this": "employee_name",
+                                    "quoted": false
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "class": "Alias",
+                        "args": {
+                            "this": {
+                                "class": "Sum",
+                                "args": {
+                                    "this": {
+                                        "class": "Column",
+                                        "args": {
+                                            "this": {
+                                                "class": "Identifier",
+                                                "args": {
+                                                    "this": "salary",
+                                                    "quoted": false
+                                                }
+                                            },
+                                            "table": {
+                                                "class": "Identifier",
+                                                "args": {
+                                                    "this": "e",
+                                                    "quoted": false
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            "alias": {
+                                "class": "Identifier",
+                                "args": {
+                                    "this": "annual_salary",
+                                    "quoted": false
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "class": "Alias",
+                        "args": {
+                            "this": {
+                                "class": "Null",
+                                "args": {}
+                            },
+                            "alias": {
+                                "class": "Identifier",
+                                "args": {
+                                    "this": "salary_rank",
+                                    "quoted": false
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "class": "Alias",
+                        "args": {
+                            "this": {
+                                "class": "Literal",
+                                "args": {
+                                    "this": "ALL DEPARTMENTS",
+                                    "is_string": true
+                                }
+                            },
+                            "alias": {
+                                "class": "Identifier",
+                                "args": {
+                                    "this": "department_name",
+                                    "quoted": false
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "class": "Alias",
+                        "args": {
+                            "this": {
+                                "class": "Window",
+                                "args": {
+                                    "this": {
+                                        "class": "Avg",
+                                        "args": {
+                                            "this": {
+                                                "class": "Column",
+                                                "args": {
+                                                    "this": {
+                                                        "class": "Identifier",
+                                                        "args": {
+                                                            "this": "salary",
+                                                            "quoted": false
+                                                        }
+                                                    },
+                                                    "table": {
+                                                        "class": "Identifier",
+                                                        "args": {
+                                                            "this": "e",
+                                                            "quoted": false
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "order": {
+                                        "class": "Order",
+                                        "args": {
+                                            "expressions": [
+                                                {
+                                                    "class": "Ordered",
+                                                    "args": {
+                                                        "this": {
+                                                            "class": "Column",
+                                                            "args": {
+                                                                "this": {
+                                                                    "class": "Identifier",
+                                                                    "args": {
+                                                                        "this": "salary",
+                                                                        "quoted": false
+                                                                    }
+                                                                },
+                                                                "table": {
+                                                                    "class": "Identifier",
+                                                                    "args": {
+                                                                        "this": "e",
+                                                                        "quoted": false
+                                                                    }
+                                                                }
+                                                            }
+                                                        },
+                                                        "desc": true,
+                                                        "nulls_first": true
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    },
+                                    "over": "OVER"
+                                }
+                            },
+                            "alias": {
+                                "class": "Identifier",
+                                "args": {
+                                    "this": "department_avg_salary",
+                                    "quoted": false
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "class": "Alias",
+                        "args": {
+                            "this": {
+                                "class": "Literal",
+                                "args": {
+                                    "this": "System",
+                                    "is_string": true
+                                }
+                            },
+                            "alias": {
+                                "class": "Identifier",
+                                "args": {
+                                    "this": "status_indicator",
+                                    "quoted": false
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "class": "Alias",
+                        "args": {
+                            "this": {
+                                "class": "Literal",
+                                "args": {
+                                    "this": "Aggregate",
+                                    "is_string": true
+                                }
+                            },
+                            "alias": {
+                                "class": "Identifier",
+                                "args": {
+                                    "this": "employee_type",
+                                    "quoted": false
+                                }
+                            }
+                        }
+                    }
                 ],
+                "from": {
+                    "class": "From",
+                    "args": {
+                        "this": {
+                            "class": "Table",
+                            "args": {
+                                "this": {
+                                    "class": "Identifier",
+                                    "args": {
+                                        "this": "employees",
+                                        "quoted": false
+                                    }
+                                },
+                                "alias": {
+                                    "class": "TableAlias",
+                                    "args": {
+                                        "this": {
+                                            "class": "Identifier",
+                                            "args": {
+                                                "this": "e",
+                                                "quoted": false
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
                 "where": {
                     "class": "Where",
                     "args": {
                         "this": {
-                            "class": "And",
+                            "class": "Exists",
                             "args": {
                                 "this": {
-                                    "class": "And",
+                                    "class": "Select",
                                     "args": {
-                                        "this": {
-                                            "class": "And",
+                                        "expressions": [
+                                            {
+                                                "class": "Literal",
+                                                "args": {
+                                                    "this": "1",
+                                                    "is_string": false
+                                                }
+                                            }
+                                        ],
+                                        "from": {
+                                            "class": "From",
+                                            "args": {
+                                                "this": {
+                                                    "class": "Table",
+                                                    "args": {
+                                                        "this": {
+                                                            "class": "Identifier",
+                                                            "args": {
+                                                                "this": "departments",
+                                                                "quoted": false
+                                                            }
+                                                        },
+                                                        "alias": {
+                                                            "class": "TableAlias",
+                                                            "args": {
+                                                                "this": {
+                                                                    "class": "Identifier",
+                                                                    "args": {
+                                                                        "this": "d",
+                                                                        "quoted": false
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "where": {
+                                            "class": "Where",
                                             "args": {
                                                 "this": {
                                                     "class": "EQ",
@@ -1072,695 +660,33 @@
                                                                 "this": {
                                                                     "class": "Identifier",
                                                                     "args": {
-                                                                        "this": "status",
+                                                                        "this": "department_id",
                                                                         "quoted": false
                                                                     }
                                                                 },
                                                                 "table": {
                                                                     "class": "Identifier",
                                                                     "args": {
-                                                                        "this": "a",
+                                                                        "this": "d",
                                                                         "quoted": false
                                                                     }
                                                                 }
                                                             }
                                                         },
                                                         "expression": {
-                                                            "class": "Literal",
-                                                            "args": {
-                                                                "this": "active",
-                                                                "is_string": true
-                                                            }
-                                                        }
-                                                    }
-                                                },
-                                                "expression": {
-                                                    "class": "Exists",
-                                                    "args": {
-                                                        "this": {
-                                                            "class": "Select",
-                                                            "args": {
-                                                                "expressions": [
-                                                                    {
-                                                                        "class": "Literal",
-                                                                        "args": {
-                                                                            "this": "1",
-                                                                            "is_string": false
-                                                                        }
-                                                                    }
-                                                                ],
-                                                                "from": {
-                                                                    "class": "From",
-                                                                    "args": {
-                                                                        "this": {
-                                                                            "class": "Table",
-                                                                            "args": {
-                                                                                "this": {
-                                                                                    "class": "Identifier",
-                                                                                    "args": {
-                                                                                        "this": "contract_t",
-                                                                                        "quoted": false
-                                                                                    }
-                                                                                },
-                                                                                "db": {
-                                                                                    "class": "Identifier",
-                                                                                    "args": {
-                                                                                        "this": "user2",
-                                                                                        "quoted": false
-                                                                                    }
-                                                                                },
-                                                                                "alias": {
-                                                                                    "class": "TableAlias",
-                                                                                    "args": {
-                                                                                        "this": {
-                                                                                            "class": "Identifier",
-                                                                                            "args": {
-                                                                                                "this": "c",
-                                                                                                "quoted": false
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                },
-                                                                "where": {
-                                                                    "class": "Where",
-                                                                    "args": {
-                                                                        "this": {
-                                                                            "class": "EQ",
-                                                                            "args": {
-                                                                                "this": {
-                                                                                    "class": "Column",
-                                                                                    "args": {
-                                                                                        "this": {
-                                                                                            "class": "Identifier",
-                                                                                            "args": {
-                                                                                                "this": "contract_id",
-                                                                                                "quoted": false
-                                                                                            }
-                                                                                        },
-                                                                                        "table": {
-                                                                                            "class": "Identifier",
-                                                                                            "args": {
-                                                                                                "this": "a",
-                                                                                                "quoted": false
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                },
-                                                                                "expression": {
-                                                                                    "class": "Column",
-                                                                                    "args": {
-                                                                                        "this": {
-                                                                                            "class": "Identifier",
-                                                                                            "args": {
-                                                                                                "this": "contract_id",
-                                                                                                "quoted": false
-                                                                                            }
-                                                                                        },
-                                                                                        "table": {
-                                                                                            "class": "Identifier",
-                                                                                            "args": {
-                                                                                                "this": "c",
-                                                                                                "quoted": false
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        "expression": {
-                                            "class": "EQ",
-                                            "args": {
-                                                "this": {
-                                                    "class": "Column",
-                                                    "args": {
-                                                        "this": {
-                                                            "class": "Identifier",
-                                                            "args": {
-                                                                "this": "user_id",
-                                                                "quoted": false
-                                                            }
-                                                        },
-                                                        "table": {
-                                                            "class": "Identifier",
-                                                            "args": {
-                                                                "this": "a",
-                                                                "quoted": false
-                                                            }
-                                                        }
-                                                    }
-                                                },
-                                                "expression": {
-                                                    "class": "Dot",
-                                                    "args": {
-                                                        "this": {
-                                                            "class": "Identifier",
-                                                            "args": {
-                                                                "this": "dim",
-                                                                "quoted": false
-                                                            }
-                                                        },
-                                                        "expression": {
-                                                            "class": "Anonymous",
-                                                            "args": {
-                                                                "this": "user_id"
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                },
-                                "expression": {
-                                    "class": "EQ",
-                                    "args": {
-                                        "this": {
-                                            "class": "Column",
-                                            "args": {
-                                                "this": {
-                                                    "class": "Identifier",
-                                                    "args": {
-                                                        "this": "dept_id",
-                                                        "quoted": false
-                                                    }
-                                                },
-                                                "table": {
-                                                    "class": "Identifier",
-                                                    "args": {
-                                                        "this": "b",
-                                                        "quoted": false
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        "expression": {
-                                            "class": "Column",
-                                            "args": {
-                                                "this": {
-                                                    "class": "Identifier",
-                                                    "args": {
-                                                        "this": "dept_id",
-                                                        "quoted": false
-                                                    }
-                                                },
-                                                "table": {
-                                                    "class": "Identifier",
-                                                    "args": {
-                                                        "this": "dept",
-                                                        "quoted": false
-                                                    }
-                                                },
-                                                "db": {
-                                                    "class": "Identifier",
-                                                    "args": {
-                                                        "this": "user2",
-                                                        "quoted": false
-                                                    }
-                                                },
-                                                "catalog": {
-                                                    "class": "Identifier",
-                                                    "args": {
-                                                        "this": "ctr",
-                                                        "quoted": false
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "order": {
-                    "class": "Order",
-                    "args": {
-                        "expressions": [
-                            {
-                                "class": "Ordered",
-                                "args": {
-                                    "this": {
-                                        "class": "Column",
-                                        "args": {
-                                            "this": {
-                                                "class": "Identifier",
-                                                "args": {
-                                                    "this": "source_names",
-                                                    "quoted": false
-                                                }
-                                            }
-                                        }
-                                    },
-                                    "desc": true,
-                                    "nulls_first": true
-                                }
-                            },
-                            {
-                                "class": "Ordered",
-                                "args": {
-                                    "this": {
-                                        "class": "Column",
-                                        "args": {
-                                            "this": {
-                                                "class": "Identifier",
-                                                "args": {
-                                                    "this": "id",
-                                                    "quoted": false
-                                                }
-                                            }
-                                        }
-                                    },
-                                    "desc": true,
-                                    "nulls_first": true
-                                }
-                            },
-                            {
-                                "class": "Ordered",
-                                "args": {
-                                    "this": {
-                                        "class": "Column",
-                                        "args": {
-                                            "this": {
-                                                "class": "Identifier",
-                                                "args": {
-                                                    "this": "emp_name",
-                                                    "quoted": false
-                                                }
-                                            }
-                                        }
-                                    },
-                                    "nulls_first": false
-                                }
-                            },
-                            {
-                                "class": "Ordered",
-                                "args": {
-                                    "this": {
-                                        "class": "Literal",
-                                        "args": {
-                                            "this": "2",
-                                            "is_string": false
-                                        }
-                                    },
-                                    "desc": true,
-                                    "nulls_first": true
-                                }
-                            }
-                        ]
-                    }
-                }
-            }
-        },
-        "distinct": false,
-        "expression": {
-            "class": "Union",
-            "args": {
-                "this": {
-                    "class": "Select",
-                    "args": {
-                        "expressions": [
-                            {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "id",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "user_id",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "source_names",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "user_emp_id",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "new_emp_id",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "emp_name",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "rn1",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "class": "Literal",
-                                "args": {
-                                    "this": "1",
-                                    "is_string": true
-                                }
-                            },
-                            {
-                                "class": "Literal",
-                                "args": {
-                                    "this": "testVale",
-                                    "is_string": true
-                                }
-                            },
-                            {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "last_update_date",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "user_name",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "emp1_user_name",
-                                            "quoted": false
-                                        }
-                                    },
-                                    "table": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "table_union",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "contract_number",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "class": "Star",
-                                "args": {}
-                            }
-                        ],
-                        "from": {
-                            "class": "From",
-                            "args": {
-                                "this": {
-                                    "class": "Table",
-                                    "args": {
-                                        "this": {
-                                            "class": "Identifier",
-                                            "args": {
-                                                "this": "table_union_cte",
-                                                "quoted": false
-                                            }
-                                        },
-                                        "alias": {
-                                            "class": "TableAlias",
-                                            "args": {
-                                                "this": {
-                                                    "class": "Identifier",
-                                                    "args": {
-                                                        "this": "t2",
-                                                        "quoted": false
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                "distinct": false,
-                "expression": {
-                    "class": "Select",
-                    "args": {
-                        "expressions": [
-                            {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "id",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "user_id",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "source_names",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "user_emp_id",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "new_emp_id",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "emp_name",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "rn1",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "class": "Literal",
-                                "args": {
-                                    "this": "1",
-                                    "is_string": true
-                                }
-                            },
-                            {
-                                "class": "Literal",
-                                "args": {
-                                    "this": "testVale",
-                                    "is_string": true
-                                }
-                            },
-                            {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "last_update_date",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "user_name",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "emp3_user_name",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "class": "Column",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "contract_number",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            },
-                            {
-                                "class": "Star",
-                                "args": {}
-                            }
-                        ],
-                        "from": {
-                            "class": "From",
-                            "args": {
-                                "this": {
-                                    "class": "Subquery",
-                                    "args": {
-                                        "this": {
-                                            "class": "Select",
-                                            "args": {
-                                                "expressions": [
-                                                    {
-                                                        "class": "Star",
-                                                        "args": {}
-                                                    }
-                                                ],
-                                                "from": {
-                                                    "class": "From",
-                                                    "args": {
-                                                        "this": {
-                                                            "class": "Table",
+                                                            "class": "Column",
                                                             "args": {
                                                                 "this": {
                                                                     "class": "Identifier",
                                                                     "args": {
-                                                                        "this": "table_union1",
+                                                                        "this": "department_id",
+                                                                        "quoted": false
+                                                                    }
+                                                                },
+                                                                "table": {
+                                                                    "class": "Identifier",
+                                                                    "args": {
+                                                                        "this": "e",
                                                                         "quoted": false
                                                                     }
                                                                 }
@@ -1773,103 +699,7 @@
                                     }
                                 }
                             }
-                        },
-                        "where": {
-                            "class": "Where",
-                            "args": {
-                                "this": {
-                                    "class": "GT",
-                                    "args": {
-                                        "this": {
-                                            "class": "Column",
-                                            "args": {
-                                                "this": {
-                                                    "class": "Identifier",
-                                                    "args": {
-                                                        "this": "last_update_date",
-                                                        "quoted": false
-                                                    }
-                                                }
-                                            }
-                                        },
-                                        "expression": {
-                                            "class": "Cast",
-                                            "args": {
-                                                "this": {
-                                                    "class": "Literal",
-                                                    "args": {
-                                                        "this": "2025-04-27",
-                                                        "is_string": true
-                                                    }
-                                                },
-                                                "to": {
-                                                    "class": "DataType",
-                                                    "args": {
-                                                        "this": {
-                                                            "class": "DataType.Type",
-                                                            "value": "DATE"
-                                                        },
-                                                        "nested": false
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
                         }
-                    }
-                },
-                "with": {
-                    "class": "With",
-                    "args": {
-                        "expressions": [
-                            {
-                                "class": "CTE",
-                                "args": {
-                                    "this": {
-                                        "class": "Select",
-                                        "args": {
-                                            "expressions": [
-                                                {
-                                                    "class": "Star",
-                                                    "args": {}
-                                                }
-                                            ],
-                                            "from": {
-                                                "class": "From",
-                                                "args": {
-                                                    "this": {
-                                                        "class": "Table",
-                                                        "args": {
-                                                            "this": {
-                                                                "class": "Identifier",
-                                                                "args": {
-                                                                    "this": "table_union2",
-                                                                    "quoted": false
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    },
-                                    "alias": {
-                                        "class": "TableAlias",
-                                        "args": {
-                                            "this": {
-                                                "class": "Identifier",
-                                                "args": {
-                                                    "this": "table_union_cte",
-                                                    "quoted": false
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        ]
                     }
                 }
             }
@@ -1886,8 +716,193 @@
                                 "args": {
                                     "expressions": [
                                         {
-                                            "class": "Star",
-                                            "args": {}
+                                            "class": "Alias",
+                                            "args": {
+                                                "this": {
+                                                    "class": "Column",
+                                                    "args": {
+                                                        "this": {
+                                                            "class": "Identifier",
+                                                            "args": {
+                                                                "this": "department_id",
+                                                                "quoted": false
+                                                            }
+                                                        },
+                                                        "table": {
+                                                            "class": "Identifier",
+                                                            "args": {
+                                                                "this": "d",
+                                                                "quoted": false
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "alias": {
+                                                    "class": "Identifier",
+                                                    "args": {
+                                                        "this": "dep_id",
+                                                        "quoted": false
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "class": "Alias",
+                                            "args": {
+                                                "this": {
+                                                    "class": "Column",
+                                                    "args": {
+                                                        "this": {
+                                                            "class": "Identifier",
+                                                            "args": {
+                                                                "this": "department_name",
+                                                                "quoted": false
+                                                            }
+                                                        },
+                                                        "table": {
+                                                            "class": "Identifier",
+                                                            "args": {
+                                                                "this": "d",
+                                                                "quoted": false
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "alias": {
+                                                    "class": "Identifier",
+                                                    "args": {
+                                                        "this": "dep_name",
+                                                        "quoted": false
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "class": "Alias",
+                                            "args": {
+                                                "this": {
+                                                    "class": "Window",
+                                                    "args": {
+                                                        "this": {
+                                                            "class": "Count",
+                                                            "args": {
+                                                                "this": {
+                                                                    "class": "Column",
+                                                                    "args": {
+                                                                        "this": {
+                                                                            "class": "Identifier",
+                                                                            "args": {
+                                                                                "this": "employee_id",
+                                                                                "quoted": false
+                                                                            }
+                                                                        },
+                                                                        "table": {
+                                                                            "class": "Identifier",
+                                                                            "args": {
+                                                                                "this": "e",
+                                                                                "quoted": false
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "big_int": true
+                                                            }
+                                                        },
+                                                        "partition_by": [
+                                                            {
+                                                                "class": "Column",
+                                                                "args": {
+                                                                    "this": {
+                                                                        "class": "Identifier",
+                                                                        "args": {
+                                                                            "this": "department_id",
+                                                                            "quoted": false
+                                                                        }
+                                                                    },
+                                                                    "table": {
+                                                                        "class": "Identifier",
+                                                                        "args": {
+                                                                            "this": "d",
+                                                                            "quoted": false
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        ],
+                                                        "over": "OVER"
+                                                    }
+                                                },
+                                                "alias": {
+                                                    "class": "Identifier",
+                                                    "args": {
+                                                        "this": "emp_count",
+                                                        "quoted": false
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "class": "Alias",
+                                            "args": {
+                                                "this": {
+                                                    "class": "Window",
+                                                    "args": {
+                                                        "this": {
+                                                            "class": "Avg",
+                                                            "args": {
+                                                                "this": {
+                                                                    "class": "Column",
+                                                                    "args": {
+                                                                        "this": {
+                                                                            "class": "Identifier",
+                                                                            "args": {
+                                                                                "this": "salary",
+                                                                                "quoted": false
+                                                                            }
+                                                                        },
+                                                                        "table": {
+                                                                            "class": "Identifier",
+                                                                            "args": {
+                                                                                "this": "e",
+                                                                                "quoted": false
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        },
+                                                        "partition_by": [
+                                                            {
+                                                                "class": "Column",
+                                                                "args": {
+                                                                    "this": {
+                                                                        "class": "Identifier",
+                                                                        "args": {
+                                                                            "this": "department_id",
+                                                                            "quoted": false
+                                                                        }
+                                                                    },
+                                                                    "table": {
+                                                                        "class": "Identifier",
+                                                                        "args": {
+                                                                            "this": "d",
+                                                                            "quoted": false
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        ],
+                                                        "over": "OVER"
+                                                    }
+                                                },
+                                                "alias": {
+                                                    "class": "Identifier",
+                                                    "args": {
+                                                        "this": "avg_sal",
+                                                        "quoted": false
+                                                    }
+                                                }
+                                            }
                                         }
                                     ],
                                     "from": {
@@ -1899,7 +914,7 @@
                                                     "this": {
                                                         "class": "Identifier",
                                                         "args": {
-                                                            "this": "source_ti",
+                                                            "this": "departments",
                                                             "quoted": false
                                                         }
                                                     },
@@ -1909,7 +924,7 @@
                                                             "this": {
                                                                 "class": "Identifier",
                                                                 "args": {
-                                                                    "this": "a",
+                                                                    "this": "d",
                                                                     "quoted": false
                                                                 }
                                                             }
@@ -1918,199 +933,237 @@
                                                 }
                                             }
                                         }
-                                    }
-                                }
-                            },
-                            "alias": {
-                                "class": "TableAlias",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "source_t",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "class": "CTE",
-                        "args": {
-                            "this": {
-                                "class": "Select",
-                                "args": {
-                                    "expressions": [
+                                    },
+                                    "joins": [
                                         {
-                                            "class": "Star",
-                                            "args": {}
-                                        }
-                                    ],
-                                    "from": {
-                                        "class": "From",
-                                        "args": {
-                                            "this": {
-                                                "class": "Table",
-                                                "args": {
-                                                    "this": {
-                                                        "class": "Identifier",
-                                                        "args": {
-                                                            "this": "source_user",
-                                                            "quoted": false
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            "alias": {
-                                "class": "TableAlias",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "source_user1",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "class": "CTE",
-                        "args": {
-                            "this": {
-                                "class": "Select",
-                                "args": {
-                                    "expressions": [
-                                        {
-                                            "class": "Star",
-                                            "args": {}
-                                        }
-                                    ],
-                                    "from": {
-                                        "class": "From",
-                                        "args": {
-                                            "this": {
-                                                "class": "Table",
-                                                "args": {
-                                                    "this": {
-                                                        "class": "Identifier",
-                                                        "args": {
-                                                            "this": "source_emp_ti",
-                                                            "quoted": false
-                                                        }
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            },
-                            "alias": {
-                                "class": "TableAlias",
-                                "args": {
-                                    "this": {
-                                        "class": "Identifier",
-                                        "args": {
-                                            "this": "source_emp_t",
-                                            "quoted": false
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "class": "CTE",
-                        "args": {
-                            "this": {
-                                "class": "Select",
-                                "args": {
-                                    "expressions": [
-                                        {
-                                            "class": "Column",
+                                            "class": "Join",
                                             "args": {
                                                 "this": {
+                                                    "class": "Table",
+                                                    "args": {
+                                                        "this": {
+                                                            "class": "Identifier",
+                                                            "args": {
+                                                                "this": "employees",
+                                                                "quoted": false
+                                                            }
+                                                        },
+                                                        "alias": {
+                                                            "class": "TableAlias",
+                                                            "args": {
+                                                                "this": {
+                                                                    "class": "Identifier",
+                                                                    "args": {
+                                                                        "this": "e",
+                                                                        "quoted": false
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "side": "LEFT",
+                                                "on": {
+                                                    "class": "EQ",
+                                                    "args": {
+                                                        "this": {
+                                                            "class": "Column",
+                                                            "args": {
+                                                                "this": {
+                                                                    "class": "Identifier",
+                                                                    "args": {
+                                                                        "this": "department_id",
+                                                                        "quoted": false
+                                                                    }
+                                                                },
+                                                                "table": {
+                                                                    "class": "Identifier",
+                                                                    "args": {
+                                                                        "this": "d",
+                                                                        "quoted": false
+                                                                    }
+                                                                }
+                                                            }
+                                                        },
+                                                        "expression": {
+                                                            "class": "Column",
+                                                            "args": {
+                                                                "this": {
+                                                                    "class": "Identifier",
+                                                                    "args": {
+                                                                        "this": "department_id",
+                                                                        "quoted": false
+                                                                    }
+                                                                },
+                                                                "table": {
+                                                                    "class": "Identifier",
+                                                                    "args": {
+                                                                        "this": "e",
+                                                                        "quoted": false
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                }
+                            },
+                            "alias": {
+                                "class": "TableAlias",
+                                "args": {
+                                    "this": {
+                                        "class": "Identifier",
+                                        "args": {
+                                            "this": "DepartmentSummary",
+                                            "quoted": false
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "class": "CTE",
+                        "args": {
+                            "this": {
+                                "class": "Select",
+                                "args": {
+                                    "expressions": [
+                                        {
+                                            "class": "Alias",
+                                            "args": {
+                                                "this": {
+                                                    "class": "Column",
+                                                    "args": {
+                                                        "this": {
+                                                            "class": "Identifier",
+                                                            "args": {
+                                                                "this": "employee_id",
+                                                                "quoted": false
+                                                            }
+                                                        },
+                                                        "table": {
+                                                            "class": "Identifier",
+                                                            "args": {
+                                                                "this": "e",
+                                                                "quoted": false
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "alias": {
                                                     "class": "Identifier",
                                                     "args": {
-                                                        "this": "user_id",
+                                                        "this": "emp_id",
                                                         "quoted": false
                                                     }
                                                 }
                                             }
                                         },
                                         {
-                                            "class": "Column",
+                                            "class": "Alias",
                                             "args": {
                                                 "this": {
+                                                    "class": "Column",
+                                                    "args": {
+                                                        "this": {
+                                                            "class": "Identifier",
+                                                            "args": {
+                                                                "this": "employee_name",
+                                                                "quoted": false
+                                                            }
+                                                        },
+                                                        "table": {
+                                                            "class": "Identifier",
+                                                            "args": {
+                                                                "this": "e",
+                                                                "quoted": false
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "alias": {
                                                     "class": "Identifier",
                                                     "args": {
-                                                        "this": "user_name",
+                                                        "this": "emp_name",
                                                         "quoted": false
                                                     }
                                                 }
                                             }
-                                        }
-                                    ],
-                                    "from": {
-                                        "class": "From",
-                                        "args": {
-                                            "this": {
-                                                "class": "Table",
-                                                "args": {
-                                                    "this": {
-                                                        "class": "Identifier",
-                                                        "args": {
-                                                            "this": "source_t",
-                                                            "quoted": false
+                                        },
+                                        {
+                                            "class": "Alias",
+                                            "args": {
+                                                "this": {
+                                                    "class": "Column",
+                                                    "args": {
+                                                        "this": {
+                                                            "class": "Identifier",
+                                                            "args": {
+                                                                "this": "salary",
+                                                                "quoted": false
+                                                            }
+                                                        },
+                                                        "table": {
+                                                            "class": "Identifier",
+                                                            "args": {
+                                                                "this": "e",
+                                                                "quoted": false
+                                                            }
                                                         }
+                                                    }
+                                                },
+                                                "alias": {
+                                                    "class": "Identifier",
+                                                    "args": {
+                                                        "this": "emp_salary",
+                                                        "quoted": false
                                                     }
                                                 }
                                             }
-                                        }
-                                    },
-                                    "group": {
-                                        "class": "Group",
-                                        "args": {
-                                            "expressions": [
-                                                {
-                                                    "class": "Column",
+                                        },
+                                        {
+                                            "class": "Alias",
+                                            "args": {
+                                                "this": {
+                                                    "class": "Window",
                                                     "args": {
                                                         "this": {
-                                                            "class": "Identifier",
+                                                            "class": "Anonymous",
                                                             "args": {
-                                                                "this": "user_id",
-                                                                "quoted": false
+                                                                "this": "RANK"
                                                             }
-                                                        }
-                                                    }
-                                                },
-                                                {
-                                                    "class": "Column",
-                                                    "args": {
-                                                        "this": {
-                                                            "class": "Identifier",
-                                                            "args": {
-                                                                "this": "user_name",
-                                                                "quoted": false
-                                                            }
-                                                        }
-                                                    }
-                                                },
-                                                {
-                                                    "class": "Case",
-                                                    "args": {
-                                                        "ifs": [
+                                                        },
+                                                        "partition_by": [
                                                             {
-                                                                "class": "If",
+                                                                "class": "Column",
                                                                 "args": {
                                                                     "this": {
-                                                                        "class": "EQ",
+                                                                        "class": "Identifier",
+                                                                        "args": {
+                                                                            "this": "employee_name",
+                                                                            "quoted": false
+                                                                        }
+                                                                    },
+                                                                    "table": {
+                                                                        "class": "Identifier",
+                                                                        "args": {
+                                                                            "this": "e",
+                                                                            "quoted": false
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        ],
+                                                        "order": {
+                                                            "class": "Order",
+                                                            "args": {
+                                                                "expressions": [
+                                                                    {
+                                                                        "class": "Ordered",
                                                                         "args": {
                                                                             "this": {
                                                                                 "class": "Column",
@@ -2118,106 +1171,161 @@
                                                                                     "this": {
                                                                                         "class": "Identifier",
                                                                                         "args": {
-                                                                                            "this": "user_type_code",
+                                                                                            "this": "salary",
+                                                                                            "quoted": false
+                                                                                        }
+                                                                                    },
+                                                                                    "table": {
+                                                                                        "class": "Identifier",
+                                                                                        "args": {
+                                                                                            "this": "e",
                                                                                             "quoted": false
                                                                                         }
                                                                                     }
                                                                                 }
                                                                             },
-                                                                            "expression": {
-                                                                                "class": "Literal",
-                                                                                "args": {
-                                                                                    "this": "admin",
-                                                                                    "is_string": true
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    },
-                                                                    "true": {
-                                                                        "class": "Literal",
-                                                                        "args": {
-                                                                            "this": "1",
-                                                                            "is_string": false
+                                                                            "desc": true,
+                                                                            "nulls_first": true
                                                                         }
                                                                     }
-                                                                }
+                                                                ]
                                                             }
-                                                        ],
-                                                        "default": {
-                                                            "class": "Literal",
+                                                        },
+                                                        "over": "OVER"
+                                                    }
+                                                },
+                                                "alias": {
+                                                    "class": "Identifier",
+                                                    "args": {
+                                                        "this": "sal_rank",
+                                                        "quoted": false
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "class": "Alias",
+                                            "args": {
+                                                "this": {
+                                                    "class": "Column",
+                                                    "args": {
+                                                        "this": {
+                                                            "class": "Identifier",
                                                             "args": {
-                                                                "this": "0",
-                                                                "is_string": false
+                                                                "this": "department_id",
+                                                                "quoted": false
+                                                            }
+                                                        },
+                                                        "table": {
+                                                            "class": "Identifier",
+                                                            "args": {
+                                                                "this": "e",
+                                                                "quoted": false
+                                                            }
+                                                        }
+                                                    }
+                                                },
+                                                "alias": {
+                                                    "class": "Identifier",
+                                                    "args": {
+                                                        "this": "dep_id",
+                                                        "quoted": false
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        {
+                                            "class": "Alias",
+                                            "args": {
+                                                "this": {
+                                                    "class": "Literal",
+                                                    "args": {
+                                                        "this": "Active",
+                                                        "is_string": true
+                                                    }
+                                                },
+                                                "alias": {
+                                                    "class": "Identifier",
+                                                    "args": {
+                                                        "this": "status_flag",
+                                                        "quoted": false
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ],
+                                    "from": {
+                                        "class": "From",
+                                        "args": {
+                                            "this": {
+                                                "class": "Table",
+                                                "args": {
+                                                    "this": {
+                                                        "class": "Identifier",
+                                                        "args": {
+                                                            "this": "employees",
+                                                            "quoted": false
+                                                        }
+                                                    },
+                                                    "alias": {
+                                                        "class": "TableAlias",
+                                                        "args": {
+                                                            "this": {
+                                                                "class": "Identifier",
+                                                                "args": {
+                                                                    "this": "e",
+                                                                    "quoted": false
+                                                                }
                                                             }
                                                         }
                                                     }
                                                 }
-                                            ]
+                                            }
                                         }
                                     },
-                                    "having": {
-                                        "class": "Having",
+                                    "where": {
+                                        "class": "Where",
                                         "args": {
                                             "this": {
-                                                "class": "And",
+                                                "class": "GT",
                                                 "args": {
                                                     "this": {
-                                                        "class": "GT",
+                                                        "class": "Column",
                                                         "args": {
                                                             "this": {
-                                                                "class": "Count",
+                                                                "class": "Identifier",
                                                                 "args": {
-                                                                    "this": {
-                                                                        "class": "Star",
-                                                                        "args": {}
-                                                                    },
-                                                                    "big_int": true
+                                                                    "this": "hire_date",
+                                                                    "quoted": false
                                                                 }
                                                             },
-                                                            "expression": {
-                                                                "class": "Literal",
+                                                            "table": {
+                                                                "class": "Identifier",
                                                                 "args": {
-                                                                    "this": "1",
-                                                                    "is_string": false
+                                                                    "this": "e",
+                                                                    "quoted": false
                                                                 }
                                                             }
                                                         }
                                                     },
                                                     "expression": {
-                                                        "class": "NEQ",
+                                                        "class": "Cast",
                                                         "args": {
                                                             "this": {
-                                                                "class": "Max",
+                                                                "class": "Literal",
                                                                 "args": {
-                                                                    "this": {
-                                                                        "class": "Column",
-                                                                        "args": {
-                                                                            "this": {
-                                                                                "class": "Identifier",
-                                                                                "args": {
-                                                                                    "this": "user_type",
-                                                                                    "quoted": false
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
+                                                                    "this": "2020-01-01",
+                                                                    "is_string": true
                                                                 }
                                                             },
-                                                            "expression": {
-                                                                "class": "Min",
+                                                            "to": {
+                                                                "class": "DataType",
                                                                 "args": {
                                                                     "this": {
-                                                                        "class": "Column",
-                                                                        "args": {
-                                                                            "this": {
-                                                                                "class": "Identifier",
-                                                                                "args": {
-                                                                                    "this": "user_type",
-                                                                                    "quoted": false
-                                                                                }
-                                                                            }
-                                                                        }
-                                                                    }
+                                                                        "class": "DataType.Type",
+                                                                        "value": "DATE"
+                                                                    },
+                                                                    "nested": false
                                                                 }
                                                             }
                                                         }
@@ -2234,7 +1342,7 @@
                                     "this": {
                                         "class": "Identifier",
                                         "args": {
-                                            "this": "source_user",
+                                            "this": "EmployeeRanking",
                                             "quoted": false
                                         }
                                     }
@@ -2243,10 +1351,7 @@
                         }
                     }
                 ]
-            },
-            "comments": [
-                "INSERT INTO db1.arget_t (id, name,emp_id)"
-            ]
+            }
         }
     }
 }
