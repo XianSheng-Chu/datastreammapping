@@ -418,7 +418,7 @@ class SqlScriptMapping():
                     tokenGraph.append((self.expressionsName(node), {(temp[0], temp[1]-1): (-1, -7)}))
                     self.nodeDg.add_edge(
                         self.__nodeBfsKey(node.parent.this),
-                        temp, key="logicalMapping", note="subquery逻辑映射")
+                        temp, key="logicalMapping", note="逻辑映射")
                 elif    node.parent.key == 'udtf':
                     pass
 
@@ -438,7 +438,7 @@ class SqlScriptMapping():
                         print(f"{tempNode.key}.{tempvar}->{tablename}")
                         self.nodeDg.add_edge(
                             tempvar,
-                            self.__nodeBfsKey(node), key="logicalMapping", note="逻辑映射")
+                            self.__nodeBfsKey(node), key="logicalMapping", note="cte逻辑映射")
                         break
                     if nodeBfsKey == (0,0):
                         break
