@@ -123,8 +123,9 @@ class SqlScriptMapping():
                 self.logicMap[selectNode]["tableAliasSource"][nodeKey] = self._expressionsMap(nodeKey,self.nodeMap[nodeId])[0][1]
             for (nodeKey, nodeId) in nodeDict["DerivedTable"].items():
                 self._expressionsMap(nodeKey, self.nodeMap[nodeId])
-            for (nodeKey, nodeId) in nodeDict["Window"].items():
-                self._expressionsMap(nodeKey, self.nodeMap[nodeId])
+            for (nodeKey, nodeIds) in nodeDict["Window"].items():
+                for nodeId in nodeIds:
+                    self._expressionsMap(nodeKey, self.nodeMap[nodeId])
             for (nodeKey, nodeId) in nodeDict["Table"].items():
                 self._expressionsMap(nodeKey, self.nodeMap[nodeId])
                 value = None
@@ -187,7 +188,9 @@ class SqlScriptMapping():
         #     self.nodeDg.nodes[bfsKey].update({"visibilityFlag": True,"className":node.key,"isOutput":True})
         #     locigType.add("output")
         if node.key=="window":
-            self.logicMap[self.__parentSelect(node)]["Window"][self.expressionsName(node)] = bfsKey
+            if node.sql() not in self.logicMap[self.__parentSelect(node)]["Window"].keys():
+                self.logicMap[self.__parentSelect(node)]["Window"][self.expressionsName(node)]=[]
+            self.logicMap[self.__parentSelect(node)]["Window"][self.expressionsName(node)].append(bfsKey)
             self.nodeDg.nodes[bfsKey].update({"visibilityFlag": True, "className": node.key,"objName":self.expressionsName(node)})
             locigType.add(node.key)
         if node.key=="alias":
@@ -464,7 +467,8 @@ class SqlScriptMapping():
         if node.key in ("column", "ordered", "order", "tablealias", "star", "literal","null"):
             name = node.sql()
         elif node.key=="window":
-            name = f"window-{self.expressionsName(node.this)}-{self.__nodeBfsKey(node)}"
+            #name = f"window-{self.expressionsName(node.this)}-{self.__nodeBfsKey(node)}"
+            name = self.expressionsName(node.this)
         elif node.key == "anonymous":
             name = node.name
         elif isinstance(node, Func):
