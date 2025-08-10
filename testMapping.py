@@ -20,55 +20,54 @@ def write_string_to_file(file_path, content):
 
 # 解析 INSERT 语句
 sql = """
-WITH DepartmentSummary AS (
-    SELECT 
-        d.department_id AS dep_id,
-        d.department_name AS dep_name,
-        COUNT(e.employee_id) OVER (PARTITION BY d.department_id) AS emp_count,
-        AVG(e.salary) OVER (PARTITION BY d.department_id) AS avg_sal
-    FROM departments d
-    LEFT JOIN employees e ON d.department_id = e.department_id
-),
-EmployeeRanking AS (
-    SELECT 
-        e.employee_id AS emp_id,
-        e.employee_name AS emp_name,
-        e.salary AS emp_salary,
-        RANK() OVER (partition by e.employee_name ORDER BY e.salary DESC) AS sal_rank,
-        e.department_id AS dep_id,
-        'Active' AS status_flag
-    FROM employees e
-    WHERE e.hire_date > DATE '2020-01-01'
-)
-SELECT 
-    er.emp_id AS employee_identifier,
-    er.emp_name AS employee_name,
-    er.emp_salary AS annual_salary,
-    er.sal_rank AS salary_rank,
-    ds.dep_name AS department_name,
-    ds.avg_sal AS department_avg_salary,
-    er.status_flag AS status_indicator,
-    'Direct Report' AS employee_type
-FROM EmployeeRanking er
-JOIN DepartmentSummary ds ON er.dep_id = ds.dep_id
+--INSERT INTO db1.arget_t (id, name,emp_id)
+with source_t as (select * from source_ti a),
+source_user1 as (select * from source_user),
+source_emp_t as (select * from source_emp_ti),
+source_user as (select user_id,user_name from source_t group by user_id,user_name,decode(user_type_code,'admin',1,0) having count(*) > 1 and max(user_type)<>min(user_type))
+SELECT distinct
+    a.user_id AS id,
+    b.user_id,
+    CONCAT(a.first_name, ' ', a.last_name) AS source_names,
+    case when b.emp_id = '01101'
+    then '22331' else a.emp_id end  as user_emp_id,
+    b.emp_id as new_emp_id,
+    b.emp_name,
+    max(b.emp_id)over(partition by a.user_id),
+    row_number()over(partition by dept.dept_id order by user_id desc,a.emp_id ) as rn,
+    1 as bvz_id,
+    '压测区' as bvz_name,
+    'testVale',
+    now() as last_update_date,
+    fun1('a') as user_name, 
+    fun2(b.emp_id) as emp_user_name, 
+    dim.contract_number,
+    dim.*,*,a.status,
+    count(*)over(partition by a.user_id,1),
+    ? as test_value,
+    $P_START_DATE as start_date
+FROM (
+with source_t_cte as (select * from source_t_cte1)
 
-UNION ALL
+select user_id,first_name,status,emp_id from user1.source_t a left join source_t_cte b on a.user_id = b.cust_id) a join source_emp_t b
+on a.emp_id = b.emp_id,
+user1.dim_contract dim,ctr.user2.dept
+ join test3 on a.user_id= test3.test3_id
+left join (select t4.test4_id from test4 t4) on a.user_id= test4_id
 
-SELECT 
-    NULL AS employee_identifier,
-    'TOTAL' AS employee_name,
-    SUM(e.salary) AS annual_salary,
-    NULL AS salary_rank,
-    'ALL DEPARTMENTS' AS department_name,
-    AVG(e.salary)OVER (ORDER BY e.salary DESC) AS department_avg_salary,
-    'System' AS status_indicator,
-    'Aggregate' AS employee_type
-FROM employees e
-WHERE EXISTS (
-    SELECT 1 
-    FROM departments d 
-    WHERE d.department_id = e.department_id
-);
+WHERE a.status = 'active'
+and exists (select 1 from user2.contract_t c where a.contract_id = c.contract_id)
+and (a.user_id = dim.user_id(+)
+and b.dept_id = ctr.user2.dept.dept_id2)
+order by source_names desc,id desc,emp_name,2 desc
+union all
+with table_union_cte as (select *from table_union2)
+select id,user_id,source_names,user_emp_id,new_emp_id,emp_name,rn1,'1','testVale',last_update_date,user_name,table_union.emp1_user_name,contract_number,*
+from table_union_cte t2
+union all
+select id,user_id,source_names,user_emp_id,new_emp_id,emp_name,rn1,'1','testVale',last_update_date,user_name,emp3_user_name,contract_number,*
+from (select *from table_union1) where last_update_date > '2025-04-27'::date
+;
 """
 parsed = sqlglot.parse_one(sql,read="postgres")
 
@@ -217,15 +216,15 @@ for item in tree:
         print(f"{item.alias}:{nodeKey}")
 
 
-for node, attrs in var.nodeDg.nodes(data=True):
+for node, attrs in var.nodeDgs.nodes(data=True):
     if attrs.get("visibilityFlag") :
         attrs["expObject"] = None
         #print(f"{node}: {attrs}")
 
-for u,v,k,d in var.nodeDg.edges(keys=True, data=True):
+for u,v,k,d in var.nodeDgs.edges(keys=True, data=True):
     if k=="logicalMapping" :
         source = lambda u,x:x.get("note") if u[0]+u[1]<0 else x.get("expNode").key
-        print(f"{u}:{source(u,var.nodeDg.nodes[u])}->{v}:{var.nodeDg.nodes[v].get("objName")}:({source(v,var.nodeDg.nodes[v])})[key:{k}]:{d}")
+        print(f"{u}:{source(u, var.nodeDgs.nodes[u])}->{v}:{var.nodeDgs.nodes[v].get("objName")}:({source(v, var.nodeDgs.nodes[v])})[key:{k}]:{d}")
 
 
 print('alias' in ( "tablealias"))
