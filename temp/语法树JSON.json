@@ -1390,16 +1390,28 @@
                                                             "class": "Dot",
                                                             "args": {
                                                                 "this": {
-                                                                    "class": "Identifier",
+                                                                    "class": "Dot",
                                                                     "args": {
-                                                                        "this": "dim",
-                                                                        "quoted": false
+                                                                        "this": {
+                                                                            "class": "Identifier",
+                                                                            "args": {
+                                                                                "this": "user2",
+                                                                                "quoted": false
+                                                                            }
+                                                                        },
+                                                                        "expression": {
+                                                                            "class": "Identifier",
+                                                                            "args": {
+                                                                                "this": "dim",
+                                                                                "quoted": false
+                                                                            }
+                                                                        }
                                                                     }
                                                                 },
                                                                 "expression": {
                                                                     "class": "Anonymous",
                                                                     "args": {
-                                                                        "this": "user_id"
+                                                                        "this": "user_id1"
                                                                     }
                                                                 }
                                                             }

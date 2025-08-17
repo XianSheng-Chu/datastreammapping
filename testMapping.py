@@ -57,7 +57,7 @@ left join (select t4.test4_id from test4 t4) on a.user_id= test4_id
 
 WHERE a.status = 'active'
 and exists (select 1 from user2.contract_t c where a.contract_id = c.contract_id)
-and (a.user_id = dim.user_id(+)
+and (a.user_id = user2.dim.user_id1(+)
 and b.dept_id = ctr.user2.dept.dept_id2)
 order by source_names desc,id desc,emp_name,2 desc
 union all
@@ -218,13 +218,98 @@ for item in tree:
 
 for node, attrs in var.nodeDgs.nodes(data=True):
     if attrs.get("visibilityFlag") :
-        attrs["expObject"] = None
-        #print(f"{node}: {attrs}")
+        #attrs["expObject"] = None
+        print(f"{node}: {attrs}")
 
 for u,v,k,d in var.nodeDgs.edges(keys=True, data=True):
     if k=="logicalMapping" :
-        source = lambda u,x:x.get("note") if u[0]+u[1]<0 else x.get("expNode").key
+        source = lambda u,x:x.get("note") if u[0]+u[1]<0 else var.nodeMap[u].key
         print(f"{u}:{source(u, var.nodeDgs.nodes[u])}->{v}:{var.nodeDgs.nodes[v].get("objName")}:({source(v, var.nodeDgs.nodes[v])})[key:{k}]:{d}")
 
+from pyvis.network import Network
+import networkx as nx
 
-print('alias' in ( "tablealias"))
+# 创建多重有向图
+G = nx.MultiDiGraph()
+edges = [
+    ('A', 'B', {'key': 'edge1', 'weight': 4, 'label': 'Edge 1'}),
+    ('A', 'B', {'key': 'edge2', 'weight': 7, 'label': 'Edge 2'}),
+    ('B', 'C', {'key': 'edge3', 'weight': 5, 'label': 'Edge 3'}),
+    ('C', 'A', {'key': 'edge4', 'weight': 6, 'label': 'Edge 4'})
+]
+G.add_edges_from(edges)
+
+G = var.nodeDgs.copy()
+G = nx.relabel_nodes(G, lambda x: str(x))
+
+# 批量设置所有边的 'weight' 属性为 1
+for u, v, key in G.edges(keys=True):
+    G[u][v][key]['parentNode'] = None
+    G[u][v][key]['locigType'] = str(G[u][v][key].get('locigType'))
+
+
+
+nx.set_node_attributes(G,  None,'expNode')
+nx.set_node_attributes(G,  None,'locigType')
+for node, data in G.nodes(data=True):
+    # 设置 PyVis 将使用的 label 属性
+    if 'objName' in data:
+        data['label'] = data['objName']
+
+# 验证结果
+print(list(G.edges()))
+
+# 转换为 PyVis 网络
+net = Network(notebook=True, directed=True, height="1000px", width="100%")
+net.from_nx(G)
+
+# 配置选项
+net.set_options("""
+{
+  "physics": {
+    "enabled": true,
+    "stabilization": {
+      "iterations": 100
+    }
+  },
+  "edges": {
+    "smooth": {
+      "type": "horizontal",
+      "roundness": 0.2
+    },
+    "arrows": {
+      "to": {
+        "enabled": true,
+        "scaleFactor": 1.5
+      }
+    }
+  },
+  "interaction": {
+    "hover": true,
+    "tooltipDelay": 200
+  }
+}
+""")
+
+# 添加自定义边标签
+for edge in net.edges:
+    # 从原始图获取键和权重
+    original_data = G.get_edge_data(edge['from'], edge['to'], edge['note'])
+    if original_data:
+        edge['title'] = f"Key: {edge['key']}\nWeight: {original_data['weight']}"
+        edge['label'] = f"{edge['key']}:{original_data['weight']}"
+# 保存或显示
+net.show("multi_digraph.html")
+
+import neo4jInstall as ni
+# 执行导入
+# 配置 Neo4j 连接
+uri = "bolt://localhost:7687"
+user = "neo4j"
+password = "19990602"
+importer = ni.Neo4jImporter(uri, user, password)
+importer.import_graph(var.nodeDgs)
+importer.close()
+#MATCH (n) DETACH DELETE n  --删除所有数据
+#match (n) WITH n CALL apoc.create.addLabels(n, [n.lable]) YIELD node AS labeled  RETURN count(labeled) --增加节点标签
+#MATCH (n)-[r]->[m] where m.id = (0,0) return n

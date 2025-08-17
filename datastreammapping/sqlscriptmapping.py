@@ -59,7 +59,7 @@ class SqlScriptMapping():
             nodeKey = (nodeDpath,depthSeq)
             self.nodeMap[nodeKey] = item
             self.nodeMapInverse[id(item)] = nodeKey
-            self.nodeDgs.add_node(nodeKey, expNode=item, visibilityFlag=False)
+            self.nodeDgs.add_node(nodeKey, expNode=None, visibilityFlag=False,lable = item.__class__.__name__)
             if item.parent is not None:
                 self.nodeDgs.add_edge(nodeKey, self.__nodeBfsKey(item.parent), key="parentNode", note="父节点")
             depthSeq+=1
@@ -272,13 +272,13 @@ class SqlScriptMapping():
             self.nodeDgs.nodes[bfsKey].update({"visibilityFlag": True, "className": node.key, "objName":self.expressionsName(node), "isFunc": True, "funcName":self.expressionsName(node), "arg_types":str(node.arg_types)})
 
         if node.key == "order":
-            list=[]
+            orderList=[]
             for ordered in node.expressions:
                 orderedKey = self.__nodeBfsKey(ordered)
-                list.append((orderedKey,ordered.args.get("desc",False)))
+                orderList.append((orderedKey,ordered.args.get("desc",False)))
                 self.nodeDgs.nodes[orderedKey].update({"visibilityFlag": True, "className": ordered.key, "objName": self.expressionsName(ordered)})
             temp = self.logicMap[self.__parentSelect(node)]["Order"].get(self.expressionsName(node),{})
-            temp[bfsKey]=list
+            temp[bfsKey]=orderList
             self.logicMap[self.__parentSelect(node)]["Order"][self.expressionsName(node)] = temp
             self.nodeDgs.nodes[orderedKey].update(
                 {"visibilityFlag": True, "className": node.key, "objName": self.expressionsName(node)})
@@ -304,7 +304,8 @@ class SqlScriptMapping():
             locigType.add("Predicate")
 
         if len(locigType)>0:
-            self.nodeDgs.nodes[bfsKey].update({"locigType":locigType})
+            #locigType = list(locigType)
+            self.nodeDgs.nodes[bfsKey].update({"locigType":list(locigType)})
 
 
     def __nodeBfsKey(self,node:expressions) ->tuple[int]:
@@ -375,10 +376,6 @@ class SqlScriptMapping():
                 tupleTemp = self.logicMap[self.__parentSelect(node.parent_select.parent)]["Table"].get(tableName, tupleTemp)
             temp = {node.table:tupleTemp}
             self.nodeDgs.add_edge(tupleTemp, self.__nodeBfsKey(node), key="logicalMapping", note="逻辑映射")
-            if node.sql()=="test3.test3_id":
-                print(f"---------{tableName}------------")
-                print(tupleTemp)
-                print(self.logicMap[self.__parentSelect(node)]["Table"])
             tokenGraph.append((name,temp))
         elif node.key == "alias":
             self.nodeDgs.add_edge(self.__nodeBfsKey(node.this), self.__nodeBfsKey(node), key="logicalMapping", note="逻辑映射")
@@ -411,7 +408,7 @@ class SqlScriptMapping():
         elif node.key == "join":
             if node.args.get("on") is not None:
                 self.nodeDgs.add_edge(self.__nodeBfsKey(node.args.get("on")), self.__nodeBfsKey(node.this), key="logicalMapping", note="join逻辑映射")
-        elif isinstance(node,Binary) or isinstance(node,Func):
+        elif isinstance(node,Binary) or isinstance(node,Func) or isinstance(node,Unary) or isinstance(node,Predicate):
             self._dgNodeToLogic(node)
 
         elif node.key == "order":
@@ -510,9 +507,10 @@ class SqlScriptMapping():
         elif isinstance(node, Func):
             name = f"{node.sql_name()}"
         elif isinstance(node, Binary) or isinstance(node, Unary):
-            name = f"{node.key}*{node.sql()}"
+            name = f"{node.key}"
         elif isinstance(node,Predicate):
-            name = f"{node.key}*{node.sql()}"
+            name = f"{node.key}"
+
 
         elif node.key =="alias":
             name = str(node.args.get("alias"))
@@ -575,7 +573,7 @@ class SqlScriptMapping():
                     key_val = None
                 # 添加逻辑映射边
                 if u[1]>=0:
-                    self.nodeDgs.add_edge(u, v, key="logicalMapping", note=f"{self.nodeDgs.nodes[u].get("expNode").key}-->{self.nodeDgs.nodes[v].get("expNode").key}")
+                    self.nodeDgs.add_edge(u, v, key="logicalMapping", note=f"{self.nodeMap[u].key}-->{self.nodeMap[v].key}")
 
                 # 如果源节点未标记为可见，则将其加入栈
                 if not self.nodeDgs.nodes[u].get("visibilityFlag", False):
