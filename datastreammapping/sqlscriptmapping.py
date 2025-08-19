@@ -170,13 +170,13 @@ class SqlScriptMapping():
         locigType=set()
         if node.key =="select":
             self.logicMap[bfsKey] = deepcopy(self.logicMapModel)
-            self.nodeDgs.nodes[bfsKey].update({"visibilityFlag":False, "className":node.key, "objName":self.expressionsName(node)})
+            self.nodeDgs.nodes[bfsKey].update({"visibilityFlag":True, "className":node.key, "objName":self.expressionsName(node)})
             locigType.add(node.key)
             for item in node.expressions:
                 name = self.expressionsName(item)
                 self.logicMap[self.__parentSelect(item)]["output"][name] = self.__nodeBfsKey(item)
                 self.logicMap[self.__parentSelect(item)]["outputList"].append((name,self.__nodeBfsKey(item)))
-                self.nodeDgs.nodes[bfsKey].update({"visibilityFlag": True, "className": item.key, "isOutput": True})
+                self.nodeDgs.nodes[self.__nodeBfsKey(item)].update({"visibilityFlag": True, "className": item.key, "isOutput": True})
                 locigType.add("output")
             if node.parent is not None and isinstance(node.parent,SetOperation):
                 self.logicMap[bfsKey]["SetOperation"]["parentOperation"] = self.__nodeBfsKey(node.parent)
@@ -189,6 +189,8 @@ class SqlScriptMapping():
             self.logicMap[bfsKey]["SetOperation"]["thisNode"] = self.__nodeBfsKey(node.this)
             if node.parent is not None:
                 self.logicMap[bfsKey]["SetOperation"]["parentOperation"] = self.__nodeBfsKey(node.parent)
+            else:
+                self.nodeDgs.nodes[bfsKey].update({"visibilityFlag": True, "className": node.key, "objName": self.expressionsName(node)})
             locigType.add(node.key)
         # elif node.key!="union" and  node!=node.root() and node.parent.key == "select" and len(node.output_name)!=0:
         #     name = node.output_name

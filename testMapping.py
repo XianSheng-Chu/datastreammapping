@@ -312,4 +312,4 @@ importer.import_graph(var.nodeDgs)
 importer.close()
 #MATCH (n) DETACH DELETE n  --删除所有数据
 #match (n) WITH n CALL apoc.create.addLabels(n, [n.lable]) YIELD node AS labeled  RETURN count(labeled) --增加节点标签
-#MATCH (n)-[r]->[m] where m.id = (0,0) return n
+#MATCH (n)-[r]->(m) where m.id = [0,0] return n
