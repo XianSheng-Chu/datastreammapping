@@ -257,7 +257,7 @@ for node, data in G.nodes(data=True):
         data['label'] = data['objName']
 
 # 验证结果
-print(list(G.edges()))
+#print(list(G.edges()))
 
 # 转换为 PyVis 网络
 net = Network(notebook=True, directed=True, height="1000px", width="100%")
@@ -307,9 +307,10 @@ import neo4jInstall as ni
 uri = "bolt://localhost:7687"
 user = "neo4j"
 password = "19990602"
-importer = ni.Neo4jImporter(uri, user, password)
-importer.import_graph(var.nodeDgs)
-importer.close()
+if 1==0:
+    importer = ni.Neo4jImporter(uri, user, password)
+    importer.import_graph(var.nodeDgs)
+    importer.close()
 #MATCH (n) DETACH DELETE n  --删除所有数据
 #match (n) WITH n CALL apoc.create.addLabels(n, [n.lable]) YIELD node AS labeled  RETURN count(labeled) --增加节点标签
 #MATCH (n)-[r]->(m) where m.id = [0,0] return n

@@ -5,7 +5,7 @@
 
 """
 import copy
-
+import json
 from openpyxl.styles.builtins import output
 from sqlglot import expressions
 from sqlglot.dialects.dialect import DialectType
@@ -59,7 +59,7 @@ class SqlScriptMapping():
             nodeKey = (nodeDpath,depthSeq)
             self.nodeMap[nodeKey] = item
             self.nodeMapInverse[id(item)] = nodeKey
-            self.nodeDgs.add_node(nodeKey, expNode=None, visibilityFlag=False,lable = item.__class__.__name__)
+            self.nodeDgs.add_node(nodeKey, expNode=None, visibilityFlag=False,objName=self.expressionsName(item),lable = item.__class__.__name__,arg_types=str(item.arg_types),args = json.dumps(item.dump(), sort_keys=False, indent=4),index=item.index)
             if item.parent is not None:
                 self.nodeDgs.add_edge(nodeKey, self.__nodeBfsKey(item.parent), key="parentNode", note="父节点")
             depthSeq+=1
@@ -260,7 +260,7 @@ class SqlScriptMapping():
 
         if isinstance(node,Func):
             funcDict = self.logicMap[self.__parentSelect(node)]["Func"]
-            self.nodeDgs.nodes[bfsKey].update({"visibilityFlag": True, "className": node.key, "objName":self.expressionsName(node), "isFunc": True, "funcName":self.expressionsName(node), "arg_types":str(node.arg_types)})
+            self.nodeDgs.nodes[bfsKey].update({"visibilityFlag": True, "className": node.key, "objName":self.expressionsName(node), "isFunc": True, "funcName":self.expressionsName(node)})
             locigType.add("Func")
             if self.expressionsName(node)  in funcDict.keys():
                 funcDict[self.expressionsName(node)][bfsKey]=node.sql()
@@ -271,7 +271,7 @@ class SqlScriptMapping():
             type = lambda x: "String" if x else "noString"
             self.nodeDgs.nodes[bfsKey].update({"visibilityFlag": True, "className": node.key, "objName":self.expressionsName(node), "literalValue":{"value":node.sql(), "type":type(node.is_string)}})
         if node.key == "null":
-            self.nodeDgs.nodes[bfsKey].update({"visibilityFlag": True, "className": node.key, "objName":self.expressionsName(node), "isFunc": True, "funcName":self.expressionsName(node), "arg_types":str(node.arg_types)})
+            self.nodeDgs.nodes[bfsKey].update({"visibilityFlag": True, "className": node.key, "objName":self.expressionsName(node), "isFunc": True, "funcName":self.expressionsName(node)})
 
         if node.key == "order":
             orderList=[]
@@ -409,7 +409,9 @@ class SqlScriptMapping():
                                       note="逻辑映射-partition_by")
         elif node.key == "join":
             if node.args.get("on") is not None:
+                print("-join-"*10)
                 self.nodeDgs.add_edge(self.__nodeBfsKey(node.args.get("on")), self.__nodeBfsKey(node.this), key="logicalMapping", note="join逻辑映射")
+            self.nodeDgs.add_edge(self.__nodeBfsKey(node.this), self.__nodeBfsKey(node),key="logicalMapping", note="join逻辑映射")
         elif isinstance(node,Binary) or isinstance(node,Func) or isinstance(node,Unary) or isinstance(node,Predicate):
             self._dgNodeToLogic(node)
 
@@ -535,6 +537,10 @@ class SqlScriptMapping():
                     name=node.alias
         elif node.key in ("select","union"):
             name=f"{node.key}-{self.__nodeBfsKey(node)}"
+        elif node.key in ("where","order","with","from"):
+            name = node.key
+        else:
+            name = node.sql()
         return name
 
     def _dgNodeToLogic(self,node:expressions):
