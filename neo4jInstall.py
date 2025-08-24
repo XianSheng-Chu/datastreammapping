@@ -87,6 +87,11 @@ class Neo4jImporter:
     @staticmethod
     def _create_nodes_batch(tx, nodes):
         query = (
+           " MATCH (n) DETACH DELETE n" # 删除库数据
+        )
+        tx.run(query, nodes=nodes)
+
+        query = (
             "UNWIND $nodes AS node "
             "MERGE (n:Expression {id: node.id}) "  # 基础节点类型
             "SET n = node "  # 设置所有属性（覆盖id）
@@ -104,3 +109,7 @@ class Neo4jImporter:
             "r.type = rel.rel_type"  # 单独存储关系类型
         )
         tx.run(query, rels=relationships)
+        query = (
+           "match (n) WITH n CALL apoc.create.addLabels(n, [n.lable]) YIELD node AS labeled  RETURN count(labeled)" #增加节点标签
+        )
+        tx.run(query)

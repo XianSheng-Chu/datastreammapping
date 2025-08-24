@@ -25,7 +25,7 @@ class SqlScriptMapping():
     logicMapInverse: dict[tuple[int]:list[str]]
     logicMapModel={"SetOperation":{"validFlag":False,"distinct":False,"isSetOperation":False,"parentOperation":(),"thisNode":()},#sql的交集并集与差集
                    "Table": {},"Alias":{},"TableAlias":{},"Columns":{},"DerivedTable":{},"output":{},"aliasSource":{},
-                   "columnsSource":{},"tableAliasSource":{},"cteSource":{},"tableSource":{},"Where":{},"Join":{},"Group":{},"outputList":[],
+                   "columnsSource":{},"tableAliasSource":{},"cteSource":{},"tableSource":{},"Where":{},"Join":{},"Group":{},"Having":{},"From":{},"outputList":[],
                    "Order":{},
                    "Func":{},
                    #"Condition":{} #布尔表达式基类，包含所有布尔类型操作，比如Predicate(>,<,=),Connector(and,or)
@@ -86,6 +86,8 @@ class SqlScriptMapping():
             for k,v in value["DerivedTable"].items():
                 ctes[v] = k
         for selectNode,nodeDict in self.logicMap.items():
+
+            self._expressionsMap(selectNode, self.nodeMap[selectNode])
             if self.logicMap[selectNode]["SetOperation"]["isSetOperation"]:
                 outputKey = self.logicMap[selectNode]["SetOperation"]["thisNode"]
                 self.logicMap[selectNode]["output"]=copy.deepcopy( self.logicMap[outputKey]["output"])
@@ -123,20 +125,30 @@ class SqlScriptMapping():
                 self.logicMap[selectNode]["tableAliasSource"][nodeKey] = self._expressionsMap(nodeKey,self.nodeMap[nodeId])[0][1]
             for (nodeKey, nodeId) in nodeDict["DerivedTable"].items():
                 self._expressionsMap(nodeKey, self.nodeMap[nodeId])
-            for (nodeKey, nodeIds) in nodeDict["Binary"].items():
-                for nodeId in nodeIds:
-                    self._expressionsMap(nodeKey, self.nodeMap[nodeId])
-            for (nodeKey, nodeIds) in nodeDict["Func"].items():
-                for nodeId in nodeIds:
-                    self._expressionsMap(nodeKey, self.nodeMap[nodeId])
+            # for (nodeKey, nodeIds) in nodeDict["Binary"].items():
+            #     for nodeId in nodeIds:
+            #         self._expressionsMap(nodeKey, self.nodeMap[nodeId])
+            # for (nodeKey, nodeIds) in nodeDict["Func"].items():
+            #     for nodeId in nodeIds:
+            #         self._expressionsMap(nodeKey, self.nodeMap[nodeId])
             for (nodeKey, nodeId) in nodeDict["Join"].items():
                 self._expressionsMap(nodeKey, self.nodeMap[nodeId])
-            for (nodeKey, nodeIds) in nodeDict["Window"].items():
-                for nodeId in nodeIds:
-                    self._expressionsMap(nodeKey, self.nodeMap[nodeId])
-            for (nodeKey, nodeIds) in nodeDict["Order"].items():
-                for nodeId in nodeIds:
-                    self._expressionsMap(nodeKey, self.nodeMap[nodeId])
+            # for (nodeKey, nodeIds) in nodeDict["Window"].items():
+            #     for nodeId in nodeIds:
+            #         self._expressionsMap(nodeKey, self.nodeMap[nodeId])
+            # for (nodeKey, nodeIds) in nodeDict["Order"].items():
+            #     for nodeId in nodeIds:
+            #         self._expressionsMap(nodeKey, self.nodeMap[nodeId])
+            for nodeKeyName in ("Group","Having","Where","From"):
+                if nodeDict.get(nodeKeyName,{})!={}:
+                    #print("#"*50+nodeDict.get(nodeKeyName,{}))
+                    # print(50*"#"+type(self.nodeMap[nodeDict.get(nodeKeyName)[str.lower(nodeKeyName)]]))
+                    nodeId = nodeDict.get(nodeKeyName)[str.lower(nodeKeyName)]
+                    self._expressionsMap(self.expressionsName(self.nodeMap[nodeId]),self.nodeMap[nodeId])
+            for nodeKeyName in ("Order","Window","Func","Binary"):
+                for (nodeKey, nodeIds) in nodeDict[nodeKeyName].items():
+                    for nodeId in nodeIds:
+                        self._expressionsMap(nodeKey, self.nodeMap[nodeId])
             for (nodeKey, nodeId) in nodeDict["Table"].items():
                 self._expressionsMap(nodeKey, self.nodeMap[nodeId])
                 value = None
@@ -247,16 +259,20 @@ class SqlScriptMapping():
             self.logicMap[self.__parentSelect(node)]["TableAlias"][self.expressionsName(node)] = bfsKey
             self.nodeDgs.nodes[bfsKey].update({"visibilityFlag": True, "className": node.key, "objName":self.expressionsName(node)})
             locigType.add("TableAlias")
-        if  node!=node.root() and node.parent.key == "group":
+        if node.key=="group":
             self.logicMap[self.__parentSelect(node)]["Group"][self.expressionsName(node)] = bfsKey
-            self.nodeDgs.nodes[bfsKey].update({"visibilityFlag": True, "isGroup":True})
-            locigType.add("Group")
-        if  node!=node.root() and node.key == "join":
-            self.logicMap[self.__parentSelect(node)]["Join"][self.expressionsName(node)] = bfsKey
-            locigType.add("join")
-
         if node.key=="where":
             self.logicMap[self.__parentSelect(node)]["Where"][self.expressionsName(node)] = bfsKey
+        if node.key=="having":
+            self.logicMap[self.__parentSelect(node)]["Having"][self.expressionsName(node)] = bfsKey
+        if node.key=="from":
+            self.logicMap[self.__parentSelect(node)]["From"][self.expressionsName(node)] = bfsKey
+        if  node!=node.root() and node.key == "join":
+            self.logicMap[self.__parentSelect(node)]["Join"][self.expressionsName(node)] = bfsKey
+            self.nodeDgs.nodes[bfsKey].update({"visibilityFlag":True, "className":node.key, "objName":self.expressionsName(node)})
+            locigType.add("join")
+
+
 
         if isinstance(node,Func):
             funcDict = self.logicMap[self.__parentSelect(node)]["Func"]
@@ -360,7 +376,23 @@ class SqlScriptMapping():
         (-1,-9):Null值
         """
         tokenGraph = []
-        if node.key == "column":
+        if node.key == "select":
+            tree = node.bfs()
+            nodeDpath = node.depth+1
+            for item in tree:
+                print(f"{item.depth}:{item.key}")
+                if  nodeDpath > item.depth:
+                    continue
+                if nodeDpath < item.depth:
+                    break
+                nodeKey = self.__nodeBfsKey(item)
+                # if self.nodeDgs.nodes[nodeKey].get("visibilityFlag",False):
+                selectkey=self.__nodeBfsKey(node)
+                self.nodeDgs.add_edge(nodeKey, selectkey, key="logicalMapping", note="Select子节点映射")
+                print(f"{nodeKey}->{selectkey}")
+
+
+        elif node.key == "column":
             tupleTemp = (lambda node: self.__nodeBfsKey(node) if node.text("table") != "" else (-1, -2))(node)
             tupleTemp = self.logicMap[self.__parentSelect(node)]["DerivedTable"].get(node.table,(-1, -2))
             tupleTemp = self.logicMap[self.__parentSelect(node)]["TableAlias"].get(node.table,tupleTemp)
@@ -409,12 +441,19 @@ class SqlScriptMapping():
                                       note="逻辑映射-partition_by")
         elif node.key == "join":
             if node.args.get("on") is not None:
-                print("-join-"*10)
-                self.nodeDgs.add_edge(self.__nodeBfsKey(node.args.get("on")), self.__nodeBfsKey(node.this), key="logicalMapping", note="join逻辑映射")
-            self.nodeDgs.add_edge(self.__nodeBfsKey(node.this), self.__nodeBfsKey(node),key="logicalMapping", note="join逻辑映射")
+                self.nodeDgs.add_edge(self.__nodeBfsKey(node.args.get("on")), self.__nodeBfsKey(node), key="logicalMapping", note="join逻辑映射-On形式")
+            else:
+                self.nodeDgs.add_edge(self.__nodeBfsKey(node.this), self.__nodeBfsKey(node),key="logicalMapping", note="join逻辑映射-非On形式")
         elif isinstance(node,Binary) or isinstance(node,Func) or isinstance(node,Unary) or isinstance(node,Predicate):
             self._dgNodeToLogic(node)
-
+        elif node.key in ("having","where","from"):
+            self.nodeDgs.add_edge(self.__nodeBfsKey(node.this), self.__nodeBfsKey(node),
+                                  key="logicalMapping", note="group逻辑映射")
+        elif node.key =="group":
+            for item in node.expressions:
+                itemKey = self.__nodeBfsKey(item)
+                self.nodeDgs.add_edge(itemKey, self.__nodeBfsKey(node),
+                                      key="logicalMapping", note="group逻辑映射")
         elif node.key == "order":
             for ordered in node.expressions:
                 orderedKey = self.__nodeBfsKey(ordered)
@@ -424,7 +463,7 @@ class SqlScriptMapping():
                                       key="logicalMapping", note="order逻辑映射")
 
 
-        elif node.key in ("alias","concat","max","window","order","ordered") or isinstance(node,Func) or isinstance(node,Predicate):
+        elif node.key in ("alias","concat","max","window","ordered") or isinstance(node,Func) or isinstance(node,Predicate):
             temp = {}
             templist = []
             loopDpath=node.depth+1
@@ -537,7 +576,7 @@ class SqlScriptMapping():
                     name=node.alias
         elif node.key in ("select","union"):
             name=f"{node.key}-{self.__nodeBfsKey(node)}"
-        elif node.key in ("where","order","with","from"):
+        elif node.key in ("where","order","with","from","group","having","limit"):
             name = node.key
         else:
             name = node.sql()

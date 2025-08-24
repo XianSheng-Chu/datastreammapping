@@ -307,7 +307,7 @@ import neo4jInstall as ni
 uri = "bolt://localhost:7687"
 user = "neo4j"
 password = "19990602"
-if 1==0:
+if 1==1:
     importer = ni.Neo4jImporter(uri, user, password)
     importer.import_graph(var.nodeDgs)
     importer.close()
