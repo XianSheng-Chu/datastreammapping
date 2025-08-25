@@ -145,7 +145,7 @@ class SqlScriptMapping():
                     # print(50*"#"+type(self.nodeMap[nodeDict.get(nodeKeyName)[str.lower(nodeKeyName)]]))
                     nodeId = nodeDict.get(nodeKeyName)[str.lower(nodeKeyName)]
                     self._expressionsMap(self.expressionsName(self.nodeMap[nodeId]),self.nodeMap[nodeId])
-            for nodeKeyName in ("Order","Window","Func","Binary"):
+            for nodeKeyName in ("Order","Window","Func","Binary","Unary","Predicate"):
                 for (nodeKey, nodeIds) in nodeDict[nodeKeyName].items():
                     for nodeId in nodeIds:
                         self._expressionsMap(nodeKey, self.nodeMap[nodeId])
@@ -188,7 +188,7 @@ class SqlScriptMapping():
                 name = self.expressionsName(item)
                 self.logicMap[self.__parentSelect(item)]["output"][name] = self.__nodeBfsKey(item)
                 self.logicMap[self.__parentSelect(item)]["outputList"].append((name,self.__nodeBfsKey(item)))
-                self.nodeDgs.nodes[self.__nodeBfsKey(item)].update({"visibilityFlag": True, "className": item.key, "isOutput": True})
+                self.nodeDgs.nodes[self.__nodeBfsKey(item)].update({"visibilityFlag": True, "className": item.key, "isOutput": True,"outputName":node.output_name})
                 locigType.add("output")
             if node.parent is not None and isinstance(node.parent,SetOperation):
                 self.logicMap[bfsKey]["SetOperation"]["parentOperation"] = self.__nodeBfsKey(node.parent)
@@ -226,7 +226,7 @@ class SqlScriptMapping():
             if node.sql() not in self.logicMap[self.__parentSelect(node)]["Columns"].keys():
                 self.logicMap[self.__parentSelect(node)]["Columns"][self.expressionsName(node)]=[]
             self.logicMap[self.__parentSelect(node)]["Columns"][self.expressionsName(node)].append(bfsKey)
-            self.nodeDgs.nodes[bfsKey].update({"visibilityFlag": True, "className": node.key, "objName":self.expressionsName(node)})
+            self.nodeDgs.nodes[bfsKey].update({"visibilityFlag": True, "className": node.key, "objName":self.expressionsName(node),"outputName":node.output_name})
             locigType.add("Columns")
         if node.key =="star" and node.parent.key not in ('column','count'):
             if node.sql() not in self.logicMap[self.__parentSelect(node)]["Columns"].keys():
@@ -302,25 +302,26 @@ class SqlScriptMapping():
                 {"visibilityFlag": True, "className": node.key, "objName": self.expressionsName(node)})
             locigType.add("Order")
         if isinstance(node,Binary):
-            if node.sql() not in self.logicMap[self.__parentSelect(node)]["Binary"].keys():
+            if self.expressionsName(node) not in self.logicMap[self.__parentSelect(node)]["Binary"].keys():
                 self.logicMap[self.__parentSelect(node)]["Binary"][self.expressionsName(node)] = []
             self.logicMap[self.__parentSelect(node)]["Binary"][self.expressionsName(node)].append(bfsKey)
             self.nodeDgs.nodes[bfsKey].update({"visibilityFlag": True, "className": node.key, "objName": self.expressionsName(node)})
             locigType.add("Binary")
         if isinstance(node,Unary):
-            if node.sql() not in self.logicMap[self.__parentSelect(node)]["Unary"].keys():
+            if self.expressionsName(node) not in self.logicMap[self.__parentSelect(node)]["Unary"].keys():
                 self.logicMap[self.__parentSelect(node)]["Unary"][self.expressionsName(node)] = []
             self.logicMap[self.__parentSelect(node)]["Unary"][self.expressionsName(node)].append(bfsKey)
             self.nodeDgs.nodes[bfsKey].update({"visibilityFlag": True, "className": node.key, "objName": self.expressionsName(node)})
             locigType.add("Unary")
         if isinstance(node, Predicate):
-            if node.sql() not in self.logicMap[self.__parentSelect(node)]["Predicate"].keys():
+            if self.expressionsName(node) not in self.logicMap[self.__parentSelect(node)]["Predicate"].keys():
                 self.logicMap[self.__parentSelect(node)]["Predicate"][self.expressionsName(node)] = []
             self.logicMap[self.__parentSelect(node)]["Predicate"][self.expressionsName(node)].append(bfsKey)
             self.nodeDgs.nodes[bfsKey].update(
                 {"visibilityFlag": True, "className": node.key, "objName": self.expressionsName(node)})
             locigType.add("Predicate")
-
+            if self.__nodeBfsKey(node)==(3,45):
+                print("*"*50 + node.sql() + str(self.__parentSelect(node)))
         if len(locigType)>0:
             #locigType = list(locigType)
             self.nodeDgs.nodes[bfsKey].update({"locigType":list(locigType)})
@@ -376,11 +377,10 @@ class SqlScriptMapping():
         (-1,-9):Null值
         """
         tokenGraph = []
-        if node.key == "select":
+        if node.key =="select" or isinstance(node,SetOperation):
             tree = node.bfs()
             nodeDpath = node.depth+1
             for item in tree:
-                print(f"{item.depth}:{item.key}")
                 if  nodeDpath > item.depth:
                     continue
                 if nodeDpath < item.depth:
@@ -389,7 +389,6 @@ class SqlScriptMapping():
                 # if self.nodeDgs.nodes[nodeKey].get("visibilityFlag",False):
                 selectkey=self.__nodeBfsKey(node)
                 self.nodeDgs.add_edge(nodeKey, selectkey, key="logicalMapping", note="Select子节点映射")
-                print(f"{nodeKey}->{selectkey}")
 
 
         elif node.key == "column":
@@ -445,6 +444,7 @@ class SqlScriptMapping():
             else:
                 self.nodeDgs.add_edge(self.__nodeBfsKey(node.this), self.__nodeBfsKey(node),key="logicalMapping", note="join逻辑映射-非On形式")
         elif isinstance(node,Binary) or isinstance(node,Func) or isinstance(node,Unary) or isinstance(node,Predicate):
+
             self._dgNodeToLogic(node)
         elif node.key in ("having","where","from"):
             self.nodeDgs.add_edge(self.__nodeBfsKey(node.this), self.__nodeBfsKey(node),
