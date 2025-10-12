@@ -1,5 +1,4 @@
 import networkx as nx
-from sipbuild.generator.outputs import output_pyi
 
 # 创建空有向图
 dg = nx.DiGraph()

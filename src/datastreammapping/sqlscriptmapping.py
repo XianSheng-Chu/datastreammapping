@@ -44,6 +44,10 @@ class SqlScriptMapping():
         self.logicMap = {}
         self.logicMapInverse = {}
         self.nodeDgs = nx.MultiDiGraph()
+        self.__mappingSetup()
+
+    def __mappingSetup(self):
+        self.__noneMapInit()
         self.__logicMapInit()
 
     def __noneMapInit(self):
@@ -70,7 +74,7 @@ class SqlScriptMapping():
 
 
     def __logicMapInit(self):
-        self.__noneMapInit()
+
         self.logicMap.clear()
         for (key,value) in self.nodeMap.items():
             self.__nodeToLogic(key,value)
@@ -141,8 +145,7 @@ class SqlScriptMapping():
             #         self._expressionsMap(nodeKey, self.nodeMap[nodeId])
             for nodeKeyName in ("Group","Having","Where","From"):
                 if nodeDict.get(nodeKeyName,{})!={}:
-                    #print("#"*50+nodeDict.get(nodeKeyName,{}))
-                    # print(50*"#"+type(self.nodeMap[nodeDict.get(nodeKeyName)[str.lower(nodeKeyName)]]))
+
                     nodeId = nodeDict.get(nodeKeyName)[str.lower(nodeKeyName)]
                     self._expressionsMap(self.expressionsName(self.nodeMap[nodeId]),self.nodeMap[nodeId])
             for nodeKeyName in ("Order","Window","Func","Binary","Unary","Predicate"):
@@ -167,6 +170,8 @@ class SqlScriptMapping():
                 if value==None:
                     value = ("Table", (-1, -8))
                 self.logicMap[selectNode]["tableSource"][nodeKey] = value
+    def __fieldMapInit(self,nodeKey:(int,int)):
+        self.nodeDgs.nodes(self.nodeMap[nodeKey])
 
 
     def __nodeToLogic(self,bfsKey:Tuple,node:expressions):
@@ -320,8 +325,7 @@ class SqlScriptMapping():
             self.nodeDgs.nodes[bfsKey].update(
                 {"visibilityFlag": True, "className": node.key, "objName": self.expressionsName(node)})
             locigType.add("Predicate")
-            if self.__nodeBfsKey(node)==(3,45):
-                print("*"*50 + node.sql() + str(self.__parentSelect(node)))
+
         if len(locigType)>0:
             #locigType = list(locigType)
             self.nodeDgs.nodes[bfsKey].update({"locigType":list(locigType)})
@@ -511,7 +515,6 @@ class SqlScriptMapping():
                     if self.logicMap[nodeBfsKey]["DerivedTable"].get(tablename) is not None:
 
                         tempvar = self.logicMap[nodeBfsKey]["DerivedTable"].get(tablename)
-                        print(f"{tempNode.key}.{tempvar}->{tablename}")
                         self.nodeDgs.add_edge(
                             tempvar,
                             self.__nodeBfsKey(node), key="logicalMapping", note="cte逻辑映射")
@@ -627,7 +630,8 @@ class SqlScriptMapping():
                     # 避免重复处理节点
                     if u not in visited:
                         stack.append(u)
-        #print(f"##########{inEdgesList}##############")
+
+
     @property
     def inputTable(self)->list[str]:
         tableList = list()

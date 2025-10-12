@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "datastreammapping"
+version = "0.1.0"
+description = "用于将sql转换分析为图数据的工具，提供了字段映射分析，引用表，字段的查询等功能"
+authors = [
+    {name = "xiansheng-chu", email = "3551143669@qq.com"},
+]
+dependencies = [
+    "sqlglot>=27.26.0",
+    "networkx>=2.7.1",
+]

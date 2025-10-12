@@ -1,7 +1,6 @@
 import json
 
-import sqlglot
-from sqlglot.expressions import Expression, Select
+from sqlglot.expressions import Select
 import sqlglot.dialects
 
 from datastreammapping.sqlscriptmapping import SqlScriptMapping
@@ -203,7 +202,7 @@ print(var.root.sql())
 
 #print(json.dumps(parsed.dump(), sort_keys=False, indent=4))
 
-write_string_to_file("temp/语法树JSON.json",json.dumps(parsed.dump(), sort_keys=False, indent=4))
+write_string_to_file("../temp/语法树JSON.json", json.dumps(parsed.dump(), sort_keys=False, indent=4))
 tree = select_node.bfs()
 nodeDpath = 0
 depthSeq = 0
@@ -213,18 +212,19 @@ for item in tree:
         nodeDpath = item.depth
     if item.key == "cte":
         nodeKey = (nodeDpath, depthSeq)
-        print(f"{item.alias}:{nodeKey}")
+        #print(f"{item.alias}:{nodeKey}")
 
 
 for node, attrs in var.nodeDgs.nodes(data=True):
     if attrs.get("visibilityFlag") :
         #attrs["expObject"] = None
-        print(f"{node}: {attrs}")
+        #print(f"{node}: {attrs}")
+        pass
 
 for u,v,k,d in var.nodeDgs.edges(keys=True, data=True):
     if k=="logicalMapping" :
         source = lambda u,x:x.get("note") if u[0]+u[1]<0 else var.nodeMap[u].key
-        print(f"{u}:{source(u, var.nodeDgs.nodes[u])}->{v}:{var.nodeDgs.nodes[v].get("objName")}:({source(v, var.nodeDgs.nodes[v])})[key:{k}]:{d}")
+        #print(f"{u}:{source(u, var.nodeDgs.nodes[u])}->{v}:{var.nodeDgs.nodes[v].get('objName')}:({source(v, var.nodeDgs.nodes[v])})[key:{k}]:{d}")
 
 from pyvis.network import Network
 import networkx as nx
@@ -299,15 +299,14 @@ for edge in net.edges:
         edge['title'] = f"Key: {edge['key']}\nWeight: {original_data['weight']}"
         edge['label'] = f"{edge['key']}:{original_data['weight']}"
 # 保存或显示
-net.show("multi_digraph.html")
+net.show("fixtures/multi_digraph.html")
 
-import neo4jInstall as ni
 # 执行导入
 # 配置 Neo4j 连接
 uri = "bolt://localhost:7687"
 user = "neo4j"
 password = "19990602"
-if 1==1:
+if 1==0:
     importer = ni.Neo4jImporter(uri, user, password)
     importer.import_graph(var.nodeDgs)
     importer.close()
