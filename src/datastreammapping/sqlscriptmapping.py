@@ -172,7 +172,7 @@ class SqlScriptMapping():
                 self.logicMap[selectNode]["tableSource"][nodeKey] = value
     def __fieldMapInit(self,nodeKey:(int,int)):
         self.nodeDgs.nodes(self.nodeMap[nodeKey])
-
+        pass
 
     def __nodeToLogic(self,bfsKey:Tuple,node:expressions):
         """
