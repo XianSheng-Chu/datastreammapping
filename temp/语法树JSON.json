@@ -1,5 +1,5 @@
 {
-    "class": "Union",
+    "class": "Union1",
     "args": {
         "this": {
             "class": "Select",
