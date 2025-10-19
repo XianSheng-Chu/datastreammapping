@@ -1,11 +1,21 @@
+from sqlglot import Expression
+from sqlglot import Dialect
+import sqlglot
+import typing as t
+
 class ASTAdapter:
     """
     SQL抽象语法树适配器。
 
     负责使用sqlglot解析SQL并转换为统一的内部AST格式。
     """
+    dialect:t.Union[str, Dialect, t.Type[Dialect], None]
+    sql_string:str
+    def __init__(self,sql_string:str,dialect=None):
+        self.dialect = dialect
+        self.sql_string = sql_string
 
-    def parse_sql(self, sql_string):
+    def parse_sql(self, sql_string,read=None) -> Expression:
         """
         解析SQL字符串为抽象语法树(AST)。
 
@@ -18,7 +28,9 @@ class ASTAdapter:
         异常:
             SQLParseError: 当SQL无法解析时抛出
         """
-        pass
+        exp = sqlglot.parse_one(sql_string,reat=read)
+        return exp
+
 
     def traverse_ast(self, ast_node, visitor):
         """

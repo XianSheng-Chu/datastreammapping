@@ -136,7 +136,7 @@ def test_sqlmapping():
     ;
     """
     parsed = sqlglot.parse_one(sql,read="postgres")
-
+    sqlglot.parser.Parser
     # 提取插入的目标表和列
     insert_node = parsed.find(sqlglot.exp.Select)
 
