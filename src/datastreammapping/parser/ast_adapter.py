@@ -1,8 +1,10 @@
+import sqlglot
 from sqlglot import Expression
 from sqlglot import Dialect
 import sqlglot
+import sqlglot.errors as errors
 import typing as t
-
+from ..utils import exceptions as dsmExceptions
 class ASTAdapter:
     """
     SQL抽象语法树适配器。
@@ -14,6 +16,7 @@ class ASTAdapter:
     def __init__(self,sql_string:str,dialect=None):
         self.dialect = dialect
         self.sql_string = sql_string
+
 
     def parse_sql(self, sql_string,read=None) -> Expression:
         """
@@ -28,9 +31,14 @@ class ASTAdapter:
         异常:
             SQLParseError: 当SQL无法解析时抛出
         """
-        exp = sqlglot.parse_one(sql_string,reat=read)
+        try:
+            exp = sqlglot.parse_one(sql_string,reat=read)
+        except errors.ParseError as e:
+            raise dsmExceptions.SQLParseError("sql无法转换为AST,请校验是否是合法语句") from e
         return exp
 
+    def parse_sql(self) -> Expression:
+        return self.parse_sql(self.sql_string, self.dialect)
 
     def traverse_ast(self, ast_node, visitor):
         """

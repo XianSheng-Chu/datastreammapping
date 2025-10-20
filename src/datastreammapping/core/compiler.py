@@ -1,4 +1,5 @@
-
+from ..parser import ASTAdapter
+from ..parser import RuleEngine
 
 
 class SQLToGraphCompiler:
@@ -11,7 +12,7 @@ class SQLToGraphCompiler:
     def __init__(self):
         """初始化编译器实例，设置默认配置和组件。"""
         self.config_loader = None
-        self.rule_engine = None
+        self.rule_engine = RuleEngine()
         self.graph_builder = None
 
     def compile_sql(self, sql_string, dialect="auto"):
@@ -29,7 +30,9 @@ class SQLToGraphCompiler:
             SQLParseError: 当SQL语法错误时抛出
             CompilationError: 当编译过程出现错误时抛出
         """
-        pass
+        ast = ASTAdapter(sql_string,dialect=dialect)
+        exp = ast.parse_sql()
+
 
     def _validate_input(self, sql_string):
         """
