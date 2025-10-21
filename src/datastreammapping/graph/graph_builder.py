@@ -1,3 +1,4 @@
+import data_models as dm
 class GraphBuilder:
     """
     图谱构建器，负责组装完整的图谱数据结构。
@@ -19,6 +20,7 @@ class GraphBuilder:
         异常:
             GraphBuildError: 当图谱构建失败时抛出
         """
+
         pass
 
     def _validate_graph_structure(self, graph_data):

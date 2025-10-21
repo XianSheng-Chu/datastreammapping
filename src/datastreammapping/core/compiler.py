@@ -15,7 +15,7 @@ class SQLToGraphCompiler:
         self.rule_engine = RuleEngine()
         self.graph_builder = None
 
-    def compile_sql(self, sql_string, dialect="auto"):
+    def compile_sql(self, sql_string, dialect=None):
         """
         将SQL语句编译为知识图谱。
 
@@ -32,6 +32,8 @@ class SQLToGraphCompiler:
         """
         ast = ASTAdapter(sql_string,dialect=dialect)
         exp = ast.parse_sql()
+        self.rule_engine.apply_rules(exp)
+
 
 
     def _validate_input(self, sql_string):

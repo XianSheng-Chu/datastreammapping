@@ -1,3 +1,7 @@
+from sqlglot import Expression
+
+
+
 class RuleEngine:
     """
     规则引擎，负责将AST节点转换为图元素。
@@ -11,7 +15,7 @@ class RuleEngine:
         self.column_rules = []
         self.relationship_rules = []
 
-    def apply_rules(self, ast_node):
+    def apply_rules(self, ast_node:Expression):
         """
         对AST节点应用所有匹配的规则。
 
@@ -21,7 +25,13 @@ class RuleEngine:
         返回:
             List[GraphElement]: 生成的图元素列表（节点和边）
         """
-        pass
+        for item in ast_node:
+            if item.key=="table":
+                self._create_table_node(item)
+            elif item.key=="column":
+                self._create_column_node(item)
+
+
 
     def _create_table_node(self, table_ast):
         """

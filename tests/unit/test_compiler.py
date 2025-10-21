@@ -8,6 +8,7 @@ class TestCompiler:
         """测试编译器实例能否正确初始化。"""
         comp = dsmCore.SQLToGraphCompiler()
         assert comp is not None
+        comp.compile_sql("select 1 from dual")
 
     def test_compile_simple_sql(self):
         """测试编译器能够处理简单的SELECT * FROM table语句。"""
