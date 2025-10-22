@@ -1,6 +1,7 @@
 from sqlglot import Expression
+from sqlglot.expressions import Table, Column
 
-
+from ..graph.run_result_dto  import *
 
 class RuleEngine:
     """
@@ -14,6 +15,8 @@ class RuleEngine:
         self.table_rules = []
         self.column_rules = []
         self.relationship_rules = []
+        self.nodeList:list[RunResultDTO] = []
+        self.relationsList:list[RelationshipDTO] = []
 
     def apply_rules(self, ast_node:Expression):
         """
@@ -25,15 +28,16 @@ class RuleEngine:
         返回:
             List[GraphElement]: 生成的图元素列表（节点和边）
         """
+        self._create_nodes(ast_node)
+
+    def _create_nodes(self,ast_node:Expression):
         for item in ast_node:
             if item.key=="table":
                 self._create_table_node(item)
             elif item.key=="column":
                 self._create_column_node(item)
 
-
-
-    def _create_table_node(self, table_ast):
+    def _create_table_node(self, table_ast:Table):
         """
         根据表AST节点创建表图节点。
 
@@ -43,9 +47,11 @@ class RuleEngine:
         返回:
             TableNode: 创建的表节点
         """
-        pass
+        self.nodeList.append(create_table_dto(table_ast.name,alias=table_ast.alias,schema=table_ast.catalog))
 
-    def _create_column_node(self, column_ast):
+
+
+    def _create_column_node(self, column_ast:Column):
         """
         根据列AST节点创建列图节点。
 
@@ -55,7 +61,8 @@ class RuleEngine:
         返回:
             ColumnNode: 创建的列节点
         """
-        pass
+        self.nodeList.append(create_column_dto(column_ast.name,column_ast.table,alias=column_ast.alias))
+
 
     def _create_contains_relationship(self, table_node, column_node):
         """
@@ -68,6 +75,8 @@ class RuleEngine:
         返回:
             GraphEdge: 表包含列的关系边
         """
+
+
         pass
 
     def _find_matching_rules(self, node_type):

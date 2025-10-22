@@ -1,4 +1,4 @@
-import data_models as dm
+
 class GraphBuilder:
     """
     图谱构建器，负责组装完整的图谱数据结构。

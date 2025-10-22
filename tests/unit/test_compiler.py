@@ -4,15 +4,19 @@ import datastreammapping.core as dsmCore
 class TestCompiler:
     """编译器功能的测试用例集合。"""
 
+    def setUp(self):
+        self.compiler = dsmCore.SQLToGraphCompiler()
+
     def test_compiler_initialization(self):
         """测试编译器实例能否正确初始化。"""
-        comp = dsmCore.SQLToGraphCompiler()
-        assert comp is not None
-        comp.compile_sql("select 1 from dual")
+
+        assert self.compiler is not None
+
 
     def test_compile_simple_sql(self):
         """测试编译器能够处理简单的SELECT * FROM table语句。"""
-        pass
+        self.compiler.compile_sql("select a.name,a.id from emp a")
+
 
     def test_compile_with_columns(self):
         """测试编译器能够正确处理包含具体列名的SELECT语句。"""
