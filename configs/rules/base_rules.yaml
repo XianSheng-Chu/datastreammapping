@@ -1,0 +1,35 @@
+# configs/rules/base_rules.yaml
+version: "1.0"
+
+table:
+  basic_table:
+    pattern: "Table"
+    conditions:
+      - "node.get('this') is not None"
+    action:
+      type: "node"
+      label: "table"
+      data:
+        name: "${node.this}"
+        alias: "${node.alias}"
+    priority: 100
+
+column:
+  basic_column:
+    pattern: "Column"
+    action:
+      type: "node"
+      label: "column"
+      data:
+        name: "${node.this}"
+        table: "${node.table}"
+    priority: 100
+
+  star_column:
+    pattern: "Star"
+    action:
+      type: "node"
+      label: "column_wildcard"
+      data:
+        name: "*"
+    priority: 90
