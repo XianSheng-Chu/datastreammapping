@@ -32,3 +32,9 @@ class ConfigurationError(Exception):
     当配置文件格式错误或配置参数无效时抛出。
     """
     pass
+
+class ConfigLoadError(ConfigurationError):
+    """
+        用户提供的配置不存在时抛出错误
+    """
+    pass

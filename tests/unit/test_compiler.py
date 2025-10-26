@@ -9,7 +9,7 @@ class TestCompiler:
 
     def test_compiler_initialization(self):
         """测试编译器实例能否正确初始化。"""
-
+        self.compiler = dsmCore.SQLToGraphCompiler()
         assert self.compiler is not None
 
 

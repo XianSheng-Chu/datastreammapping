@@ -1,0 +1,15 @@
+version: "1.0"
+metadata:
+  schema_version: "1.0"
+  description: "DataStreamMapping默认配置内容"
+
+dialect: "standard"
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+rules:
+  imports:
+    - "rules/base_rules.yaml"
+    - "rules/expression_rules.yaml"

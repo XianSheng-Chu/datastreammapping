@@ -5,4 +5,5 @@ __all__ = [
     "SQLParseError",
     "GraphBuildError",
     "ConfigurationError",
+    "ConfigLoadError",
 ]

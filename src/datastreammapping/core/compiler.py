@@ -1,6 +1,6 @@
 from ..parser import ASTAdapter
 from ..parser import RuleEngine
-
+from ..config import ConfigLoader
 
 class SQLToGraphCompiler:
     """
@@ -11,7 +11,8 @@ class SQLToGraphCompiler:
 
     def __init__(self):
         """初始化编译器实例，设置默认配置和组件。"""
-        self.config_loader = None
+        self.config_loader = ConfigLoader()
+        self.config_loader.load_default_config()
         self.rule_engine = RuleEngine()
         self.graph_builder = None
 
