@@ -40,7 +40,7 @@ class ConfigLoader:
             if user_path.exists() and user_path.is_dir():
                 return user_path.resolve()
             else:
-                raise ConfigLoadError(f"Provided config directory does not exist/配置目录不存在: {config_dir}")
+                raise ConfigLoadError(f"Provided config directory does not exist/配置目录不存在: {user_path.absolute()}")
         current_file_dir = Path(__file__).parent
 
         package_configs_dir = current_file_dir.parent / "configs"
@@ -53,7 +53,7 @@ class ConfigLoader:
 
     def load_default_config(self) -> Dict[str, Any]:
         """加载默认配置文件"""
-        defalultPuth =   self._resolve_config_dir("../configs")
+        defalultPuth = self._resolve_config_dir((Path(__file__).resolve().parent.parent/"configs").__str__())
 
 
 
