@@ -2,7 +2,6 @@ from sqlglot import Expression
 from sqlglot.expressions import Table, Column
 
 from ..graph.run_result_dto  import *
-
 class RuleEngine:
     """
     规则引擎，负责将AST节点转换为图元素。

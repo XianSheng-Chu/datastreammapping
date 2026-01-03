@@ -1,9 +1,43 @@
 # configs/rules/base_rules.yaml
 version: "1.0"
 
+basic_table:
+#规则值,用于自定义匹配规则
+    pattern:
+    #用于匹配相关的节点
+        level:
+          "current"
+        #匹配的节点层级
+        class_name:
+          "table"
+        #匹配的类名
+    conditions:
+    #匹配上的节点继续时所需要满足的条件
+        default_condition:
+          True
+        #缺省值,代表这一条件一直满族
+    action:
+    #满足条件时执行如下动作
+        scopes:
+          current
+        #挂载作用域
+        return:
+        #返回构造值
+            return_type:
+                dict
+            data:
+                key_type:
+                  str
+                key_name:
+                  "table_name"
+                value_type:
+                  str
+                value_name:
+                  "${this.}"
+
 table:
   basic_table:
-    pattern: "Table"
+    pattern: "table"
     conditions:
       - "node.get('this') is not None"
     action:
@@ -16,7 +50,7 @@ table:
 
 column:
   basic_column:
-    pattern: "Column"
+    pattern: "column"
     action:
       type: "node"
       label: "column"
@@ -26,7 +60,7 @@ column:
     priority: 100
 
   star_column:
-    pattern: "Star"
+    pattern: "star"
     action:
       type: "node"
       label: "column_wildcard"

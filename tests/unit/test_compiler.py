@@ -1,10 +1,11 @@
 import pytest
 from unittest.mock import Mock, patch, MagicMock
 import datastreammapping.core as dsmCore
+
 class TestCompiler:
     """编译器功能的测试用例集合。"""
 
-    def setUp(self):
+    def setup_method(self):
         self.compiler = dsmCore.SQLToGraphCompiler()
 
     def test_compiler_initialization(self):
