@@ -1,21 +1,25 @@
 # configs/rules/base_rules.yaml
-version: "1.0"
+# version: "1.0"
 
 basic_table:
 #规则值,用于自定义匹配规则
     pattern:
     #用于匹配相关的节点
-        level:
-          "current"
+        type : "node"
+        level: "current"
         #匹配的节点层级
-        class_name:
-          "table"
+        class_name: "table"
         #匹配的类名
     conditions:
-    #匹配上的节点继续时所需要满足的条件
-        default_condition:
-          True
-        #缺省值,代表这一条件一直满族
+    #匹配上的节点继续时所需要满足的条件,对于两个同级的列表项，默认作为or条件使用，只要有一个条件满足就代表该条件校验通过，权重值会直接取所有被满足的条件的最大值
+        - And :
+            - True:
+                weight : 1
+            - parent_class:
+                # 匹配父类是否为某一个特定的类
+                class_name : "Expression"
+                weight : 7
+
     action:
     #满足条件时执行如下动作
         scopes:

@@ -50,11 +50,15 @@ class ConfigLoader:
 
     def load_rule_file(self, rule_file: str) -> Dict[str, Any]:
         """加载单个规则文件"""
+        yaml = YAML(typ='rt')
+        with open(rule_file, 'r', encoding='utf-8') as file:
+            data = yaml.load(file)
+        return data
 
     def load_default_config(self) -> Dict[str, Any]:
         """加载默认配置文件"""
         defalultPuth = self._resolve_config_dir((Path(__file__).resolve().parent.parent/"configs").__str__())
-
+        return self._load_yaml_file(defalultPuth/"default.yaml")
 
 
     def load_all_rules(self) -> Dict[str, Any]:
@@ -75,24 +79,26 @@ class ConfigLoader:
         #预加载与其他情况
         try:
             yaml = YAML(typ='rt')
-            with open(file_path, 'r') as file:
+            with open(file_path, 'r' ,encoding='utf-8') as file:
                 data = yaml.load(file)
 
 
-            if "imports" in data:
-                imports = data.pop("imports")
+            if "rules" in data:
+                rules = data.pop("rules")
+                imports = rules.pop("imports")
                 base_config = data.copy()
 
                 for import_path in imports:
-                    imported_config = self.load_rule_file(import_path)
-                    base_config = self._merge_configs(base_config, imported_config)
-
+                    rules_path = file_path.parent / import_path
+                    imported_config = self.load_rule_file(file_path.parent/import_path)
+                    #base_config = self._merge_configs(base_config, imported_config)
+                    self._cache[rules_path] = imported_config
+                    self._file_mtimes[rules_path] = current_mtime
                 config = base_config
 
             # 更新缓存
-                self._cache[cache_key] = config
+                self._cache[cache_key] = base_config
                 self._file_mtimes[cache_key] = current_mtime
-
                 return config
         except Exception as e:
             raise ConfigLoadError(f"Provided config directory does not exist/配置目录不存在: {file_path}: {e}")
@@ -105,3 +111,7 @@ class ConfigLoader:
         """清空配置缓存"""
         self._cache.clear()
         self._file_mtimes.clear()
+
+    @property
+    def rule_files(self)->Dict[str, Any]:
+        return self._cache

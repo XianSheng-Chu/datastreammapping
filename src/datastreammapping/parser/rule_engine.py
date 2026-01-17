@@ -1,6 +1,6 @@
 from sqlglot import Expression
 from sqlglot.expressions import Table, Column
-
+from typing import Callable
 from ..graph.run_result_dto  import *
 class RuleEngine:
     """
@@ -9,13 +9,14 @@ class RuleEngine:
     应用预定义的规则来创建表节点、列节点和它们之间的关系。
     """
 
-    def __init__(self):
+    def __init__(self,execute_result:dict[str, list[dict[str,Callable]]]):
         """初始化规则引擎，加载默认规则集。"""
         self.table_rules = []
         self.column_rules = []
         self.relationship_rules = []
         self.nodeList:list[RunResultDTO] = []
         self.relationsList:list[RelationshipDTO] = []
+        self.execute_result = execute_result
 
     def apply_rules(self, ast_node:Expression):
         """
@@ -27,7 +28,15 @@ class RuleEngine:
         返回:
             List[GraphElement]: 生成的图元素列表（节点和边）
         """
-        self._create_nodes(ast_node)
+        tree = ast_node.bfs()
+        for item in tree:
+            for file_name in self.execute_result.keys():
+                rules_list = self.execute_result[file_name]
+                for node_rule in rules_list:
+                    for step_name in node_rule.keys():
+                        rule = node_rule[step_name]
+                        if step_name == "pattern":
+                            rule(item)
 
     def _create_nodes(self,ast_node:Expression):
         for item in ast_node:
