@@ -1,5 +1,5 @@
 from sqlglot import Expression
-from sqlglot.expressions import Table, Column
+from sqlglot.expressions import Table, Column, false
 from typing import Callable
 from ..graph.run_result_dto  import *
 class RuleEngine:
@@ -30,13 +30,18 @@ class RuleEngine:
         """
         tree = ast_node.bfs()
         for item in tree:
+            pattern_flag = False
             for file_name in self.execute_result.keys():
                 rules_list = self.execute_result[file_name]
                 for node_rule in rules_list:
                     for step_name in node_rule.keys():
-                        rule = node_rule[step_name]
                         if step_name == "pattern":
-                            rule(item)
+                            rule = node_rule[step_name]
+                            pattern_flag = rule(item)
+                        if step_name == "conditions" and pattern_flag:
+                            rule = node_rule[step_name]
+                            print(rule(item))
+
 
     def _create_nodes(self,ast_node:Expression):
         for item in ast_node:

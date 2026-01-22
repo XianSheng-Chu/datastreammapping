@@ -13,11 +13,11 @@ basic_table:
     conditions:
     #匹配上的节点继续时所需要满足的条件,对于两个同级的列表项，默认作为or条件使用，只要有一个条件满足就代表该条件校验通过，权重值会直接取所有被满足的条件的最大值
         - And :
-            - True:
+            - condition_true:
                 weight : 1
             - parent_class:
                 # 匹配父类是否为某一个特定的类
-                class_name : "Expression"
+                class_name : "Update"
                 weight : 7
 
     action:

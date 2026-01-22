@@ -39,7 +39,7 @@ class RuleCompiler:
         """编译规则模式匹配函数"""
         if pattern["type"]=="node":
             return PatternNode(pattern["class_name"],pattern["level"]).apply
-    def _compile_rule_conditions(self, conditions: List[Any]) -> Callable:
+    def _compile_rule_conditions(self, conditions: List) -> Callable:
         """编译规则条件检查函数"""
         return Conditions(conditions).apply
     def _compile_rule_action(self, action: Any) -> Callable:
