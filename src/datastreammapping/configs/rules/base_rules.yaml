@@ -19,13 +19,20 @@ basic_table:
                 # 匹配父类是否为某一个特定的类
                 class_name : "Update"
                 weight : 7
+            - or:
+                - condition_false:
+                - sub_class:
+                    - class_name: "Update"
+                    - weight: 8
+
+
+
 
     action:
     #满足条件时执行如下动作
-        scopes:
-          current
+        - scopes: current
         #挂载作用域
-        return:
+        - return:
         #返回构造值
             return_type:
                 dict

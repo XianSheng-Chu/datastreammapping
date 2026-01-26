@@ -70,6 +70,10 @@ class Conditions:
     def apply(self, node: Expression) -> int:
         return self.condition_or(self.conditions,node)
 
+class Action:
+    def __init__(self,conditions:list):
+
+        pass
 
 
 
