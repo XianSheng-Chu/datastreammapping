@@ -24,13 +24,16 @@ class RuleCompiler:
             for rule_name in file.keys():
 
                 rule = file[rule_name]
-                if rule_name == 'basic_table':
+                if rule_name in  ('basic_table',"basic_select"):
                     rule_node = dict()
                     step_name = "pattern"
                     rule_node[step_name] = self._compile_rule_pattern(rule[step_name])
                     rule_callables.append(rule_node)
                     step_name = "conditions"
                     rule_node[step_name] = self._compile_rule_conditions(rule[step_name])
+                    rule_callables.append(rule_node)
+                    step_name = "actions"
+                    rule_node[step_name] = self._compile_rule_action(rule[step_name])
                     rule_callables.append(rule_node)
             result[file_name] = rule_callables
         return  result
@@ -42,8 +45,10 @@ class RuleCompiler:
     def _compile_rule_conditions(self, conditions: List) -> Callable:
         """编译规则条件检查函数"""
         return Conditions(conditions).apply
-    def _compile_rule_action(self, action: Any) -> Callable:
+
+    def _compile_rule_action(self, actions: list) -> Callable:
         """编译规则动作执行函数"""
+        return Action(actions).apply
 
     def _create_rule_function(self, pattern_matcher: Callable,
                               condition_checkers: List[Callable],

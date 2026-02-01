@@ -1,5 +1,5 @@
 {
-    "class": "Union1",
+    "class": "Union",
     "args": {
         "this": {
             "class": "Select",
@@ -557,7 +557,21 @@
                             "table": {
                                 "class": "Identifier",
                                 "args": {
-                                    "this": "dim",
+                                    "this": "dept",
+                                    "quoted": false
+                                }
+                            },
+                            "db": {
+                                "class": "Identifier",
+                                "args": {
+                                    "this": "user2",
+                                    "quoted": false
+                                }
+                            },
+                            "catalog": {
+                                "class": "Identifier",
+                                "args": {
+                                    "this": "ctr",
                                     "quoted": false
                                 }
                             }

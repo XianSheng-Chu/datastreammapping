@@ -2,6 +2,7 @@ from sqlglot import Expression
 from sqlglot.expressions import Table, Column, false
 from typing import Callable
 from ..graph.run_result_dto  import *
+from ..symbol_table import *
 class RuleEngine:
     """
     规则引擎，负责将AST节点转换为图元素。
@@ -11,6 +12,7 @@ class RuleEngine:
 
     def __init__(self,execute_result:dict[str, list[dict[str,Callable]]]):
         """初始化规则引擎，加载默认规则集。"""
+        self.current_scope = None
         self.table_rules = []
         self.column_rules = []
         self.relationship_rules = []
@@ -18,7 +20,7 @@ class RuleEngine:
         self.relationsList:list[RelationshipDTO] = []
         self.execute_result = execute_result
 
-    def apply_rules(self, ast_node:Expression):
+    def apply_rules(self, ast_node:Expression,query_scope):
         """
         对AST节点应用所有匹配的规则。
 
@@ -29,8 +31,11 @@ class RuleEngine:
             List[GraphElement]: 生成的图元素列表（节点和边）
         """
         tree = ast_node.bfs()
+        self.current_scope = query_scope
         for item in tree:
             pattern_flag = False
+            rule_weight = 0
+            actions = None
             for file_name in self.execute_result.keys():
                 rules_list = self.execute_result[file_name]
                 for node_rule in rules_list:
@@ -40,7 +45,15 @@ class RuleEngine:
                             pattern_flag = rule(item)
                         if step_name == "conditions" and pattern_flag:
                             rule = node_rule[step_name]
-                            print(rule(item))
+                            if rule_weight < rule(item):
+                                rule_weight = rule(item)
+                                actions = node_rule["actions"]
+
+            if actions is not None:
+                actions(item,self.current_scope)
+
+
+
 
 
     def _create_nodes(self,ast_node:Expression):

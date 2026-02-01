@@ -2,6 +2,8 @@ from ..parser import ASTAdapter
 from ..parser import RuleEngine
 from ..config import ConfigLoader
 from ..config import RuleCompiler
+from ..symbol_table import CatalogScope, QueryScope, SchemaScope
+
 
 class SQLToGraphCompiler:
     """
@@ -14,12 +16,14 @@ class SQLToGraphCompiler:
         """初始化编译器实例，设置默认配置和组件。"""
         self.config_loader = ConfigLoader()
         self.config_loader.load_default_config()
-        self.rule_compiler= RuleCompiler(self.config_loader.rule_files)
-
+        self.rule_compiler = RuleCompiler(self.config_loader.rule_files)
         self.rule_engine = RuleEngine(self.rule_compiler.execute_result)
         self.graph_builder = None
+        self.catalog_scope = CatalogScope()
+        self.current_schema = self.catalog_scope.spawn_child_scope("master")
+        self.current_query = None
 
-    def compile_sql(self, sql_string, dialect=None):
+    def compile_sql(self, sql_string: str, query_scope: QueryScope = None, dialect=None):
         """
         将SQL语句编译为知识图谱。
 
@@ -34,11 +38,11 @@ class SQLToGraphCompiler:
             SQLParseError: 当SQL语法错误时抛出
             CompilationError: 当编译过程出现错误时抛出
         """
-        ast = ASTAdapter(sql_string,dialect=dialect)
+        if query_scope == None:
+            self.current_query = self.current_schema.spawn_child_scope()
+        ast = ASTAdapter(sql_string, dialect=dialect)
         exp = ast.parse_sql()
-        self.rule_engine.apply_rules(exp)
-
-
+        self.rule_engine.apply_rules(exp, self.current_query)
 
     def _validate_input(self, sql_string):
         """

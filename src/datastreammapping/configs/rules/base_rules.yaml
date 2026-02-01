@@ -17,20 +17,18 @@ basic_table:
                 weight : 1
             - parent_class:
                 # 匹配父类是否为某一个特定的类
-                class_name : "Update"
+                class_name : "Expression"
                 weight : 7
             - or:
-                - condition_false:
+                - condition_true:
+                    weight: 1
                 - sub_class:
                     - class_name: "Update"
                     - weight: 8
 
 
-
-
-    action:
+    actions:
     #满足条件时执行如下动作
-        - scopes: current
         #挂载作用域
         - return:
         #返回构造值
@@ -45,6 +43,19 @@ basic_table:
                   str
                 value_name:
                   "${this.}"
+
+basic_select:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "select"
+    conditions:
+        - condition_true:
+            weight: 1
+    actions:
+      - scopes: select
+        # scopes的create只能限定在如下的节点之内 select,delete,update,merge
+
 
 table:
   basic_table:

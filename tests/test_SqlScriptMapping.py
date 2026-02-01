@@ -108,7 +108,7 @@ def test_sqlmapping():
         fun1('a') as user_name, 
         fun2(b.emp_id) as emp_user_name, 
         dim.contract_number,
-        dim.*,*,a.status,
+        ctr.user2.dept.*,*,a.status,
         count(*)over(partition by a.user_id,1),
         ? as test_value,
         $P_START_DATE as start_date
