@@ -50,7 +50,7 @@ class RuleEngine:
                                 actions = node_rule["actions"]
 
             if actions is not None:
-                actions(item,self.current_scope)
+                self.current_scope = actions(item,self.current_scope)
 
 
 

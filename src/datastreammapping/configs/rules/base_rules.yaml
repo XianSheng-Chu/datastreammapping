@@ -57,35 +57,13 @@ basic_select:
         # scopes的create只能限定在如下的节点之内 select,delete,update,merge
 
 
-table:
-  basic_table:
-    pattern: "table"
+basic_from:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "from"
     conditions:
-      - "node.get('this') is not None"
-    action:
-      type: "node"
-      label: "table"
-      data:
-        name: "${node.this}"
-        alias: "${node.alias}"
-    priority: 100
-
-column:
-  basic_column:
-    pattern: "column"
-    action:
-      type: "node"
-      label: "column"
-      data:
-        name: "${node.this}"
-        table: "${node.table}"
-    priority: 100
-
-  star_column:
-    pattern: "star"
-    action:
-      type: "node"
-      label: "column_wildcard"
-      data:
-        name: "*"
-    priority: 90
+        - condition_true:
+            weight: 1
+    actions:
+      - set_stage : from

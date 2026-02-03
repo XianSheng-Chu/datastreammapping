@@ -24,7 +24,8 @@ class RuleCompiler:
             for rule_name in file.keys():
 
                 rule = file[rule_name]
-                if rule_name in  ('basic_table',"basic_select"):
+                if str(file_name) == 'D:\Software\Domes\datastreammapping\src\datastreammapping\configs\\rules\\base_rules.yaml':
+
                     rule_node = dict()
                     step_name = "pattern"
                     rule_node[step_name] = self._compile_rule_pattern(rule[step_name])
