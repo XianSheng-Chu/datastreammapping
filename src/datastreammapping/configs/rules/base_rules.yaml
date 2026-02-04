@@ -29,20 +29,26 @@ basic_table:
 
     actions:
     #满足条件时执行如下动作
-        #挂载作用域
-        - return:
-        #返回构造值
-            return_type:
-                dict
-            data:
-                key_type:
-                  str
-                key_name:
-                  "table_name"
-                value_type:
-                  str
-                value_name:
-                  "${this.}"
+        - property_values:
+            #获取@property_value的属性
+            - db: schema
+              #方法名：属性和备注
+            - catalog: catalog
+            - alias: table_alias
+            - name : table_name
+
+
+        - values:
+            - text :
+                - table
+                - this
+              #key为需要调用的函数名，value为函数传参
+            - text :
+                - table
+                - db
+            - text :
+                - table
+                - catalog
 
 basic_select:
     pattern:
@@ -67,3 +73,4 @@ basic_from:
             weight: 1
     actions:
       - set_stage : from
+

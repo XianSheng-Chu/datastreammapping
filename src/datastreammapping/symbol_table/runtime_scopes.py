@@ -3,7 +3,7 @@ from .scope_enums import ScopeType
 
 class SelectScope(QueryScope):
     def __init__(self, parent:QueryScope,query_name,ast_node,scope_type=ScopeType.QUERY):
-        super().__init__(parent,query_name)
+        super().__init__(parent,query_name,scope_type)
 
         self.current_stage = "select"
         self.output_columns:list = []
@@ -24,8 +24,12 @@ class SelectScope(QueryScope):
             else:
                 self.columns.append(item[i])
 
-    def add_node(self,ast_node:Expression):
+    def add_node(self,ast_node:Expression,):
         node = ast_node
 
     def set_stage(self,stage_name,ast_node:Expression):
         self.current_stage = stage_name
+
+    def add_property_node(self, node, property_name, info):
+        value = getattr(node, property_name)
+        print(f"{info} : {value}")

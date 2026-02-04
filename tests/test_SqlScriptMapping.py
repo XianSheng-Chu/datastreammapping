@@ -111,9 +111,10 @@ def test_sqlmapping():
         ctr.user2.dept.*,*,a.status,
         count(*)over(partition by a.user_id,1),
         ? as test_value,
-        $P_START_DATE as start_date
+        $P_START_DATE as start_date,
+        a."name" as name
     FROM (
-    with source_t_cte as (select * from source_t_cte1)
+    with source_t_cte as (select * from source_t_cte1(1,b))
     
     select user_id,first_name,status,emp_id from user1.source_t a left join source_t_cte b on a.user_id = b.cust_id) a join source_emp_t b
     on a.emp_id = b.emp_id,
@@ -136,6 +137,7 @@ def test_sqlmapping():
     ;
     """
     parsed = sqlglot.parse_one(sql,read="postgres")
+    write_string_to_file("../temp/语法树JSON.json", repr(parsed))
     sqlglot.parser.Parser
     # 提取插入的目标表和列
     insert_node = parsed.find(sqlglot.exp.Select)
@@ -204,7 +206,6 @@ def test_sqlmapping():
 
     #print(json.dumps(parsed.dump(), sort_keys=False, indent=4))
 
-    write_string_to_file("../temp/语法树JSON.json", json.dumps(parsed.dump(), sort_keys=False, indent=4))
     tree = select_node.bfs()
     nodeDpath = 0
     depthSeq = 0
