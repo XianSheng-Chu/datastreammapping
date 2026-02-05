@@ -1,5 +1,6 @@
 from .query_scope import *
 from .scope_enums import ScopeType
+from networkx import MultiDiGraph
 
 class SelectScope(QueryScope):
     def __init__(self, parent:QueryScope,query_name,ast_node,scope_type=ScopeType.QUERY):
@@ -9,8 +10,9 @@ class SelectScope(QueryScope):
         self.output_columns:list = []
         self.columns: list = []
         parent.add_child_scope(self)
-        self.set_ast_node(ast_node)
+        self.set_ast_root(ast_node)
         self.fetch_columns(ast_node)
+        self.nodeDgs = MultiDiGraph()
 
 
     def fetch_columns(self,ast_node:select):
@@ -24,12 +26,13 @@ class SelectScope(QueryScope):
             else:
                 self.columns.append(item[i])
 
-    def add_node(self,ast_node:Expression,):
-        node = ast_node
+    def dg_add_node(self,node:Expression):
+        node = node
 
     def set_stage(self,stage_name,ast_node:Expression):
         self.current_stage = stage_name
 
-    def add_property_node(self, node, property_name, info):
-        value = getattr(node, property_name)
-        print(f"{info} : {value}")
+
+    def add_node_info(self, node, info:dict):
+        for key,value in info.items():
+            print(f"{key} : {value}")

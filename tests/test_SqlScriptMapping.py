@@ -137,7 +137,7 @@ def test_sqlmapping():
     ;
     """
     parsed = sqlglot.parse_one(sql,read="postgres")
-    write_string_to_file("../temp/语法树JSON.json", repr(parsed))
+    write_string_to_file("../temp/语法树JSON.json", json.dumps(parsed.dump(), sort_keys=False, indent=4))
     sqlglot.parser.Parser
     # 提取插入的目标表和列
     insert_node = parsed.find(sqlglot.exp.Select)

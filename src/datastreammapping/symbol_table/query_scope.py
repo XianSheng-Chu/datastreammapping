@@ -19,14 +19,14 @@ class QueryScope(SymbolTableScope):
     def __init__(self,parent,query_name = None,scope_type=ScopeType.QUERY):
         super().__init__(scope_name=query_name, parent=parent, scope_type=scope_type)
         self.children:list[tuple[ScopeType,QueryScope]] = []
-        self.ast_node:expressions = None
+        self.ast_root:expressions = None
 
     def add_child_scope(self, scope:'QueryScope'):
         self.children.append((scope.scope_type,scope))
 
-    def set_ast_node(self,node):
+    def set_ast_root(self,node):
         if node is None:
             raise ValueError(
                 "Invalid expressions node"
             )
-        self.ast_node = node
+        self.ast_root = node

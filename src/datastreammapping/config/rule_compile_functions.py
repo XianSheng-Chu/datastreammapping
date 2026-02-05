@@ -107,9 +107,11 @@ class Action:
         return self.actions_list(self.actions, node, scope)
 
     def property_values(self, propertys:dict, node, scope:SelectScope):
+        rulest = {}
         for property in propertys:
             for property_name, info in property.items():
-                scope.add_property_node(node,property_name,info)
+                rulest[info] = getattr(node, property_name)
+        scope.add_node_info(node,rulest)
 
 
 

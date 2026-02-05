@@ -24,7 +24,7 @@ class RuleCompiler:
             for rule_name in file.keys():
 
                 rule = file[rule_name]
-                if str(file_name) == 'D:\Software\pythonProject\datastreammapping\src\datastreammapping\configs\\rules\\base_rules.yaml':
+                if str(file_name) == r"D:\Software\Domes\datastreammapping\src\datastreammapping\configs\rules\base_rules.yaml":
 
                     rule_node = dict()
                     step_name = "pattern"
