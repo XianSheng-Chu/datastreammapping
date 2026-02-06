@@ -10,7 +10,7 @@ class SelectScope(QueryScope):
         self.output_columns:list = []
         self.columns: list = []
         parent.add_child_scope(self)
-        self.set_ast_root(ast_node)
+        self.set_scope_root(ast_node)
         self.fetch_columns(ast_node)
         self.nodeDgs = MultiDiGraph()
 
@@ -26,13 +26,16 @@ class SelectScope(QueryScope):
             else:
                 self.columns.append(item[i])
 
-    def dg_add_node(self,node:Expression):
-        node = node
+
+
+
+
 
     def set_stage(self,stage_name,ast_node:Expression):
         self.current_stage = stage_name
 
 
     def add_node_info(self, node, info:dict):
+        self.dg_add_node(node)
         for key,value in info.items():
             print(f"{key} : {value}")
