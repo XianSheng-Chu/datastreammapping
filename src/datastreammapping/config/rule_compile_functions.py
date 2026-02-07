@@ -86,6 +86,8 @@ class Action:
                 print(f"Action:line:86:action_name:{action_name}")
                 if action_name == "actions":
                     self.actions_list(actions[action_name],node,scope)
+                if action_name == "add_node":
+                    self.dg_add_node(node, scope)
                 if action_name == "scopes":
                     self.current_scope = self.create_scopes(actions[action_name],node,scope)
                 if action_name == "set_stage":
@@ -105,6 +107,9 @@ class Action:
     def apply(self, node: Expression,scope:QueryScope):
         self.current_scope = scope
         return self.actions_list(self.actions, node, scope)
+
+    def dg_add_node(self,node, scope:SelectScope):
+        scope.dg_add_node(node)
 
     def property_values(self, propertys:dict, node, scope:SelectScope):
         rulest = {}

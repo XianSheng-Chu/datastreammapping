@@ -16,7 +16,7 @@ class TestCompiler:
 
     def test_compile_simple_sql(self):
         """测试编译器能够处理简单的SELECT * FROM table语句。"""
-        self.compiler.compile_sql("select a.name,a.id from emp a")
+        self.compiler.compile_sql("select a.name,a.id from emp a where a.id=2;")
 
 
     def test_compile_with_columns(self):

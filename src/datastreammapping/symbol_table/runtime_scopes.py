@@ -1,6 +1,5 @@
 from .query_scope import *
 from .scope_enums import ScopeType
-from networkx import MultiDiGraph
 
 class SelectScope(QueryScope):
     def __init__(self, parent:QueryScope,query_name,ast_node,scope_type=ScopeType.QUERY):
@@ -12,7 +11,7 @@ class SelectScope(QueryScope):
         parent.add_child_scope(self)
         self.set_scope_root(ast_node)
         self.fetch_columns(ast_node)
-        self.nodeDgs = MultiDiGraph()
+
 
 
     def fetch_columns(self,ast_node:select):
@@ -36,6 +35,6 @@ class SelectScope(QueryScope):
 
 
     def add_node_info(self, node, info:dict):
-        self.dg_add_node(node)
+
         for key,value in info.items():
-            print(f"{key} : {value}")
+            self.nodeDgs.nodes[self.data_node_active][key] = value

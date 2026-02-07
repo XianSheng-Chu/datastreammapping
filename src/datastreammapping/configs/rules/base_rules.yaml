@@ -29,6 +29,8 @@ basic_table:
 
     actions:
     #满足条件时执行如下动作
+        - add_node:
+            #add_node将该节点添加至图之中
         - property_values:
             #获取@property_value的属性
             - db: schema
@@ -36,6 +38,8 @@ basic_table:
             - catalog: catalog
             - alias: table_alias
             - name : table_name
+
+
 
 
         - values:
@@ -72,5 +76,18 @@ basic_from:
         - condition_true:
             weight: 1
     actions:
-      - set_stage : from
+        - add_node:
+        - set_stage : from
+
+basic_where:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "where"
+    conditions:
+        - condition_true:
+            weight: 1
+    actions:
+        - add_node:
+        - set_stage : where
 

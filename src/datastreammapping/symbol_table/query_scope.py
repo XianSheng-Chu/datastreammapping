@@ -1,3 +1,5 @@
+from networkx import MultiDiGraph
+
 from .base import SymbolTableScope
 from .scope_enums import ScopeType
 from sqlglot import *
@@ -20,6 +22,9 @@ class QueryScope(SymbolTableScope):
         super().__init__(scope_name=query_name, parent=parent, scope_type=scope_type)
         self.children:list[tuple[ScopeType,QueryScope]] = []
         self.scope_root:expressions = None
+        self.nodeDgs = MultiDiGraph()
+        self.data_node_active = None
+        self.current_stage = None
 
     def add_child_scope(self, scope:'QueryScope'):
         self.children.append((scope.scope_type,scope))
@@ -32,7 +37,7 @@ class QueryScope(SymbolTableScope):
         self.scope_root = node
 
     def dg_add_node(self, node: Expression):
-        dg_key = []
+        dg_key = list()
         current_node = node
         if node == self.scope_root:
             pass
@@ -42,15 +47,20 @@ class QueryScope(SymbolTableScope):
                 if current_node.parent is None:
                     break
                 current_node = current_node.parent
+        dg_key.reverse()
         dg_key = tuple(dg_key)
+        if dg_key not in self.nodeDgs:
+            self.nodeDgs.add_node(dg_key,exp_key = node.key,exp_node=node,exp_stage=self.current_stage)
+        self.data_node_active = dg_key
+        # print(dg_key)
 
+        # print(self.nodeDgs.nodes[dg_key])
         # print(repr(node.root()))
         # print(f"{dg_key}:{node.sql()},{node.key}")
 
-    def find_parent_key(self, node: Expression):
+    def find_parent_key(self, node: Expression)-> str | tuple:
         result: str | tuple
         if node.parent:
-
             current_parent = node.parent
             for args_key, value in current_parent.args.items():
                 if isinstance(value, list):
