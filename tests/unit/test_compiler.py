@@ -16,12 +16,13 @@ class TestCompiler:
 
     def test_compile_simple_sql(self):
         """测试编译器能够处理简单的SELECT * FROM table语句。"""
-        self.compiler.compile_sql("select a.name,a.id from emp a where a.id=2;")
+        self.compiler.compile_sql("select * from emp a ;")
 
 
     def test_compile_with_columns(self):
         """测试编译器能够正确处理包含具体列名的SELECT语句。"""
-        pass
+        self.compiler.compile_sql(
+            "select a.name,a.id from emp a  join dept b on a.dept_id =b.dept_id where a.id=2;")
 
     def test_compile_with_table_alias(self):
         """测试编译器能够正确处理使用表别名的SQL语句。"""

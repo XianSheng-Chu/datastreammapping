@@ -8,7 +8,7 @@ class QueryScope(SymbolTableScope):
 
     def spawn_child_scope(self, ast_node: expressions=None, scope_type = ScopeType.QUERY) -> 'QueryScope':
         rulest = None
-        print(f"spawn_child_scope:line 9:scope_type:{scope_type}")
+        # print(f"spawn_child_scope:line 9:scope_type:{scope_type}")
         if scope_type==ScopeType.SELECT:
             from .runtime_scopes import SelectScope
             rulest = SelectScope(self,scope_type.str(),ast_node)
@@ -51,8 +51,9 @@ class QueryScope(SymbolTableScope):
         dg_key = tuple(dg_key)
         if dg_key not in self.nodeDgs:
             self.nodeDgs.add_node(dg_key,exp_key = node.key,exp_node=node,exp_stage=self.current_stage)
+            # print(dg_key)
         self.data_node_active = dg_key
-        # print(dg_key)
+
 
         # print(self.nodeDgs.nodes[dg_key])
         # print(repr(node.root()))
@@ -74,3 +75,6 @@ class QueryScope(SymbolTableScope):
                         return result
         else:
             return "query_root"
+
+    def set_stage(self,stage_name,ast_node:Expression):
+        self.current_stage = stage_name

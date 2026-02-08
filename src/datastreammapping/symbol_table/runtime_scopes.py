@@ -27,14 +27,6 @@ class SelectScope(QueryScope):
 
 
 
-
-
-
-    def set_stage(self,stage_name,ast_node:Expression):
-        self.current_stage = stage_name
-
-
     def add_node_info(self, node, info:dict):
-
         for key,value in info.items():
             self.nodeDgs.nodes[self.data_node_active][key] = value

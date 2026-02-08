@@ -83,7 +83,6 @@ class Action:
 
         for actions in actions_list:
             for action_name in actions.keys():
-                print(f"Action:line:86:action_name:{action_name}")
                 if action_name == "actions":
                     self.actions_list(actions[action_name],node,scope)
                 if action_name == "add_node":
@@ -94,6 +93,8 @@ class Action:
                     self.set_stage(actions[action_name],node,scope)
                 if action_name == "property_values":
                     self.property_values(actions[action_name], node, scope)
+                if action_name == "args_values":
+                    self.args_values(actions[action_name], node, scope)
         return self.current_scope
 
     def create_scopes(self,scopes_name,node: Expression,scope:QueryScope) -> QueryScope:
@@ -117,6 +118,19 @@ class Action:
             for property_name, info in property.items():
                 rulest[info] = getattr(node, property_name)
         scope.add_node_info(node,rulest)
+
+    def args_values(self, args_list:dict, node, scope:SelectScope):
+        rulest = {}
+        for node_args in args_list:
+            for node_arg, info in node_args.items():
+                if info["node_key"] in node.args:
+                    rulest[info["node_key"]] = node.args.get(node_arg)
+                elif info["node_key"] not in node.args and info["keep_missing"]:
+                    rulest[info["node_key"]] = info.get("default_value")
+                    # print(f"Action:line:129:node_arg:{node_arg}:{node.method}")
+                    # print(repr(node))
+        scope.add_node_info(node,rulest)
+
 
 
 

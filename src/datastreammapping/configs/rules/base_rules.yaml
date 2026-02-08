@@ -34,7 +34,7 @@ basic_table:
         - property_values:
             #获取@property_value的属性
             - db: schema
-              #方法名：属性和备注
+              #方法名：属性和备注(该名称作为节点的key存储)
             - catalog: catalog
             - alias: table_alias
             - name : table_name
@@ -63,8 +63,11 @@ basic_select:
         - condition_true:
             weight: 1
     actions:
-      - scopes: select
-        # scopes的create只能限定在如下的节点之内 select,delete,update,merge
+        - scopes: select
+          # scopes的create只能限定在如下的节点之内 select,delete,update,merge
+        - add_node:
+        - set_stage : select
+
 
 
 basic_from:
@@ -91,3 +94,83 @@ basic_where:
         - add_node:
         - set_stage : where
 
+basic_join:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "join"
+    conditions:
+        - condition_true:
+            weight: 1
+    actions:
+        - add_node:
+        - set_stage : joins
+        - args_values:
+              #按照直接获取当前节点的表达式参数值
+              - side:
+                #side参数表示两张表join方式
+                    node_key: join_side
+                    # 参数值在存储时所用的键值
+                    keep_missing : True
+                    # value不存在时是否依旧记录该键值对
+                    default_value: inner
+                    # value不存在时使用的默认值
+
+
+
+
+basic_column:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "column"
+    conditions:
+        - condition_true:
+            weight: 2
+    actions:
+        - add_node:
+        - property_values:
+              #获取@property_value的属性
+              - db: schema
+                  #方法名：属性和备注
+              - catalog: catalog
+              - alias: table_alias
+              - name: table_name
+
+basic_alias:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "alias"
+    conditions:
+        - condition_true:
+            weight: 1
+    actions:
+        - add_node:
+        - property_values:
+              #获取@property_value的属性
+              - output_name: output_name
+
+basic_with:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "alias"
+    conditions:
+        - condition_true:
+            weight: 1
+    actions:
+        - add_node:
+        - set_stage: with
+        - property_values:
+              #获取@property_value的属性
+              - recursive: recursive_flag
+                #recursive用来标志改语句是否是递归的
+        - args_values:
+              #按照直接获取当前节点的表达式参数值
+            - search:
+              #search参数用来标记cte是一个标量cte
+                  node_key: search_flag
+                  # 参数值在存储时所用的键值
+                  keep_missing: True
+                  # value不存在时是否依旧记录该键值对
