@@ -14,14 +14,14 @@ basic_table:
     #匹配上的节点继续时所需要满足的条件,对于两个同级的列表项，默认作为or条件使用，只要有一个条件满足就代表该条件校验通过，权重值会直接取所有被满足的条件的最大值
         - And :
             - condition_true:
-                weight : 1
+                weight : 2
             - parent_class:
                 # 匹配父类是否为某一个特定的类
                 class_name : "Expression"
                 weight : 7
             - or:
                 - condition_true:
-                    weight: 1
+                    weight: 2
                 - sub_class:
                     - class_name: "Update"
                     - weight: 8
@@ -40,20 +40,6 @@ basic_table:
             - name : table_name
 
 
-
-
-        - values:
-            - text :
-                - table
-                - this
-              #key为需要调用的函数名，value为函数传参
-            - text :
-                - table
-                - db
-            - text :
-                - table
-                - catalog
-
 basic_select:
     pattern:
         type: "node"
@@ -61,7 +47,7 @@ basic_select:
         class_name: "select"
     conditions:
         - condition_true:
-            weight: 1
+            weight: 3
     actions:
         - scopes: select
           # scopes的create只能限定在如下的节点之内 select,delete,update,merge
@@ -77,7 +63,7 @@ basic_from:
         class_name: "from"
     conditions:
         - condition_true:
-            weight: 1
+            weight: 2
     actions:
         - add_node:
         - set_stage : from
@@ -89,7 +75,7 @@ basic_where:
         class_name: "where"
     conditions:
         - condition_true:
-            weight: 1
+            weight: 2
     actions:
         - add_node:
         - set_stage : where
@@ -101,7 +87,7 @@ basic_join:
         class_name: "join"
     conditions:
         - condition_true:
-            weight: 1
+            weight: 2
     actions:
         - add_node:
         - set_stage : joins
@@ -126,7 +112,7 @@ basic_column:
         class_name: "column"
     conditions:
         - condition_true:
-            weight: 2
+            weight: 3
     actions:
         - add_node:
         - property_values:
@@ -144,7 +130,7 @@ basic_alias:
         class_name: "alias"
     conditions:
         - condition_true:
-            weight: 1
+            weight: 2
     actions:
         - add_node:
         - property_values:
@@ -158,7 +144,7 @@ basic_with:
         class_name: "alias"
     conditions:
         - condition_true:
-            weight: 1
+            weight: 2
     actions:
         - add_node:
         - set_stage: with
