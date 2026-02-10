@@ -160,3 +160,51 @@ basic_with:
                   # 参数值在存储时所用的键值
                   keep_missing: True
                   # value不存在时是否依旧记录该键值对
+
+
+basic_cte:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "cte"
+    conditions:
+        - condition_true:
+            weight: 3
+    actions:
+        - add_node:
+        - args_values:
+              #按照直接获取当前节点的表达式参数值
+            - alias:
+              #cte表达式的别名
+                  node_key: alias
+                  # 参数值在存储时所用的键值
+                  keep_missing: False
+                  # value不存在时是否依旧记录该键值对
+
+basic_group:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "group"
+    conditions:
+        - condition_true:
+            weight: 2
+    actions:
+        - add_node:
+        - set_stage : group
+
+basic_order:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "order"
+    conditions:
+        - condition_true:
+            weight: 2
+    actions:
+        - add_node:
+        - set_stage : order
+
+
+
+

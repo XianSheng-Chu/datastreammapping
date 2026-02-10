@@ -123,6 +123,8 @@ class Action:
         rulest = {}
         for node_args in args_list:
             for node_arg, info in node_args.items():
+                if node_arg not in set(node.arg_types.keys()):
+                    raise ValueError("Argument '{}' is not a valid {} node arg_types key".format(node_arg,node.__class__))
                 if info["node_key"] in node.args:
                     rulest[info["node_key"]] = node.args.get(node_arg)
                 elif info["node_key"] not in node.args and info["keep_missing"]:
