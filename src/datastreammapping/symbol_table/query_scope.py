@@ -13,6 +13,7 @@ class QueryScope(SymbolTableScope):
             from .runtime_scopes import SelectScope
             rulest = SelectScope(self,scope_type.str(),ast_node)
             self.add_child_scope(rulest)
+            # print(ast_node.sql)
 
         if rulest is not None:
             return rulest
@@ -22,9 +23,14 @@ class QueryScope(SymbolTableScope):
         super().__init__(scope_name=query_name, parent=parent, scope_type=scope_type)
         self.children:list[tuple[ScopeType,QueryScope]] = []
         self.scope_root:expressions = None
-        self.nodeDgs = MultiDiGraph()
+        if self.scope_type==ScopeType.QUERY:
+            self.nodeDgs = MultiDiGraph()
+            self.query_count = 0
+        else:
+            self.parent.nodeDgs = MultiDiGraph()
         self.data_node_active = None
         self.current_stage = None
+
 
     def add_child_scope(self, scope:'QueryScope'):
         self.children.append((scope.scope_type,scope))
@@ -51,7 +57,7 @@ class QueryScope(SymbolTableScope):
         dg_key = tuple(dg_key)
         if dg_key not in self.nodeDgs:
             self.nodeDgs.add_node(dg_key,exp_key = node.key,exp_node=node,exp_stage=self.current_stage)
-            # print(dg_key)
+            print(dg_key)
         self.data_node_active = dg_key
 
 
@@ -74,7 +80,8 @@ class QueryScope(SymbolTableScope):
                         result = args_key
                         return result
         else:
-            return "query_root"
+            self.query_count+=1
+            return (self.scope_name,self.query_count)
 
     def set_stage(self,stage_name,ast_node:Expression):
         self.current_stage = stage_name

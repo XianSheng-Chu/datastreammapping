@@ -12,7 +12,7 @@ class RuleEngine:
 
     def __init__(self,execute_result:dict[str, list[dict[str,Callable]]]):
         """初始化规则引擎，加载默认规则集。"""
-        self.current_scope = None
+        self.current_scope:QueryScope
         self.table_rules = []
         self.column_rules = []
         self.relationship_rules = []
@@ -52,7 +52,9 @@ class RuleEngine:
             if actions is not None:
                 self.current_scope = actions(item,self.current_scope)
 
-
+        for node in self.current_scope.nodeDgs.nodes:
+            print(node)
+            print("\n")
 
 
 

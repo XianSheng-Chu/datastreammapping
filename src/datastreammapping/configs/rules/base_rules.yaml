@@ -206,5 +206,63 @@ basic_order:
         - set_stage : order
 
 
+basic_having:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "having"
+    conditions:
+        - condition_true:
+            weight: 2
+    actions:
+        - add_node:
+        - set_stage : having
+
+
+
+basic_ordered:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "ordered"
+    conditions:
+        - condition_true:
+            weight: 2
+    actions:
+        - add_node:
+        - args_values:
+            - desc :
+                node_key: nulls_first
+                keep_missing: false
+
+
+basic_literal:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "literal"
+    conditions:
+        - condition_true:
+            weight: 3
+    actions:
+        - add_node:
+        - property_values:
+              #获取@property_value的属性
+              - output_name: literal_value
+
+        - args_values:
+            - is_string:
+                node_key: is_string
+                keep_missing: false
+
+
+
+
+
+
+
+
+
+
 
 
