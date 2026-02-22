@@ -255,6 +255,44 @@ basic_literal:
                 node_key: is_string
                 keep_missing: false
 
+basic_func:
+    pattern:
+        type: "node"
+        level: "super"
+#       super代表匹配所有父类为func的节点
+        class_name: "Func"
+#       匹配父类时类名是大小写敏感的
+    conditions:
+        - and :
+            - condition_true:
+                weight: 3
+            - in:
+#                复合列表中的值的数据被视为有效的
+                match_value: class_name
+                weight: 3
+                value_list:
+                    [AggFunc,Abs,Flatten,Transform,Anonymous,Apply,Array,ToArray,List,Pad,ToChar,ToNumber,ToDouble,
+                     Columns,Convert,ConvertTimezone,GenerateSeries,ArrayAll,ArrayAny,ArrayConcat,ArrayConstructCompact,
+                     ArrayFilter,ArrayToString,String,StringToArray,ArraySize,ArraySort,ArraySum,Case,Cast,Try,
+                     CastToStrType,Ceil,Coalesce,Chr,Concat,Contains,ConnectByRoot,Cbrt,CurrentDate,CurrentDatetime,
+                     CurrentTime,CurrentTimestamp,CurrentUser,DateTrunc,Datetime,DayOfWeek,DayOfWeekIso,DayOfMonth,DayOfYear,
+                     ToDays,WeekOfYear,MonthsBetween,MakeInterval,Extract,Timestamp,DateFromParts,TimeFromParts,
+                     DateStrToDate,DateToDateStr,DateToDi,Date,Day,Decode,DiToDate,Encode,Exp,Inline,Floor,FromBase64,
+                     FeaturesAtTime,ToBase64,FromISO8601Timestamp,GapFill,GenerateDateArray,GenerateTimestampArray,Greatest,
+                     Hex,If,Nullif,Initcap,IsAscii,IsNan,Int64,IsInf,JSONObject,JSONArray,JSONArrayAgg,JSONExists,JSONValueArray,
+                     JSONTable,ObjectInsert,OpenJSON,JSONBExists,JSONExtractArray,JSONFormat,ParseJSON,Least,Left,Right,Length,
+                     Levenshtein,Ln,Log,Lower,Map,ToMap,MapFromEntries,StarMap,VarMap,MatchAgainst,MD5,MD5Digest,Month,AddMonths,
+                     Nvl2,Normalize,Overlay,Predict,Quarter,Rand,Randn,RangeN,ReadCSV,Reduce,RegexpExtract,RegexpExtractAll,
+                     RegexpReplace,RegexpSplit,Repeat,Round,RowNumber,SafeDivide,SHA,SHA2,Sign,SortArray,Split,SplitPart,Substring,
+                     StandardHash,StartsWith,StrPosition,StrToDate,StrToTime,StrToUnix,StrToMap,NumberToStr,FromBase,Struct,StructExtract,
+                     Stuff,Sqrt,Time,TimeToStr,TimeToTimeStr,TimeToUnix,TimeStrToDate,TimeStrToTime,TimeStrToUnix,Trim,TsOrDsToDateStr,
+                     TsOrDsToDate,TsOrDsToDatetime,TsOrDsToTime,TsOrDsToTimestamp,TsOrDiToDi,Unhex,Unicode,UnixDate,UnixToStr,
+                     UnixToTime,UnixToTimeStr,UnixSeconds,Uuid,TimestampFromParts,Upper,Week,XMLElement,XMLTable,Year,NextValueFor,]
+    actions:
+        - add_node:
+
+
+
 
 
 

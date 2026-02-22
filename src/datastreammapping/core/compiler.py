@@ -23,7 +23,7 @@ class SQLToGraphCompiler:
         self.current_schema = self.catalog_scope.spawn_child_scope("master")
         self.current_query = None
 
-    def compile_sql(self, sql_string: str, query_scope: QueryScope = None, dialect=None):
+    def compile_sql(self, sql_string: str, dialect=None, query_scope: QueryScope = None):
         """
         将SQL语句编译为知识图谱。
 

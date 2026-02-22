@@ -25,9 +25,13 @@ class QueryScope(SymbolTableScope):
         self.scope_root:expressions = None
         if self.scope_type==ScopeType.QUERY:
             self.nodeDgs = MultiDiGraph()
+            self.nodeDgs.add_node(query_name,database_object_type=scope_type.str(),database_object_name = query_name)
+            self.query_root_name = query_name
             self.query_count = 0
         else:
-            self.parent.nodeDgs = MultiDiGraph()
+            self.nodeDgs = self.parent.nodeDgs
+            self.query_root_name = self.parent.query_root_name
+            self.query_count = self.parent.query_count
         self.data_node_active = None
         self.current_stage = None
 
@@ -45,19 +49,19 @@ class QueryScope(SymbolTableScope):
     def dg_add_node(self, node: Expression):
         dg_key = list()
         current_node = node
-        if node == self.scope_root:
-            pass
-        else:
-            while True:
-                dg_key.append(self.find_parent_key(current_node))
-                if current_node.parent is None:
-                    break
-                current_node = current_node.parent
+        if node == node.root():
+            self.query_count += 1
+        while True:
+            dg_key.append(self.find_parent_key(current_node))
+            if current_node.parent is None:
+                dg_key.append(self.query_root_name)
+                break
+            current_node = current_node.parent
         dg_key.reverse()
         dg_key = tuple(dg_key)
         if dg_key not in self.nodeDgs:
             self.nodeDgs.add_node(dg_key,exp_key = node.key,exp_node=node,exp_stage=self.current_stage)
-            print(dg_key)
+            print(f"{dg_key}:{node.key}")
         self.data_node_active = dg_key
 
 
@@ -67,6 +71,7 @@ class QueryScope(SymbolTableScope):
 
     def find_parent_key(self, node: Expression)-> str | tuple:
         result: str | tuple
+
         if node.parent:
             current_parent = node.parent
             for args_key, value in current_parent.args.items():
@@ -80,8 +85,11 @@ class QueryScope(SymbolTableScope):
                         result = args_key
                         return result
         else:
-            self.query_count+=1
-            return (self.scope_name,self.query_count)
+            return self.scope_name,self.query_count
 
     def set_stage(self,stage_name,ast_node:Expression):
         self.current_stage = stage_name
+
+    def add_node_info(self, node, info:dict):
+        for key,value in info.items():
+            self.nodeDgs.nodes[self.data_node_active][key] = value

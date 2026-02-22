@@ -2,7 +2,7 @@ from .query_scope import *
 from .scope_enums import ScopeType
 
 class SelectScope(QueryScope):
-    def __init__(self, parent:QueryScope,query_name,ast_node,scope_type=ScopeType.QUERY):
+    def __init__(self, parent:QueryScope,query_name,ast_node,scope_type=ScopeType.SELECT):
         super().__init__(parent,query_name,scope_type)
 
         self.current_stage = "select"
@@ -27,6 +27,3 @@ class SelectScope(QueryScope):
 
 
 
-    def add_node_info(self, node, info:dict):
-        for key,value in info.items():
-            self.nodeDgs.nodes[self.data_node_active][key] = value

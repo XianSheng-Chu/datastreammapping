@@ -16,7 +16,7 @@ class TestCompiler:
 
     def test_compile_simple_sql(self):
         """测试编译器能够处理简单的SELECT * FROM table语句。"""
-        self.compiler.compile_sql("select * from emp a ;")
+        self.compiler.compile_sql("""select sysdate as last_update_date,emp_id from emp a""","oracle")
 
 
     def test_compile_with_columns(self):

@@ -1,6 +1,6 @@
 from sqlglot import *
 from ..symbol_table import *
-
+from ..symbol_table import QueryScope
 
 
 class PatternNode:
@@ -10,7 +10,10 @@ class PatternNode:
 
     def apply(self,node:Expression)->bool:
         if self.model=="current":
-            return node.key == self.className
+            return node.key == self.className.lower()
+        if self.model == "super":
+            parent_class = getattr(expressions, self.className)
+            return isinstance(node,  parent_class)
         return False
 
 
@@ -36,6 +39,8 @@ class Conditions:
                 return self.condition_parent_class(condition[condition_name], node)
             if str.lower(condition_name) == "condition_false":
                 return 0
+            if str.lower(condition_name) == "in":
+                return self.condition_in(condition[condition_name], node)
         return 0
 
     def condition_or(self,conditions:list, node: Expression)->int:
@@ -68,6 +73,14 @@ class Conditions:
             return condition["weight"]
         return 0
 
+    def condition_in(self, condition:dict, node: Expression):
+        return_value = 0
+        if condition["match_value"] == "class_name":
+            class_list = [s.lower() for s in condition["value_list"]]
+            if node.key in class_list:
+                return_value = condition["weight"]
+        return return_value
+
     def apply(self, node: Expression) -> int:
         return self.condition_or(self.conditions,node)
 
@@ -75,8 +88,9 @@ class Conditions:
 
 
 class Action:
+    current_scope: QueryScope
     def __init__(self,actions:list):
-        self.current_scope = None
+        self.current_scope:QueryScope = None
         self.actions = actions
 
     def actions_list(self,actions_list:list,node: Expression,scope)->QueryScope:
@@ -84,22 +98,23 @@ class Action:
         for actions in actions_list:
             for action_name in actions.keys():
                 if action_name == "actions":
-                    self.actions_list(actions[action_name],node,scope)
+                    self.actions_list(actions[action_name],node,self.current_scope)
                 if action_name == "add_node":
-                    self.dg_add_node(node, scope)
+                    self.dg_add_node(node, self.current_scope)
                 if action_name == "scopes":
-                    self.current_scope = self.create_scopes(actions[action_name],node,scope)
+                    self.current_scope = self.create_scopes(actions[action_name],node,self.current_scope)
                 if action_name == "set_stage":
-                    self.set_stage(actions[action_name],node,scope)
+                    self.set_stage(actions[action_name],node,self.current_scope)
                 if action_name == "property_values":
-                    self.property_values(actions[action_name], node, scope)
+                    self.property_values(actions[action_name], node, self.current_scope)
                 if action_name == "args_values":
-                    self.args_values(actions[action_name], node, scope)
+                    self.args_values(actions[action_name], node, self.current_scope)
         return self.current_scope
 
     def create_scopes(self,scopes_name,node: Expression,scope:QueryScope) -> QueryScope:
         scopes_type = ScopeType.from_string(scopes_name)
         current_scope = scope.spawn_child_scope(node,scopes_type)
+        self.current_scope = current_scope
         return current_scope
 
     def set_stage(self,stage_name,node: Expression,scope):
@@ -109,17 +124,17 @@ class Action:
         self.current_scope = scope
         return self.actions_list(self.actions, node, scope)
 
-    def dg_add_node(self,node, scope:SelectScope):
+    def dg_add_node(self,node, scope:QueryScope):
         scope.dg_add_node(node)
 
-    def property_values(self, propertys:dict, node, scope:SelectScope):
+    def property_values(self, propertys:dict, node, scope:QueryScope):
         rulest = {}
         for property in propertys:
             for property_name, info in property.items():
                 rulest[info] = getattr(node, property_name)
         scope.add_node_info(node,rulest)
 
-    def args_values(self, args_list:dict, node, scope:SelectScope):
+    def args_values(self, args_list:dict, node, scope:QueryScope):
         rulest = {}
         for node_args in args_list:
             for node_arg, info in node_args.items():

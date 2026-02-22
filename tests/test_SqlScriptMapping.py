@@ -82,7 +82,7 @@ def write_string_to_file(file_path, content):
     """
     with open(file_path, 'w', encoding='utf-8') as file:
         file.write(content)
-
+from sqlglot import generator
 def test_sqlmapping():
     # 解析 INSERT 语句
     sql = """
