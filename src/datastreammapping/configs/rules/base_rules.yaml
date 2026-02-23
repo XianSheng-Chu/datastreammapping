@@ -54,6 +54,26 @@ basic_select:
         - add_node:
         - set_stage : select
 
+basic_subquery:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "subquery"
+    conditions:
+        - condition_true:
+            weight: 6
+    actions:
+        - add_node:
+        - args_values:
+              #按照直接获取当前节点的表达式参数值
+              - alias:
+                    #cte表达式的别名
+                    node_key: alias
+                    # 参数值在存储时所用的键值
+                    keep_missing: False
+                    # value不存在时是否依旧记录该键值对
+
+
 
 
 basic_from:
@@ -193,6 +213,7 @@ basic_group:
         - add_node:
         - set_stage : group
 
+
 basic_order:
     pattern:
         type: "node"
@@ -255,13 +276,35 @@ basic_literal:
                 node_key: is_string
                 keep_missing: false
 
+basic_Anonymous:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "anonymous"
+#        Anonymous类通常代表解析器无法识别具体类型的函数调用（即未注册的函数），一般是用户自定义的函数
+    conditions:
+        - condition_true:
+            weight: 4
+    actions:
+        - add_node:
+        - property_values:
+              #获取@property_value的属性
+              - name: func_name
+
+        - add_custom_values:
+              #            为图节点添加自定义信息
+              key_name: func_type
+              #                描述函数的类型信息，主要分为以下三类：Scalar_Functions，Aggregate_Functions,Anonymous_Functions
+              value: Anonymous_Functions
+
 basic_func:
     pattern:
         type: "node"
         level: "super"
 #       super代表匹配所有父类为func的节点
-        class_name: "Func"
-#       匹配父类时类名是大小写敏感的
+        class_name: 
+            - "Func"
+#       匹配父类时类名是大小写敏感的,由于多继承的存在，匹配的父类可以是一个列表,由于多继承的存在，匹配的父类可以是一个列表
     conditions:
         - and :
             - condition_true:
@@ -290,17 +333,266 @@ basic_func:
                      UnixToTime,UnixToTimeStr,UnixSeconds,Uuid,TimestampFromParts,Upper,Week,XMLElement,XMLTable,Year,NextValueFor,]
     actions:
         - add_node:
+        - add_custom_values:
+#            为图节点添加自定义信息
+                key_name: func_type
+#                描述函数的类型信息，主要分为以下三类：Scalar_Functions，Aggregate_Functions,Anonymous_Functions
+                value: Scalar_Functions
 
 
+basic_aggFunc:
+    pattern:
+        type: "node"
+        level: "super"
+        #       super代表匹配所有父类为func的节点
+        class_name: 
+            - "AggFunc"
+    #       匹配父类时类名是大小写敏感的,由于多继承的存在，匹配的父类可以是一个列表
+    conditions:
+        - in:
+              #  复合列表中的值的数据被视为有效的
+              match_value: class_name
+              weight: 4
+              value_list:
+                [ParameterizedAgg,ArgMax,ArgMin,ApproxTopK,AnonymousAggFunc,Hll,ApproxDistinct,ArrayAgg,ArrayUniqueAgg,ArrayUnionAgg,
+                 Avg,AnyValue,Lag,Lead,First,Last,FirstValue,LastValue,NthValue,Count,CountIf,GroupConcat,JSONObjectAgg,LogicalOr,
+                 LogicalAnd,Max,Median,Min,PercentileCont,PercentileDisc,Quantile,Sum,Stddev,StddevPop,StddevSamp,Variance,VariancePop,]
+    actions:
+        - add_node:
+        - add_custom_values:
+              #            为图节点添加自定义信息
+              key_name: func_type
+              #                描述函数的类型信息，主要分为以下三类：Scalar_Functions，Aggregate_Functions,Anonymous_Functions
+              value: Aggregate_Functions
+
+basic_SubqueryPredicate_super:
+    pattern:
+        type: "node"
+        level: "super"
+        #       super代表匹配所有父类为func的节点
+        class_name:
+            - "SubqueryPredicate"
+    #       匹配父类时类名是大小写敏感的,由于多继承的存在，匹配的父类可以是一个列表
+    conditions:
+        - in:
+              #  复合列表中的值的数据被视为有效的
+              match_value: class_name
+              weight: 4
+              value_list:
+                [All,Any,Exists,]
+    actions:
+        - add_node:
+
+basic_Unary_super:
+    pattern:
+        type: "node"
+        level: "super"
+        #       super代表匹配所有父类为func的节点
+        class_name:
+            - "Unary"
+    #       Unary类表示所有的一元操作符
+    conditions:
+        - in:
+              #  复合列表中的值的数据被视为有效的
+              match_value: class_name
+              weight: 3
+              value_list:
+                [BitwiseNot,Not,Paren,Neg,]
+    actions:
+        - add_node:
+
+basic_Predicate_super:
+    pattern:
+        type: "node"
+        level: "super"
+        #       super代表匹配所有父类为func的节点
+        class_name:
+            - "Predicate"
+    #       Predicate类表示所有的谓词类
+    conditions:
+        - in:
+              #  复合列表中的值的数据被视为有效的
+              match_value: class_name
+              weight: 3
+              value_list:
+                [Between,In,]
+    actions:
+        - add_node:
+
+basic_Binary_super:
+    pattern:
+        type: "node"
+        level: "super"
+        #       super代表匹配所有父类为func的节点
+        class_name:
+            - "Binary"
+    #       Binary类表示所有的二元操作符类
+    conditions:
+        - in:
+              #  复合列表中的值的数据被视为有效的
+              match_value: class_name
+              weight: 3
+              value_list:
+                [Add,Connector,BitwiseAnd,BitwiseLeftShift,BitwiseOr,BitwiseRightShift,BitwiseXor,Div,Overlaps,Dot,DPipe,
+                 PropertyEQ,Distance,Escape,IntDiv,Kwarg,Mod,Mul,Operator,Slice,Sub,]
+    actions:
+        - add_node:
+
+basic_Binary_Predicate_super:
+    pattern:
+        type: "node"
+        level: "super"
+        #       super代表匹配所有父类为func的节点
+        class_name:
+            - "Binary"
+            - "Predicate"
+    #       Binary类表示所有的二元操作符类
+    conditions:
+        - in:
+              #  复合列表中的值的数据被视为有效的
+              match_value: class_name
+              weight: 6
+              value_list:
+                [EQ,NullSafeEQ,NullSafeNEQ,Glob,GT,GTE,ILike,ILikeAny,Is,Like,LikeAny,LT,LTE,NEQ,SimilarTo,]
+    actions:
+        - add_node:
+
+basic_Binary_Func_super:
+    pattern:
+        type: "node"
+        level: "super"
+        #       super代表匹配所有父类为func的节点
+        class_name:
+            - "Binary"
+            - "Func"
+    #       Binary类表示所有的二元操作符类
+    conditions:
+        - in:
+              #  复合列表中的值的数据被视为有效的
+              match_value: class_name
+              weight: 6
+              value_list:
+                [ArrayContains,ArrayContainsAll,ArrayOverlaps,Collate,JSONBContains,JSONExtract,JSONExtractScalar,JSONBExtract,
+                 JSONBExtractScalar,JSONArrayContains,Pow,RegexpLike,RegexpILike,]
+    actions:
+        - add_node:
+
+basic_Binary_AggFunc_super:
+    pattern:
+        type: "node"
+        level: "super"
+        class_name:
+            - "Binary"
+            - "AggFunc"
+    #       Binary类表示所有的二元操作符类
+    conditions:
+        - in:
+              #  复合列表中的值的数据被视为有效的
+              match_value: class_name
+              weight: 7
+              value_list:
+                [Corr,CovarSamp,CovarPop,]
+    actions:
+        - add_node:
+
+basic_Func_TimeUnit_super:
+    pattern:
+        type: "node"
+        level: "super"
+        #       super代表匹配所有父类为func的节点
+        class_name:
+            - "Func"
+            - "TimeUnit"
+    #       Binary类表示所有的二元操作符类
+    conditions:
+        - in:
+              #  复合列表中的值的数据被视为有效的
+              match_value: class_name
+              weight: 5
+              value_list:
+                [DateDiff,DatetimeDiff,DatetimeTrunc,LastDay,TimestampAdd,TimestampSub,TimestampDiff,TimestampTrunc,
+                 TimeAdd,TimeSub,TimeDiff,TimeTrunc,TsOrDsAdd,TsOrDsDiff,]
+    actions:
+        - add_node:
+
+basic_Func_IntervalOp_super:
+    pattern:
+        type: "node"
+        level: "super"
+        #       super代表匹配所有父类为func的节点
+        class_name:
+            - "Func"
+            - "IntervalOp"
+    conditions:
+
+        - in:
+              #  复合列表中的值的数据被视为有效的
+              match_value: class_name
+              weight: 6
+              value_list:
+                [DateAdd,DateSub,DatetimeAdd,DatetimeSub,]
+    actions:
+        - add_node:
+
+basic_window:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "Window"
+    conditions:
+        - condition_true:
+            weight: 3
+    actions:
+        - add_node:
+
+basic_Null:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "Null"
+    conditions:
+        - condition_true:
+            weight: 3
+    actions:
+        - add_node:
+
+basic_Boolean:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "Boolean"
+    conditions:
+        - condition_true:
+            weight: 3
+    actions:
+        - add_node:
 
 
+basic_Connector_super:
+    pattern:
+        type: "node"
+        level: "super"
+        #       super代表匹配所有父类为func的节点
+        class_name:
+            - "Connector"
+    conditions:
 
-
-
-
-
-
-
-
-
-
+        - in:
+              #  复合列表中的值的数据被视为有效的
+              match_value: class_name
+              weight: 6
+              value_list:
+                [And,Or,]
+        - and:
+              - parent_class:
+                      # 匹配父类是否为某一个特定的类
+                      class_name: "Func"
+                      weight: 3
+              - in:
+                    #  复合列表中的值的数据被视为有效的
+                    match_value: class_name
+                    weight: 7
+                    value_list:
+                      [ Xor,]
+    actions:
+        - add_node:

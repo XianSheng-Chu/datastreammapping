@@ -35,7 +35,7 @@ class ASTAdapter:
         if read is None:
             read = self.dialect
         try:
-            exp = sqlglot.parse_one(sql_string,read=read)
+            exp = sqlglot.parse_one(sql_string,read=read,dialect=read)
         except errors.ParseError as e:
             raise dsmExceptions.SQLParseError("sql无法转换为AST,请校验是否是合法语句") from e
         return exp

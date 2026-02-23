@@ -32,8 +32,8 @@ class RuleEngine:
         """
         tree = ast_node.bfs()
         self.current_scope = query_scope
-        import json
-        print(json.dumps(ast_node.dump(), sort_keys=False, indent=4))
+        # import json
+        # print(json.dumps(ast_node.dump(), sort_keys=False, indent=4))
         for item in tree:
             pattern_flag = False
             rule_weight = 0
@@ -54,10 +54,10 @@ class RuleEngine:
             if actions is not None:
                 self.current_scope = actions(item,self.current_scope)
 
-
         for node in self.current_scope.nodeDgs.nodes:
-            print(node)
-            print("\n")
+            if self.current_scope.nodeDgs.nodes[node].get("exp_node") is not None:
+                # print(f"{node}:{self.current_scope.nodeDgs.nodes[node]["exp_node"].sql("oracle")}")
+                print(f"{node}:{self.current_scope.nodeDgs.nodes[node]["exp_node"].key}")
 
 
 

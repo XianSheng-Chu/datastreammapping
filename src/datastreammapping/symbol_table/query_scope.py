@@ -61,7 +61,7 @@ class QueryScope(SymbolTableScope):
         dg_key = tuple(dg_key)
         if dg_key not in self.nodeDgs:
             self.nodeDgs.add_node(dg_key,exp_key = node.key,exp_node=node,exp_stage=self.current_stage)
-            print(f"{dg_key}:{node.key}")
+            # print(f"{dg_key}:{self.nodeDgs.nodes[dg_key]["exp_node"]}")
         self.data_node_active = dg_key
 
 

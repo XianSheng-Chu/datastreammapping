@@ -16,8 +16,32 @@ class TestCompiler:
 
     def test_compile_simple_sql(self):
         """测试编译器能够处理简单的SELECT * FROM table语句。"""
-        self.compiler.compile_sql("""select sysdate as last_update_date,emp_id from emp a""","oracle")
+        self.compiler.compile_sql("""
+        
+        select sysdate as last_update_date,emp_id,nvl2(a.emp_name,'default',a.emp_name),user1.func1(a.emp_id,a.emp_name) as user_id from emp a
+        
+        ""","oracle")
 
+    def test_compile_simple_subquery(self):
+        """测试编译器能够处理简单的SELECT * FROM table语句。"""
+        self.compiler.compile_sql("""
+
+        select false,Last_Day(now()),a.* from (select user_id,user_name from  emp ) a
+
+        """)
+
+    def test_compile_simple_case(self):
+        """测试编译器能够处理简单的SELECT * FROM table语句。"""
+        self.compiler.compile_sql("""
+
+        select (case when a.emp_name is null 
+                    then 'isnull'
+                    when a.emp_name != (1,2,5,6) and 1=1 or 1=0
+                    then a.emp_name
+                else 'user_name' end) as emp_name
+          from  emp a
+
+        """)
 
     def test_compile_with_columns(self):
         """测试编译器能够正确处理包含具体列名的SELECT语句。"""

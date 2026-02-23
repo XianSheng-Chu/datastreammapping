@@ -4,7 +4,7 @@ from ..symbol_table import QueryScope
 
 
 class PatternNode:
-    def __init__(self,className:str,model:str="current"):
+    def __init__(self,className:str|list[str],model:str="current"):
         self.className = className
         self.model=model
 
@@ -12,8 +12,11 @@ class PatternNode:
         if self.model=="current":
             return node.key == self.className.lower()
         if self.model == "super":
-            parent_class = getattr(expressions, self.className)
-            return isinstance(node,  parent_class)
+            result = True
+            for super_class_name in self.className:
+                parent_class = getattr(expressions, super_class_name)
+                result = result and isinstance(node, parent_class)
+            return result
         return False
 
 
@@ -109,6 +112,8 @@ class Action:
                     self.property_values(actions[action_name], node, self.current_scope)
                 if action_name == "args_values":
                     self.args_values(actions[action_name], node, self.current_scope)
+                if action_name == "add_custom_values":
+                    self.add_custom_values(actions[action_name], node, self.current_scope)
         return self.current_scope
 
     def create_scopes(self,scopes_name,node: Expression,scope:QueryScope) -> QueryScope:
@@ -147,6 +152,10 @@ class Action:
                     # print(f"Action:line:129:node_arg:{node_arg}:{node.method}")
                     # print(repr(node))
         scope.add_node_info(node,rulest)
+
+    def add_custom_values(self, param, node, scope):
+        rulest = {param["key_name"]:param["value"]}
+        scope.add_node_info(node, rulest)
 
 
 
