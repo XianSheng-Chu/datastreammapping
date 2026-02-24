@@ -30,7 +30,7 @@ class RuleEngine:
         返回:
             List[GraphElement]: 生成的图元素列表（节点和边）
         """
-        tree = ast_node.bfs()
+        tree = ast_node.dfs()
         self.current_scope = query_scope
         # import json
         # print(json.dumps(ast_node.dump(), sort_keys=False, indent=4))

@@ -23,9 +23,10 @@ class QueryScope(SymbolTableScope):
         super().__init__(scope_name=query_name, parent=parent, scope_type=scope_type)
         self.children:list[tuple[ScopeType,QueryScope]] = []
         self.scope_root:expressions = None
+        self.scope_key = None
         if self.scope_type==ScopeType.QUERY:
             self.nodeDgs = MultiDiGraph()
-            self.nodeDgs.add_node(query_name,database_object_type=scope_type.str(),database_object_name = query_name)
+            self.scope_key=self.nodeDgs.add_node(query_name,database_object_type=scope_type.str(),database_object_name = query_name)
             self.query_root_name = query_name
             self.query_count = 0
         else:
@@ -59,11 +60,13 @@ class QueryScope(SymbolTableScope):
             current_node = current_node.parent
         dg_key.reverse()
         dg_key = tuple(dg_key)
-        if dg_key not in self.nodeDgs:
+        if dg_key not in self.nodeDgs.nodes:
+            if self.scope_root == node:
+                self.scope_key=dg_key
             self.nodeDgs.add_node(dg_key,exp_key = node.key,exp_node=node,exp_stage=self.current_stage)
             # print(f"{dg_key}:{self.nodeDgs.nodes[dg_key]["exp_node"]}")
         self.data_node_active = dg_key
-
+        return dg_key
 
         # print(self.nodeDgs.nodes[dg_key])
         # print(repr(node.root()))

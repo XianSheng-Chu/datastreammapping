@@ -48,7 +48,7 @@ class TestCompiler:
         self.compiler.compile_sql(
             """
             with a as (select * from user) select a.name,a.id from emp a  join dept b on a.dept_id =b.dept_id where a.id=2
-            group by a.name order by b.dept_id
+            group by a.name order by b.dept_id;
             """)
 
     def test_compile_with_table_alias(self):

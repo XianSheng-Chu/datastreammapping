@@ -157,11 +157,25 @@ basic_alias:
               #获取@property_value的属性
               - output_name: output_name
 
+basic_TableAlias:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "TableAlias"
+    conditions:
+        - condition_true:
+            weight: 2
+    actions:
+        - add_node:
+        - property_values:
+              #获取@property_value的属性
+              - output_name: output_name
+
 basic_with:
     pattern:
         type: "node"
         level: "current"
-        class_name: "alias"
+        class_name: "with"
     conditions:
         - condition_true:
             weight: 2
@@ -172,14 +186,7 @@ basic_with:
               #获取@property_value的属性
               - recursive: recursive_flag
                 #recursive用来标志改语句是否是递归的
-        - args_values:
-              #按照直接获取当前节点的表达式参数值
-            - search:
-              #search参数用来标记cte是一个标量cte
-                  node_key: search_flag
-                  # 参数值在存储时所用的键值
-                  keep_missing: True
-                  # value不存在时是否依旧记录该键值对
+
 
 
 basic_cte:
@@ -200,6 +207,12 @@ basic_cte:
                   # 参数值在存储时所用的键值
                   keep_missing: False
                   # value不存在时是否依旧记录该键值对
+            - scalar:
+                #search参数用来标记cte是一个标量cte
+                node_key: scalar_flag
+                # 参数值在存储时所用的键值
+                keep_missing: True
+                # value不存在时是否依旧记录该键值对
 
 basic_group:
     pattern:
@@ -256,6 +269,16 @@ basic_ordered:
                 node_key: nulls_first
                 keep_missing: false
 
+basic_star:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "star"
+    conditions:
+        - condition_true:
+            weight: 2
+    actions:
+        - add_node:
 
 basic_literal:
     pattern:
