@@ -1,6 +1,6 @@
 from networkx import MultiDiGraph
 
-from .base import SymbolTableScope
+from .base import *
 from .scope_enums import ScopeType
 from sqlglot import *
 
@@ -61,9 +61,23 @@ class QueryScope(SymbolTableScope):
         dg_key.reverse()
         dg_key = tuple(dg_key)
         if dg_key not in self.nodeDgs.nodes:
+            stage_name = None
             if self.scope_root == node:
                 self.scope_key=dg_key
-            self.nodeDgs.add_node(dg_key,exp_key = node.key,exp_node=node,exp_stage=self.current_stage)
+                stage_name = "scope_root"
+            elif self.scope_key is not None:
+
+                stage_name = dg_key[len(self.scope_key):][0]
+                if type(stage_name) is tuple:
+                    stage_name = stage_name[0]
+            self.nodeDgs.add_node(
+                                  dg_key,
+                                  exp_key = node.key,
+                                  exp_node=node,
+                                  exp_stage=stage_name,
+                                  scope_key = self.scope_key,
+                                  scope_root_temp = self.scope_root     #scope_root_temp属性无需进行持久化
+                                  )
             # print(f"{dg_key}:{self.nodeDgs.nodes[dg_key]["exp_node"]}")
         self.data_node_active = dg_key
         return dg_key
@@ -96,3 +110,31 @@ class QueryScope(SymbolTableScope):
     def add_node_info(self, node, info:dict):
         for key,value in info.items():
             self.nodeDgs.nodes[self.data_node_active][key] = value
+
+    def is_descendant(self,ast_node:Expression)->bool:
+        """检查 ast_node 是否在 该作用域之中"""
+        # find 返回第一个匹配的节点，如果找到则返回节点本身，否则返回 None
+        node = ast_node
+        if self.scope_root is None:
+            return True
+        while node != self.scope_root and node is not None:
+            node = node.parent
+            if node == self.scope_root:
+                return True
+        return False
+
+    @abstractmethod
+    def scope_logical_order(self,stage_key:tuple):
+         # 该定义域内不同的阶段的排序
+        if stage_key == self.scope_key:
+            return 0
+        else:
+            return stage_key[1][1]
+
+
+    def apply_logical_order(self):
+        """
+        对于一个已经完成数据提取的定义域，需要按照语义分析的路径进行排序
+        :return:
+        """
+        pass

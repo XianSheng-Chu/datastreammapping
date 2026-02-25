@@ -20,7 +20,7 @@ class RuleEngine:
         self.relationsList:list[RelationshipDTO] = []
         self.execute_result = execute_result
 
-    def apply_rules(self, ast_node:Expression,query_scope):
+    def apply_rules(self, ast_node:Expression,query_scope:QueryScope):
         """
         对AST节点应用所有匹配的规则。
 
@@ -52,12 +52,14 @@ class RuleEngine:
                                 actions = node_rule["actions"]
 
             if actions is not None:
+                while not self.current_scope.is_descendant(item):
+                    self.current_scope = self.current_scope.parent
                 self.current_scope = actions(item,self.current_scope)
 
         for node in self.current_scope.nodeDgs.nodes:
             if self.current_scope.nodeDgs.nodes[node].get("exp_node") is not None:
                 # print(f"{node}:{self.current_scope.nodeDgs.nodes[node]["exp_node"].sql("oracle")}")
-                print(f"{node}:{self.current_scope.nodeDgs.nodes[node]["exp_node"].key}")
+                print(f"{node}:{self.current_scope.nodeDgs.nodes[node]["exp_stage"]}")
 
 
 

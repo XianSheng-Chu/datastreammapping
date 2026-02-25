@@ -29,5 +29,6 @@ class SelectScope(QueryScope):
             else:
                 self.columns.append(item[i])
 
-
+    def scope_logical_order(self,stage_key:tuple):
+        pass
 
