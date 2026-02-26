@@ -26,8 +26,9 @@ class QueryScope(SymbolTableScope):
         self.scope_key = None
         if self.scope_type==ScopeType.QUERY:
             self.nodeDgs = MultiDiGraph()
-            self.scope_key=self.nodeDgs.add_node(query_name,database_object_type=scope_type.str(),database_object_name = query_name)
-            self.query_root_name = query_name
+            query_dg_key = query_name
+            self.scope_key=self.nodeDgs.add_node(query_dg_key,database_object_type=scope_type.str(),database_object_name = query_name,scope_root_temp = self)
+            self.query_root_name = query_dg_key
             self.query_count = 0
         else:
             self.nodeDgs = self.parent.nodeDgs
@@ -68,7 +69,7 @@ class QueryScope(SymbolTableScope):
             elif self.scope_key is not None:
 
                 stage_name = dg_key[len(self.scope_key):][0]
-                if type(stage_name) is tuple:
+                if type(stage_name) is  tuple:
                     stage_name = stage_name[0]
             self.nodeDgs.add_node(
                                   dg_key,
@@ -76,7 +77,7 @@ class QueryScope(SymbolTableScope):
                                   exp_node=node,
                                   exp_stage=stage_name,
                                   scope_key = self.scope_key,
-                                  scope_root_temp = self.scope_root     #scope_root_temp属性无需进行持久化
+                                  scope_root_temp = self     #scope_root_temp属性无需进行持久化
                                   )
             # print(f"{dg_key}:{self.nodeDgs.nodes[dg_key]["exp_node"]}")
         self.data_node_active = dg_key
@@ -123,18 +124,27 @@ class QueryScope(SymbolTableScope):
                 return True
         return False
 
-    @abstractmethod
-    def scope_logical_order(self,stage_key:tuple):
+    def scope_logical_order_key(self,dg_key:tuple)  ->str:
          # 该定义域内不同的阶段的排序
-        if stage_key == self.scope_key:
-            return 0
-        else:
-            return stage_key[1][1]
+         result = ''
+         for item in list(dg_key):
+            if type(item) is tuple:
+                item = '_'.join(map(str, item))
+            result =result+":"+item
+         return result
 
+
+    def scope_logical_order(self,dg_key:tuple):
+        return self.nodeDgs.nodes[dg_key]["scope_root_temp"].scope_logical_order_key(dg_key)
 
     def apply_logical_order(self):
         """
         对于一个已经完成数据提取的定义域，需要按照语义分析的路径进行排序
         :return:
         """
-        pass
+        dg_node_keys = list(self.nodeDgs.nodes)
+
+        dg_node_keys.sort(key=self.scope_logical_order)
+
+        return dg_node_keys
+
