@@ -79,13 +79,9 @@ class QueryScope(SymbolTableScope):
                                   scope_key = self.scope_key,
                                   scope_root_temp = self     #scope_root_temp属性无需进行持久化
                                   )
-            # print(f"{dg_key}:{self.nodeDgs.nodes[dg_key]["exp_node"]}")
         self.data_node_active = dg_key
         return dg_key
 
-        # print(self.nodeDgs.nodes[dg_key])
-        # print(repr(node.root()))
-        # print(f"{dg_key}:{node.sql()},{node.key}")
 
     def find_parent_key(self, node: Expression)-> str | tuple:
         result: str | tuple
@@ -133,7 +129,6 @@ class QueryScope(SymbolTableScope):
             result =result+":"+item
          return result
 
-
     def scope_logical_order(self,dg_key:tuple):
         return self.nodeDgs.nodes[dg_key]["scope_root_temp"].scope_logical_order_key(dg_key)
 
@@ -147,4 +142,6 @@ class QueryScope(SymbolTableScope):
         dg_node_keys.sort(key=self.scope_logical_order)
 
         return dg_node_keys
+
+
 

@@ -16,5 +16,12 @@ class SymbolTableScope(ABC):
         :return:
         """
 
+    @property
+    def catalog(self) -> str:
+        return self.parent.catalog
+
+    @property
+    def schema(self)->str:
+        return self.parent.schema
 
 

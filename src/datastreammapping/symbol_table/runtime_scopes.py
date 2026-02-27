@@ -43,7 +43,7 @@ class SelectScope(QueryScope):
             if type(stage_order_name) is tuple and self.logical_processing_order[i] == stage_order_name[0] :
                 stage_order_name = list(stage_order_name)
                 stage_order_name[0] = i + 1000
-                stage_order_name[1] = i + 1000000
+                stage_order_name[1] = stage_order_name[1] + 1000000
                 stage_order_name = tuple(stage_order_name)
             elif type(stage_order_name) is not tuple and self.logical_processing_order[i] == stage_order_name:
                 stage_order_name = i + 1000

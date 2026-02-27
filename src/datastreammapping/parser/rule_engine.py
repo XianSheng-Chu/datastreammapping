@@ -56,9 +56,10 @@ class RuleEngine:
                 while not self.current_scope.is_descendant(item):
                     self.current_scope = self.current_scope.parent
                 self.current_scope = actions(item,self.current_scope)
-        dg_node_keys = self.current_scope.apply_logical_order()
-        for node in dg_node_keys:
 
+        dg_node_keys = self.current_scope.apply_logical_order()
+
+        for node in dg_node_keys:
             if self.current_scope.nodeDgs.nodes[node].get("exp_node") is not None:
                 # print(f"{node}:{self.current_scope.nodeDgs.nodes[node]["exp_node"].sql("oracle")}")
                 print(f"{node}{self.current_scope.nodeDgs.nodes[node]["scope_root_temp"].scope_logical_order(node)}")
