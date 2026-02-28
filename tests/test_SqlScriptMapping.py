@@ -308,7 +308,6 @@ def test_sqlmapping():
     # 配置 Neo4j 连接
     uri = "bolt://localhost:7687"
     user = "neo4j"
-    password = "19990602"
     if 1==0:
         importer = ni.Neo4jImporter(uri, user, password)
         importer.import_graph(var.nodeDgs)

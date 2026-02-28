@@ -36,7 +36,7 @@ class QueryScope(SymbolTableScope):
             self.query_count = self.parent.query_count
         self.data_node_active = None
         self.current_stage = None
-
+        self.current_scope_symbols ={}
 
     def add_child_scope(self, scope:'QueryScope'):
         self.children.append((scope.scope_type,scope))
@@ -143,5 +143,54 @@ class QueryScope(SymbolTableScope):
 
         return dg_node_keys
 
+    def add_symbol(self,dg_key:tuple,upper_limit:int,lower_limit:int,symbol_name:str):
+
+        pass
+
+    def symbol_name(self,dg_key:tuple)->str:
+        symbol_name = ""
+        dg_node = self.nodeDgs.nodes[dg_key]
+        if dg_node is None or dg_node.get("exp_key",None) is None:
+            return symbol_name
+
+        # 下列分支是为了表的符号名称
+        if dg_node["exp_key"] == "cte":
+            return dg_node["alias"]
+        elif dg_node["exp_key"] == "table":
+            if dg_node["table_alias"] != "":
+                return dg_node["table_alias"]
+
+            if dg_node["table_name"] == "":
+                dg_key_this = list(dg_key)
+                dg_key_this.append("this")
+                dg_key_this = tuple(dg_key_this)
+                return self.symbol_name(dg_key_this)
+
+            symbol_name = dg_node["table_name"]
+            if dg_node["schema"] != "":
+                symbol_name = f"{dg_node["schema"]}.{symbol_name}"
+
+            if dg_node["catalog"] != "":
+                symbol_name = f"{dg_node["catalog"]}.{symbol_name}"
+
+            return symbol_name
+
+        #以下分支是为表述select字句中的所有列的名称符号
+        dg_key_parent = dg_key[:-1]
+        if dg_key_parent not in self.nodeDgs.nodes:
+            return f"not exists {dg_key_parent}"
+
+        if self.nodeDgs.nodes[dg_key_parent].get("exp_key") in ("select",):
+            if dg_node["exp_key"] in ("alias", "column","star") :
+                symbol_name = dg_node["output_name"]
+
+            if dg_node["exp_key"] == "anonymous":
+                symbol_name = dg_node["func_name"]
+            elif dg_node.get("func_type","")!="":
+                symbol_name = dg_node["exp_key"]
+
+            if dg_node["exp_key"] == "literal":
+                symbol_name = dg_node["?column?"]
 
 
+        return symbol_name

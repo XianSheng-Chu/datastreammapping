@@ -140,8 +140,8 @@ basic_column:
               - db: schema
                   #方法名：属性和备注
               - catalog: catalog
-              - alias: table_alias
-              - name: table_name
+              - table: table
+              - output_name: output_name
 
 basic_alias:
     pattern:
@@ -279,6 +279,9 @@ basic_star:
             weight: 2
     actions:
         - add_node:
+        - property_values:
+              #获取@property_value的属性
+              - output_name: output_name
 
 basic_literal:
     pattern:
@@ -499,6 +502,10 @@ basic_Binary_Func_super:
                  JSONBExtractScalar,JSONArrayContains,Pow,RegexpLike,RegexpILike,]
     actions:
         - add_node:
+        - add_custom_values:
+              #   为图节点添加自定义信息
+              key_name: func_type
+              value: Binary_Functions
 
 basic_Binary_AggFunc_super:
     pattern:
@@ -517,6 +524,10 @@ basic_Binary_AggFunc_super:
                 [Corr,CovarSamp,CovarPop,]
     actions:
         - add_node:
+        - add_custom_values:
+              #   为图节点添加自定义信息
+              key_name: func_type
+              value: Binary_AggFuncs
 
 basic_Func_TimeUnit_super:
     pattern:
@@ -537,6 +548,11 @@ basic_Func_TimeUnit_super:
                  TimeAdd,TimeSub,TimeDiff,TimeTrunc,TsOrDsAdd,TsOrDsDiff,]
     actions:
         - add_node:
+        - add_custom_values:
+              #   为图节点添加自定义信息
+              key_name: func_type
+              value: TimeUnit_Functions
+
 
 basic_Func_IntervalOp_super:
     pattern:
@@ -556,6 +572,10 @@ basic_Func_IntervalOp_super:
                 [DateAdd,DateSub,DatetimeAdd,DatetimeSub,]
     actions:
         - add_node:
+        - add_custom_values:
+              #   为图节点添加自定义信息
+              key_name: func_type
+              value: IntervalOp_Functions
 
 basic_window:
     pattern:
@@ -606,16 +626,27 @@ basic_Connector_super:
               weight: 6
               value_list:
                 [And,Or,]
-        - and:
-              - parent_class:
-                      # 匹配父类是否为某一个特定的类
-                      class_name: "Func"
-                      weight: 3
-              - in:
-                    #  复合列表中的值的数据被视为有效的
-                    match_value: class_name
-                    weight: 7
-                    value_list:
-                      [ Xor,]
     actions:
         - add_node:
+
+basic_Func_Connector_super:
+    pattern:
+        type: "node"
+        level: "super"
+        #       super代表匹配所有父类为func的节点
+        class_name:
+            - "Func"
+            - "Connector"
+    conditions:
+          - in:
+                #  复合列表中的值的数据被视为有效的
+                match_value: class_name
+                weight: 7
+                value_list:
+                  [ Xor,]
+    actions:
+        - add_node:
+        - add_custom_values:
+              #   为图节点添加自定义信息
+              key_name: func_type
+              value: Connector_Functions

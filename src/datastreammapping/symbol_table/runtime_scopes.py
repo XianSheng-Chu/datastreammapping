@@ -58,3 +58,14 @@ class SelectScope(QueryScope):
             result = result + ":" + item
 
         return result_parent+result
+
+    def add_symbol(self,dg_key:tuple,upper_limit:int,lower_limit:int,symbol_name:str):
+        symbol_level = 0
+        dg_node = self.nodeDgs.nodes[dg_key]
+        if dg_node == "cte":
+            symbol_level = 0
+            self.current_scope_symbols[symbol_level]={dg_key:symbol_name}
+        elif dg_node == "table":
+            symbol_level = 1
+            self.current_scope_symbols[symbol_level] = {dg_key: symbol_name}
+        pass
