@@ -1,4 +1,4 @@
-from .base import SymbolTableScope
+from .base import *
 from .scope_enums import ScopeType
 from .scheme_scope import SchemaScope
 
@@ -16,11 +16,15 @@ class CatalogScope(SymbolTableScope):
             scope_type (ScopeType, 可选): 作用域类型，应为 ScopeType.CATALOG，默认为该值
         """
         super().__init__(name,parent=None,scope_type = scope_type)
+
         self._catalog = catalog
 
     @property
     def catalog(self):
         return self._catalog
 
-
+    @property
+    def scope_root_key(self) -> tuple:
+        relust = ((self.scope_type.str(),self.scope_name),)
+        return relust
 

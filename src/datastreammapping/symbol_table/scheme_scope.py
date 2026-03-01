@@ -6,6 +6,7 @@ class SchemaScope(SymbolTableScope):
     def spawn_child_scope(self,query_name="Undefined_Query") -> QueryScope:
         result = QueryScope(self,query_name,ScopeType.QUERY)
         self.children[query_name] = result
+        self.nodeDgs = self.parent.nodeDgs
         return result
 
     def __init__(self,parent,schema_name = "Undefined_schema",scope_type=ScopeType.SCHEMA):

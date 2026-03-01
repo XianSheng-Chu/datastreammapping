@@ -133,7 +133,7 @@ def test_sqlmapping():
     from table_union_cte t2
     union all
     select id,user_id,source_names,user_emp_id,new_emp_id,emp_name,rn1,'1','testVale',last_update_date,user_name,emp3_user_name,contract_number,*
-    from (select *from table_union1) where last_update_date > '2025-04-27'::date
+    from (select *from table_union1) sub_table where last_update_date > '2025-04-27'::date
     ;
     """
     parsed = sqlglot.parse_one(sql,read="postgres")

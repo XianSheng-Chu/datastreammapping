@@ -59,10 +59,17 @@ class RuleEngine:
 
         dg_node_keys = self.current_scope.apply_logical_order()
 
+        # test
+        self.current_scope.create_table_relationship_map()
         for node in dg_node_keys:
             if self.current_scope.nodeDgs.nodes[node].get("exp_node") is not None:
-                # print(f"{node}:{self.current_scope.nodeDgs.nodes[node]["exp_node"].sql("oracle")}")
-                print(f"{node}:{self.current_scope.nodeDgs.nodes[node]["scope_root_temp"].symbol_name(node)}")
+                # print(f"{node}:{self.current_scope.nodeDgs.nodes[node]["exp_stage"]}")
+                # print(f"{node}:{self.current_scope.nodeDgs.nodes[node].get("output_flag",False)}")
+                symbol_name = self.current_scope.nodeDgs.nodes[node]["scope_root_temp"].symbol_name(node)
+                self.current_scope.nodeDgs.nodes[node].get("scope_root_temp").add_symbol(node,symbol_name)
+                print(f"{node}:{symbol_name}")
+                # print(f"{node}:{self.current_scope.nodeDgs.nodes[node]["scope_root_temp"].symbol_name(node)}")
+
             else:
                 print(f"{node}")
 

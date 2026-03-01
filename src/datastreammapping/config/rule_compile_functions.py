@@ -91,7 +91,7 @@ class Conditions:
 
 
 class Action:
-    current_scope: QueryScope
+    current_scope: QueryScope|SelectScope
     def __init__(self,actions:list):
         self.current_scope:QueryScope = None
         self.actions = actions
@@ -129,7 +129,7 @@ class Action:
         self.current_scope = scope
         return self.actions_list(self.actions, node, scope)
 
-    def dg_add_node(self,node, scope:QueryScope):
+    def dg_add_node(self,node, scope:SelectScope|QueryScope):
         scope.dg_add_node(node)
 
     def property_values(self, propertys:dict, node, scope:QueryScope):
@@ -146,7 +146,11 @@ class Action:
                 if node_arg not in set(node.arg_types.keys()):
                     raise ValueError("Argument '{}' is not a valid {} node arg_types key".format(node_arg,node.__class__))
                 if info["node_key"] in node.args:
-                    rulest[info["node_key"]] = node.args.get(node_arg)
+
+                    if isinstance(node.args.get(node_arg), Expression):
+                        rulest[info["node_key"]] = node.args.get(node_arg).name
+                    else:
+                        rulest[info["node_key"]] = node.args.get(node_arg)
                 elif info["node_key"] not in node.args and info["keep_missing"]:
                     rulest[info["node_key"]] = info.get("default_value")
                     # print(f"Action:line:129:node_arg:{node_arg}:{node.method}")

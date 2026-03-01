@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from networkx import MultiDiGraph
 
 
 class SymbolTableScope(ABC):
@@ -8,6 +9,27 @@ class SymbolTableScope(ABC):
         self.symbols = {}  # 当前作用域符号表
         self.children = {}  # 子作用域（可选，用于构建完整树）
         self.scope_name = scope_name
+        if self.parent is not None:
+            self.nodeDgs: MultiDiGraph = self.parent.nodeDgs
+        else:
+            self.nodeDgs: MultiDiGraph = MultiDiGraph()
+        self.scope_key = self.create_root_dg_node()
+
+    def create_root_dg_node(self):
+        self.nodeDgs.add_node(self.scope_root_key, database_object_type=self.scope_type.str(),
+                                               database_object_name=self.scope_name, scope_root_temp=self)
+
+    def find_parent_scope(self,scope_type) -> SymbolTableScope:
+        """
+        寻找第一个目标类型的父作用域对象
+        :return:SymbolTableScope
+        """
+        current = self.parent
+        if current is None:
+            return self
+        while current.scope_type != scope_type:
+            current = current.parent
+        return current
 
     @abstractmethod
     def spawn_child_scope(self)->'SymbolTableScope':
@@ -23,5 +45,25 @@ class SymbolTableScope(ABC):
     @property
     def schema(self)->str:
         return self.parent.schema
+
+    @property
+    def scope_root_key(self) -> tuple:
+        current = self
+        result = None
+        if current.parent is not None:
+            result =  current.parent.scope_root_key + ((self.scope_type.str(),self.scope_name),)
+        return result
+
+    def scope_logical_order_key(self,dg_key:tuple)  ->str:
+         # 该定义域内不同的阶段的排序
+         result = ''
+         for item in list(dg_key):
+            if type(item) is tuple:
+                item = '_'.join(map(str, item))
+            result =result+":"+item
+         return result
+
+    def scope_logical_order(self,dg_key:tuple):
+        return self.nodeDgs.nodes[dg_key]["scope_root_temp"].scope_logical_order_key(dg_key)
 
 

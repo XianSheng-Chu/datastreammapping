@@ -17,7 +17,6 @@ class SelectScope(QueryScope):
         self.set_scope_root(ast_node)
         self.fetch_columns(ast_node)
 
-
     def fetch_columns(self,ast_node:select):
         node = ast_node
         outputs = node.named_selects
@@ -29,13 +28,19 @@ class SelectScope(QueryScope):
             else:
                 self.columns.append(item[i])
 
+    def dg_add_node(self, node: Expression):
+        super().dg_add_node(node)
+        if self.nodeDgs.nodes[self.data_node_active]["exp_stage"]=="expressions":
+            for u, v, key in self.nodeDgs.out_edges(self.data_node_active,keys=True):
+                if self.nodeDgs.nodes[v]["exp_key"] == "select":
+                    self.nodeDgs.nodes[u]["output_flag"] = True
+
     def scope_logical_order_key(self,dg_key:tuple) ->str:
 
         result_parent:tuple = self.parent.scope_logical_order_key(self.scope_key)
         if dg_key == self.scope_key:
             # 定义域顶层调用时，无需关注子句的执行顺序
             return result_parent
-
         result_self = list(dg_key[len(self.scope_key):])
         stage_order_name = result_self[0]
 
@@ -59,13 +64,39 @@ class SelectScope(QueryScope):
 
         return result_parent+result
 
-    def add_symbol(self,dg_key:tuple,upper_limit:int,lower_limit:int,symbol_name:str):
-        symbol_level = 0
+    def add_symbol(self,dg_key:tuple,symbol_name:str):
         dg_node = self.nodeDgs.nodes[dg_key]
-        if dg_node == "cte":
-            symbol_level = 0
-            self.current_scope_symbols[symbol_level]={dg_key:symbol_name}
-        elif dg_node == "table":
-            symbol_level = 1
-            self.current_scope_symbols[symbol_level] = {dg_key: symbol_name}
-        pass
+
+        #以下分支是为表述select字句中的所有列的名称符号
+        dg_key_parent = dg_key[:-1]
+        if dg_key_parent not in self.nodeDgs.nodes:
+            return
+        if dg_node.get("output_flag", False):
+            symbol_type = "output"
+            if self.current_scope_symbols.get(symbol_type) is None:
+                self.current_scope_symbols[symbol_type] = {}
+            self.current_scope_symbols[symbol_type][symbol_name] = dg_key
+        super().add_symbol(dg_key,symbol_name)
+
+    def symbol_name(self,dg_key:tuple)->str:
+        symbol_name = ""
+        dg_node = self.nodeDgs.nodes[dg_key]
+        if dg_node is None or dg_node.get("exp_key", None) is None:
+            return symbol_name
+        #以下分支是为表述select字句中的所有列的名称符号
+        if dg_node.get("output_flag",False):
+            if dg_node["exp_key"] in ("alias", "column","star") :
+                symbol_name = dg_node["output_name"]
+            elif dg_node["exp_key"] == "anonymous":
+                symbol_name = dg_node["func_name"]
+            elif dg_node.get("func_type","")!="":
+                symbol_name = dg_node["exp_key"]
+            elif dg_node["exp_key"] == "literal":
+                symbol_name = dg_node["?column?"]
+            else:
+                symbol_name = self.scope_logical_order_key(dg_key)
+
+        if symbol_name == "":
+            symbol_name = super().symbol_name(dg_key)
+
+        return symbol_name

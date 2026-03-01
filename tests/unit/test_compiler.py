@@ -47,8 +47,21 @@ class TestCompiler:
         """测试编译器能够正确处理包含具体列名的SELECT语句。"""
         self.compiler.compile_sql(
             """
-            with a as (select * from user) select a.name,a.id from emp a  join dept b on a.dept_id =b.dept_id where a.id=2
-            group by a.name order by b.dept_id;
+            WITH company_avg AS (
+                SELECT AVG(salary) AS avg_salary FROM employees
+            ),
+            high_earners AS (
+                SELECT e.id, e.name, e.salary, e.department_id
+                FROM employees e, company_avg
+                WHERE e.salary > company_avg.avg_salary
+            )
+            SELECT 
+                d.department_name,
+                COUNT(h.id) AS high_earner_count
+            FROM fin_date.departments d
+            LEFT JOIN high_earners h ON d.id = h.department_id
+            GROUP BY d.department_name
+            ORDER BY high_earner_count DESC;
             """)
 
     def test_compile_with_table_alias(self):
