@@ -2013,6 +2013,18 @@
                                                     }
                                                 }
                                             }
+                                        },
+                                        "alias": {
+                                            "class": "TableAlias",
+                                            "args": {
+                                                "this": {
+                                                    "class": "Identifier",
+                                                    "args": {
+                                                        "this": "sub_table",
+                                                        "quoted": false
+                                                    }
+                                                }
+                                            }
                                         }
                                     }
                                 }
