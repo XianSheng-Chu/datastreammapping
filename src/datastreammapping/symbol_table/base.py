@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from networkx import MultiDiGraph
-
+from ..graph.data_models import *
 
 class SymbolTableScope(ABC):
     def __init__(self,scope_name, parent:'SymbolTableScope'=None, scope_type=None):
@@ -19,7 +19,7 @@ class SymbolTableScope(ABC):
         self.nodeDgs.add_node(self.scope_root_key, database_object_type=self.scope_type.str(),
                                                database_object_name=self.scope_name, scope_root_temp=self)
 
-    def find_parent_scope(self,scope_type) -> SymbolTableScope:
+    def find_parent_scope(self,scope_type) -> 'SymbolTableScope':
         """
         寻找第一个目标类型的父作用域对象
         :return:SymbolTableScope

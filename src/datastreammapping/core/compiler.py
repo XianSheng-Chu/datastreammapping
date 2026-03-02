@@ -1,3 +1,5 @@
+from sqlglot import Dialects, Dialect
+
 from ..parser import ASTAdapter
 from ..parser import RuleEngine
 from ..config import ConfigLoader
@@ -12,14 +14,14 @@ class SQLToGraphCompiler:
     负责协调整个转换流程，包括SQL解析、规则应用和图构建。
     """
 
-    def __init__(self):
+    def __init__(self,data_base_type:str):
         """初始化编译器实例，设置默认配置和组件。"""
         self.config_loader = ConfigLoader()
         self.config_loader.load_default_config()
         self.rule_compiler = RuleCompiler(self.config_loader.rule_files)
         self.rule_engine = RuleEngine(self.rule_compiler.execute_result)
         self.graph_builder = None
-        self.catalog_scope = CatalogScope()
+        self.catalog_scope = CatalogScope(data_base_type)
         self.current_schema = self.catalog_scope.spawn_child_scope("master")
         self.current_query = None
 

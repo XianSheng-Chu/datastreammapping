@@ -6,11 +6,11 @@ class TestCompiler:
     """编译器功能的测试用例集合。"""
 
     def setup_method(self):
-        self.compiler = dsmCore.SQLToGraphCompiler()
+        self.compiler = dsmCore.SQLToGraphCompiler("postgres")
 
     def test_compiler_initialization(self):
         """测试编译器实例能否正确初始化。"""
-        self.compiler = dsmCore.SQLToGraphCompiler()
+        self.compiler = dsmCore.SQLToGraphCompiler("postgres")
         assert self.compiler is not None
 
 
