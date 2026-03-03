@@ -57,7 +57,8 @@ class TestCompiler:
             )
             SELECT 
                 d.department_name,
-                COUNT(h.id) AS high_earner_count
+                COUNT(h.id) AS high_earner_count,
+                1
             FROM fin_date.departments d
             LEFT JOIN high_earners h ON d.id = h.department_id
             GROUP BY d.department_name

@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from networkx import MultiDiGraph
 from ..graph.data_models import *
 
 class SymbolTableScope(ABC):
@@ -13,11 +12,18 @@ class SymbolTableScope(ABC):
             self.nodeDgs: MultiDiGraph = self.parent.nodeDgs
         else:
             self.nodeDgs: MultiDiGraph = MultiDiGraph()
-        self.scope_key = self.create_root_dg_node()
+        self.scope_key = self.scope_root_key
+
+
+
+
+
 
     def create_root_dg_node(self):
-        self.nodeDgs.add_node(self.scope_root_key, database_object_type=self.scope_type.str(),
-                                               database_object_name=self.scope_name, scope_root_temp=self)
+        add_model_to_graph(self.nodeDgs,self.root_dg_node_model)
+        self.nodeDgs.nodes[self.scope_key]["scope_root_temp"] = self
+
+
 
     def find_parent_scope(self,scope_type) -> 'SymbolTableScope':
         """
@@ -53,6 +59,12 @@ class SymbolTableScope(ABC):
         if current.parent is not None:
             result =  current.parent.scope_root_key + ((self.scope_type.str(),self.scope_name),)
         return result
+
+    def init_root_dg_node_model(self)->BaseNode:
+        model:BaseNode = None
+        if self.root_dg_node_model is not None:
+            model = self.root_dg_node_model
+        return model
 
     def scope_logical_order_key(self,dg_key:tuple)  ->str:
          # 该定义域内不同的阶段的排序

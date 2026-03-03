@@ -21,12 +21,15 @@ class QueryScope(SymbolTableScope):
 
     def __init__(self,parent,query_name = None,scope_type=ScopeType.QUERY):
         super().__init__(scope_name=query_name, parent=parent, scope_type=scope_type)
+
         self.children:list[tuple[ScopeType,QueryScope]] = []
         self.scope_root:expressions = None
-        self.scope_key = None
+        # self.scope_key = None
         if self.scope_type==ScopeType.QUERY:
+            self.root_dg_node_model = self.init_root_dg_node_model()
+            self.create_root_dg_node()
             query_dg_key = self.scope_root_key
-            self.scope_key=self.nodeDgs.add_node(query_dg_key,database_object_type=scope_type.str(),database_object_name = query_name,scope_root_temp = self)
+            self.scope_key=self.nodeDgs.nodes[query_dg_key]
             self.query_root_name = query_dg_key
             self.query_count = 0
         else:
@@ -40,8 +43,7 @@ class QueryScope(SymbolTableScope):
     def add_child_scope(self, scope:'QueryScope'):
         self.children.append((scope.scope_type,scope))
 
-    def create_root_dg_node(self):
-        pass
+
 
     def set_scope_root(self,node):
         if node is None:
@@ -185,10 +187,12 @@ class QueryScope(SymbolTableScope):
 
             symbol_name = dg_node["table_name"]
             if dg_node["schema"] != "":
-                symbol_name = f"{dg_node["schema"]}.{symbol_name}"
-
+                schema_name = dg_node["schema"]
+                symbol_name = f"{schema_name}.{symbol_name}"
             if dg_node["catalog"] != "":
-                symbol_name = f"{dg_node["catalog"]}.{symbol_name}"
+                catalog_name = dg_node["catalog"]
+                symbol_name = f"{catalog_name}.{symbol_name}"
+
 
             return symbol_name
         elif dg_node["exp_key"] == "subquery":
@@ -203,8 +207,8 @@ class QueryScope(SymbolTableScope):
         scoop_root:QueryScope=self
 
 
-        while self.parent.scope_type != ScopeType.QUERY:
-            scoop_root = self.parent
+        while scoop_root.scope_type != ScopeType.QUERY:
+            scoop_root = scoop_root.parent
         dg_node_order_keys = scoop_root.apply_logical_order()
 
         for dg_key in dg_node_order_keys:
@@ -219,9 +223,11 @@ class QueryScope(SymbolTableScope):
                 else:
                     symbol_name = dg_node["table_name"]
                     if dg_node["schema"] != "":
-                        symbol_name = f"{dg_node["schema"]}.{symbol_name}"
+                        schema_name = dg_node["schema"]
+                        symbol_name = f"{schema_name}.{symbol_name}"
                     if dg_node["catalog"] != "":
-                        symbol_name = f"{dg_node["catalog"]}.{symbol_name}"
+                        catalog_name = dg_node["catalog"]
+                        symbol_name = f"{catalog_name}.{symbol_name}"
                     source_symbol_key = current_scoop.find_mapping_source("table",symbol_name)
                     if source_symbol_key is not None:
                         pass
@@ -244,7 +250,11 @@ class QueryScope(SymbolTableScope):
 
         return result
 
-
+    def init_root_dg_node_model(self):
+        return QueryNode(
+            node_id = self.scope_key,
+            scope_name = self.scope_name
+        )
 
 
 

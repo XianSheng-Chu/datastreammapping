@@ -92,7 +92,7 @@ class SelectScope(QueryScope):
             elif dg_node.get("func_type","")!="":
                 symbol_name = dg_node["exp_key"]
             elif dg_node["exp_key"] == "literal":
-                symbol_name = dg_node["?column?"]
+                symbol_name = "?column?"
             else:
                 symbol_name = self.scope_logical_order_key(dg_key)
 

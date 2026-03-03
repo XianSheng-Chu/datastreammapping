@@ -1,14 +1,20 @@
 # graph/data_models.py
-
+from networkx import MultiDiGraph
 from pydantic import BaseModel, Field, model_validator,field_serializer,PrivateAttr
 from typing import Literal, Optional, List,Dict
 from datetime import datetime
 from sqlglot import Dialects
 
+def add_model_to_graph(graph: MultiDiGraph, model: BaseModel, exclude: set = None):
+    # 将节点模型写入图中
+    exclude = exclude or set()
+    # exclude标识不需要写入图的模型属性
+    node_attrs = model.model_dump(exclude=exclude)
+    graph.add_node(model.node_id, **node_attrs)
 
 class BaseNode(BaseModel):
-    node_key:tuple = Field(..., description="全局唯一节点ID")
-
+    node_id:tuple = Field(..., description="全局唯一节点ID")
+    description:Optional[str] = Field(None, description="节点描述")
 
     @property
     def node_type(self) -> str:
@@ -54,7 +60,7 @@ class BaseNode(BaseModel):
         # 去重并返回
         return list(dict.fromkeys(labels))
 
-class BaseEntityNode(BaseModel):
+class BaseEntityNode(BaseNode):
     """
     所有实体对象的基类：
     - 例子：数据库表、字段、API接口、消息队列Topic
@@ -102,6 +108,23 @@ class CatalogNode(BaseEntityNode):
 
     # 其他属性
     extra_attrs:Optional[Dict[str|int, str|int]]= Field(default_factory=dict)
+
+
+class SchemaNode(BaseEntityNode):
+    _neo4j_label: str = PrivateAttr(default="Catalog")
+
+    # 核心属性
+    schema_name:str = Field(..., description="schema名称")
+    scope_name:str = Field(..., description="数据定义域的名称,可以写明环境信息等非严格字段")
+
+    # 其他属性
+    extra_attrs: Optional[Dict[str | int, str | int]] = Field(default_factory=dict)
+
+
+class QueryNode(BaseEntityNode):
+    scope_name:str = Field(..., description="查询的名称，Query一般是作为一整个sql文件存在的")
+
+
 
 
 
