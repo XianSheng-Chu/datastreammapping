@@ -1,3 +1,4 @@
+
 from .base import *
 from .scope_enums import ScopeType
 from .query_scope import QueryScope
@@ -27,8 +28,36 @@ class SchemaScope(SymbolTableScope):
             scope_name = self.scope_name
         )
 
-    def find_table(self,table_name:str) -> tuple:
+    def find_table(self,table_name:str,schema:str=None,catalog:str=None) -> tuple:
+        current_schema = self
+        if schema != self.schema:
+            from .catalog_scope import CatalogScope
+            current_catalog: CatalogScope = self.find_parent_scope(ScopeType.CATALOG)
+            current_schema = current_catalog.find_schema_scope(schema)
 
-        return None
+        find_key = current_schema.scope_root_key + ("table",table_name)
+        if find_key not in current_schema.nodeDgs.nodes():
+            find_key = current_schema.register_table(table_name,TableSourceEnum.SQL_REFERENCED)
+
+        return find_key
+
+    def register_table(
+            self,
+            table_name: str,
+            table_source: TableSourceEnum = TableSourceEnum.PHYSICAL,
+            table_comment: Optional[str] = None
+    ) -> tuple:
+        node_id = self.scope_root_key + (("table",table_name),)
+        table_node = TableNode(
+            node_id = node_id,
+            table_name = table_name,
+            table_source = table_source,
+            table_comment = table_comment
+        )
+        self.add_scope_node(table_node)
+        return node_id
+
+
+
 
 

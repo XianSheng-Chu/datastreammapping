@@ -1,8 +1,10 @@
 from abc import ABC, abstractmethod
+
+from .scope_enums import ScopeType
 from ..graph.data_models import *
 
 class SymbolTableScope(ABC):
-    def __init__(self,scope_name, parent:'SymbolTableScope'=None, scope_type=None):
+    def __init__(self,scope_name, parent:'SymbolTableScope'=None,scope_type:ScopeType=None):
         self.parent = parent  # 父作用域引用
         self.scope_type = scope_type  # 作用域类型
         self.symbols = {}  # 当前作用域符号表
@@ -20,12 +22,12 @@ class SymbolTableScope(ABC):
 
 
     def create_root_dg_node(self):
-        add_model_to_graph(self.nodeDgs,self.root_dg_node_model)
+        self.add_scope_node(self.root_dg_node_model)
         self.nodeDgs.nodes[self.scope_key]["scope_root_temp"] = self
 
 
 
-    def find_parent_scope(self,scope_type) -> 'SymbolTableScope':
+    def find_parent_scope(self,scope_type:ScopeType) -> 'SymbolTableScope':
         """
         寻找第一个目标类型的父作用域对象
         :return:SymbolTableScope
@@ -77,5 +79,8 @@ class SymbolTableScope(ABC):
 
     def scope_logical_order(self,dg_key:tuple):
         return self.nodeDgs.nodes[dg_key]["scope_root_temp"].scope_logical_order_key(dg_key)
+
+    def add_scope_node(self,model: BaseModel, exclude: set = None):
+        add_model_to_graph(self.nodeDgs,model,exclude)
 
 

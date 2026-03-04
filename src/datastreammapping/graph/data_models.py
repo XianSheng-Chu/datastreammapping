@@ -5,6 +5,10 @@ from typing import Literal, Optional, List,Dict
 from datetime import datetime
 from sqlglot import Dialects
 
+from enum import StrEnum
+
+
+
 def add_model_to_graph(graph: MultiDiGraph, model: BaseModel, exclude: set = None):
     # 将节点模型写入图中
     exclude = exclude or set()
@@ -115,17 +119,34 @@ class SchemaNode(BaseEntityNode):
 
     # 核心属性
     schema_name:str = Field(..., description="schema名称")
-    scope_name:str = Field(..., description="数据定义域的名称,可以写明环境信息等非严格字段")
+    scope_name:str = Field("auto_schema", description="数据定义域的名称,可以写明环境信息等非严格字段")
 
     # 其他属性
     extra_attrs: Optional[Dict[str | int, str | int]] = Field(default_factory=dict)
 
 
 class QueryNode(BaseEntityNode):
+    _neo4j_label: str =PrivateAttr(default="QueryNode")
     scope_name:str = Field(..., description="查询的名称，Query一般是作为一整个sql文件存在的")
 
+    # 其他属性
+    extra_attrs: Optional[Dict[str | int, str | int]] = Field(default_factory=dict)
+
+class TableSourceEnum(StrEnum):
+    PHYSICAL = "physical"  # 物理表：已在元数据中注册，真实挂载在 schema 下
+    SQL_REFERENCED = "sql_referenced"  # SQL引用表：仅在SQL中被引用，未进行元数据注册
 
 
+
+class TableNode(BaseEntityNode):
+    _neo4j_label: str =PrivateAttr(default="TableNode")
+
+    table_name:str = Field(..., description="数据库实体表的表名")
+    table_source: TableSourceEnum = Field(..., description="主要用于区分表的类型，分为未注册表，物理表，视图，临时表等")
+    table_comment: Optional[str] = Field(None, description="表注释（来自元数据）")
+
+    # 其他属性
+    extra_attrs: Optional[Dict[str | int, str | int]] = Field(default_factory=dict)
 
 
 

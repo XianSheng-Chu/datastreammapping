@@ -1,12 +1,13 @@
 from networkx import MultiDiGraph
 
+
 from .base import *
 from .scope_enums import ScopeType
 from sqlglot import *
 
 class QueryScope(SymbolTableScope):
 
-    def spawn_child_scope(self, ast_node: expressions=None, scope_type = ScopeType.QUERY) -> 'QueryScope':
+    def spawn_child_scope(self, ast_node: expressions=None, scope_type:ScopeType = ScopeType.QUERY) -> 'QueryScope':
         rulest = None
         # print(f"spawn_child_scope:line 9:scope_type:{scope_type}")
         if scope_type==ScopeType.SELECT:
@@ -222,6 +223,10 @@ class QueryScope(SymbolTableScope):
                     pass
                 else:
                     symbol_name = dg_node["table_name"]
+                    table_name = symbol_name
+                    schema_name = self.schema
+                    catalog_name = self.catalog
+
                     if dg_node["schema"] != "":
                         schema_name = dg_node["schema"]
                         symbol_name = f"{schema_name}.{symbol_name}"
@@ -229,7 +234,11 @@ class QueryScope(SymbolTableScope):
                         catalog_name = dg_node["catalog"]
                         symbol_name = f"{catalog_name}.{symbol_name}"
                     source_symbol_key = current_scoop.find_mapping_source("table",symbol_name)
-                    if source_symbol_key is not None:
+                    if source_symbol_key is  None:
+                        from .schema_scope import SchemaScope
+                        current_schema: SchemaScope = self.find_parent_scope(ScopeType.SCHEMA)
+                        source_symbol_key = current_schema.find_table(table_name,schema_name,catalog_name)
+                    else:
                         pass
                     print(f"{symbol_name}<-{source_symbol_key}")
 

@@ -31,9 +31,7 @@ class CatalogScope(SymbolTableScope):
         result = ((self.scope_type.str(),self.scope_name),)
         return result
 
-    def create_root_dg_node(self):
-        add_model_to_graph(self.nodeDgs,self.root_dg_node_model)
-        self.nodeDgs.nodes[self.scope_key]["scope_root_temp"] = self
+
 
     def init_root_dg_node_model(self):
         return CatalogNode(
@@ -42,3 +40,9 @@ class CatalogScope(SymbolTableScope):
             scope_name = self.scope_name,
             database_type = self.data_base_type
         )
+
+    def find_schema_scope(self,schema_name:str)->SchemaScope:
+        find_schema_scope = self.children.get(schema_name,None)
+        if find_schema_scope is None:
+            find_schema_scope = self.spawn_child_scope(schema_name)
+        return find_schema_scope
