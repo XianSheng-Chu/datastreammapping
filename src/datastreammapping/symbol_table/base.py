@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
 
 from .scope_enums import ScopeType
-from ..graph.data_models import *
+from ..models.node_models import *
+from ..models.edge_models import *
+
 
 class SymbolTableScope(ABC):
     def __init__(self,scope_name, parent:'SymbolTableScope'=None,scope_type:ScopeType=None):
@@ -81,6 +83,7 @@ class SymbolTableScope(ABC):
         return self.nodeDgs.nodes[dg_key]["scope_root_temp"].scope_logical_order_key(dg_key)
 
     def add_scope_node(self,model: BaseModel, exclude: set = None):
-        add_model_to_graph(self.nodeDgs,model,exclude)
+        add_node_model_to_graph(self.nodeDgs, model, exclude)
+
 
 

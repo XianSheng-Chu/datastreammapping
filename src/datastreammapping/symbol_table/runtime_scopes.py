@@ -5,7 +5,7 @@ class SelectScope(QueryScope):
     def __init__(self, parent:QueryScope,query_name,ast_node,scope_type=ScopeType.SELECT):
         super().__init__(parent,query_name,scope_type)
         # logical_processing_order用于存储一个定义域下子句在语义中解析的顺序
-        self.logical_processing_order:list = ['with','from','laterals','joins','pivots','sample','prewhere','where',
+        self.logical_processing_order:list = ['with','with_','from','from_','laterals','joins','pivots','sample','prewhere','where',
                                          'match','connect','group','having','windows','qualify','expressions','operation_modifiers',
                                          'distinct','distribute','sort','cluster','order','limit','offset','into','locks','format',
                                          'settings','options',]

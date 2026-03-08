@@ -1,4 +1,4 @@
-# graph/data_models.py
+
 from networkx import MultiDiGraph
 from pydantic import BaseModel, Field, model_validator,field_serializer,PrivateAttr
 from typing import Literal, Optional, List,Dict
@@ -7,14 +7,6 @@ from sqlglot import Dialects
 
 from enum import StrEnum
 
-
-
-def add_model_to_graph(graph: MultiDiGraph, model: BaseModel, exclude: set = None):
-    # 将节点模型写入图中
-    exclude = exclude or set()
-    # exclude标识不需要写入图的模型属性
-    node_attrs = model.model_dump(exclude=exclude)
-    graph.add_node(model.node_id, **node_attrs)
 
 class BaseNode(BaseModel):
     node_id:tuple = Field(..., description="全局唯一节点ID")
@@ -147,6 +139,14 @@ class TableNode(BaseEntityNode):
 
     # 其他属性
     extra_attrs: Optional[Dict[str | int, str | int]] = Field(default_factory=dict)
+
+
+def add_node_model_to_graph(graph: MultiDiGraph, model: BaseNode, exclude: set = None):
+    # 将节点模型写入图中
+    exclude = exclude or set()
+    # exclude标识不需要写入图的模型属性
+    node_attrs = model.model_dump(exclude=exclude)
+    graph.add_node(model.node_id, **node_attrs)
 
 
 

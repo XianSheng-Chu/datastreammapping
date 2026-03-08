@@ -86,7 +86,12 @@ class QueryScope(SymbolTableScope):
                                   )
             for i in range(-1,-len(dg_key),-1):
                 if dg_key[:i] in self.nodeDgs.nodes:
-                    self.nodeDgs.add_edge(dg_key,dg_key[:i],key="syntax_tree_parent",tree_path=dg_key[-i:])
+                    edge_model = CodeStructureEdge(
+                        source_node_id=dg_key,
+                        target_node_id=dg_key[:i],
+                        edge_sub_type=CodeStructureEdgeEnum.SYNTAX_TREE_PARENT
+                    )
+                    add_edge_model_to_graph(self.nodeDgs,edge_model)
                     break
 
         self.data_node_active = dg_key
@@ -212,11 +217,24 @@ class QueryScope(SymbolTableScope):
             scoop_root = scoop_root.parent
         dg_node_order_keys = scoop_root.apply_logical_order()
 
+
+
         for dg_key in dg_node_order_keys:
             dg_node  = scoop_root.nodeDgs.nodes[dg_key]
             current_scoop:QueryScope = dg_node["scope_root_temp"]
             if not isinstance(current_scoop, QueryScope):
                 continue
+
+            if dg_node.get("exp_key", "") in ("subquery","cte"):
+
+                edge_model = DataStreamMappingEdge(
+                    source_node_id=dg_key+("this",),
+                    target_node_id=dg_key,
+                    edge_sub_type=DataStreamMappingEdgeEnum.SUBQUERY_TO_QUERY
+                )
+                add_edge_model_to_graph(self.nodeDgs, edge_model)
+                print(f"{dg_node.get("exp_key", "")}<-{dg_key+("this",)}")
+
             if dg_node.get("exp_key","")=="table":
                 if dg_node.get("table_name")=="":
                     #此处是处理table为一个func的分支
@@ -238,8 +256,22 @@ class QueryScope(SymbolTableScope):
                         from .schema_scope import SchemaScope
                         current_schema: SchemaScope = self.find_parent_scope(ScopeType.SCHEMA)
                         source_symbol_key = current_schema.find_table(table_name,schema_name,catalog_name)
+                        edge_model = DataStreamMappingEdge(
+                            source_node_id=source_symbol_key,
+                            target_node_id=dg_key,
+                            edge_sub_type=DataStreamMappingEdgeEnum.SQL_REFERENCED_TABLE_FROM_ENTITY
+                        )
                     else:
-                        pass
+                        edge_model = DataStreamMappingEdge(
+                            source_node_id=dg_key + ("this",),
+                            target_node_id=dg_key,
+                            edge_sub_type=DataStreamMappingEdgeEnum.TABLE_FROM_QUERY
+                        )
+
+
+                    add_edge_model_to_graph(self.nodeDgs, edge_model)
+
+
                     print(f"{symbol_name}<-{source_symbol_key}")
 
             current_scoop.add_symbol(dg_key,current_scoop.symbol_name(dg_key))

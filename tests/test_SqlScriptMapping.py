@@ -109,6 +109,7 @@ def test_sqlmapping():
         fun2(b.emp_id) as emp_user_name, 
         dim.contract_number,
         ctr.user2.dept.*,*,a.status,
+        (select count(*) from source_t_cte ) as source_user_count,
         count(*)over(partition by a.user_id,1),
         ? as test_value,
         $P_START_DATE as start_date,

@@ -161,7 +161,7 @@ basic_TableAlias:
     pattern:
         type: "node"
         level: "current"
-        class_name: "TableAlias"
+        class_name: "tablealias"
     conditions:
         - condition_true:
             weight: 2
