@@ -262,10 +262,49 @@ def test_sqlmapping():
 
     # 验证结果
     #print(list(G.edges()))
+    import datastreammapping.core as dsmCore
+    compiler = dsmCore.SQLToGraphCompiler("postgres")
+    compiler.compile_sql(
+        """
+        WITH company_avg AS (
+            SELECT AVG(salary) AS avg_salary FROM employees
+        ),
+        high_earners AS (
+            SELECT e.id, e.name, e.salary, e.department_id
+            FROM employees e, company_avg
+            WHERE e.salary > company_avg.avg_salary
+        )
+        SELECT 
+            d.department_name,
+            COUNT(h.id) AS high_earner_count,
+            1,d.*
+        FROM (select * from fin_date.departments) d
+        LEFT JOIN high_earners h ON d.id = h.department_id
+        GROUP BY d.department_name
+        ORDER BY high_earner_count DESC;
+        """)
+    nodeDg = compiler.current_query.nodeDgs.copy()
+    mapping = {node: str(node) for node in nodeDg.nodes}
+    nodeDgs = nx.relabel_nodes(nodeDg, mapping, copy=True)
+    for node, data in nodeDgs.nodes(data=True):
+        label = data.get('output',"")
+        if label == "":
+            label =  data.get("exp_key","")
+        if label == "":
+            label =  str(node)
+        data["label"] = label
+        data["node_id"] = str(node)
 
-    # 转换为 PyVis 网络
+        attrs_to_remove = ["exp_node","scope_root_temp","created_data","last_updated_data","scope_key","node_id"]
+        for attr in attrs_to_remove:
+            data.pop(attr, None)
+        if type(node) is tuple:
+            print(data)
+
+
+            # 转换为 PyVis 网络
     net = Network(notebook=True, directed=True, height="1000px", width="100%")
-    net.from_nx(G)
+    net.from_nx(nodeDgs)
 
     # 配置选项
     net.set_options("""
@@ -296,12 +335,12 @@ def test_sqlmapping():
     """)
 
     # 添加自定义边标签
-    for edge in net.edges:
-        # 从原始图获取键和权重
-        original_data = G.get_edge_data(edge['from'], edge['to'], edge['note'])
-        if original_data:
-            edge['title'] = f"Key: {edge['key']}\nWeight: {original_data['weight']}"
-            edge['label'] = f"{edge['key']}:{original_data['weight']}"
+    # for edge in net.edges:
+    #     # 从原始图获取键和权重
+    #     original_data = G.get_edge_data(edge['from'], edge['to'], edge['note'])
+    #     if original_data:
+    #         edge['title'] = f"Key: {edge['key']}\nWeight: {original_data['weight']}"
+    #         edge['label'] = f"{edge['key']}:{original_data['weight']}"
     # 保存或显示
     net.show("fixtures/multi_digraph.html")
 

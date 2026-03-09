@@ -7,7 +7,6 @@
 """
 import copy
 import json
-from openpyxl.styles.builtins import output
 from sqlglot import expressions
 from sqlglot.dialects.dialect import DialectType
 from sqlglot.expressions import *

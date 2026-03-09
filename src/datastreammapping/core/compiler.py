@@ -1,4 +1,3 @@
-from sqlglot import Dialects, Dialect
 
 from ..parser import ASTAdapter
 from ..parser import RuleEngine
@@ -23,7 +22,7 @@ class SQLToGraphCompiler:
         self.graph_builder = None
         self.catalog_scope = CatalogScope(data_base_type)
         self.current_schema = self.catalog_scope.spawn_child_scope("master")
-        self.current_query = None
+        self.current_query:QueryScope = None
 
     def compile_sql(self, sql_string: str, dialect=None, query_scope: QueryScope = None):
         """
