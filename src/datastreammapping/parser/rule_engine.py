@@ -57,10 +57,11 @@ class RuleEngine:
                     self.current_scope = self.current_scope.parent
                 self.current_scope = actions(item,self.current_scope)
 
-        dg_node_keys = self.current_scope.apply_logical_order()
+        self.current_scope.create_table_relationship_map()
+        self.current_scope.create_column_relationship_map()
 
         # test
-        self.current_scope.create_table_relationship_map()
+        dg_node_keys = self.current_scope.apply_logical_order()
         for node in dg_node_keys:
             if self.current_scope.nodeDgs.nodes[node].get("exp_node") is not None:
                 # print(f"{node}:{self.current_scope.nodeDgs.nodes[node]["exp_stage"]}")

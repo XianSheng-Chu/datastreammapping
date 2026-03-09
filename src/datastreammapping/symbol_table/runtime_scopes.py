@@ -82,7 +82,7 @@ class SelectScope(QueryScope):
         symbol_name = ""
         dg_node = self.nodeDgs.nodes[dg_key]
         if dg_node is None or dg_node.get("exp_key", None) is None:
-            return symbol_name
+            return super().symbol_name(dg_key)
         #以下分支是为表述select字句中的所有列的名称符号
         if dg_node.get("output_flag",False):
             if dg_node["exp_key"] in ("alias", "column","star") :

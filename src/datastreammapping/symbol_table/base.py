@@ -25,7 +25,6 @@ class SymbolTableScope(ABC):
 
     def create_root_dg_node(self):
         self.add_scope_node(self.root_dg_node_model)
-        self.nodeDgs.nodes[self.scope_key]["scope_root_temp"] = self
 
 
 
@@ -82,8 +81,8 @@ class SymbolTableScope(ABC):
     def scope_logical_order(self,dg_key:tuple):
         return self.nodeDgs.nodes[dg_key]["scope_root_temp"].scope_logical_order_key(dg_key)
 
-    def add_scope_node(self,model: BaseModel, exclude: set = None):
+    def add_scope_node(self,model: BaseNode, exclude: set = None):
         add_node_model_to_graph(self.nodeDgs, model, exclude)
-
+        self.nodeDgs.nodes[model.node_id]["scope_root_temp"] = self
 
 

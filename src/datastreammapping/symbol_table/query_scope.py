@@ -233,7 +233,7 @@ class QueryScope(SymbolTableScope):
                     edge_sub_type=DataStreamMappingEdgeEnum.SUBQUERY_TO_QUERY
                 )
                 add_edge_model_to_graph(self.nodeDgs, edge_model)
-                print(f"{dg_node.get("exp_key", "")}<-{dg_key+("this",)}")
+                # print(f"{dg_node.get("exp_key", "")}<-{dg_key+("this",)}")
 
             if dg_node.get("exp_key","")=="table":
                 if dg_node.get("table_name")=="":
@@ -263,7 +263,7 @@ class QueryScope(SymbolTableScope):
                         )
                     else:
                         edge_model = DataStreamMappingEdge(
-                            source_node_id=dg_key + ("this",),
+                            source_node_id=source_symbol_key,
                             target_node_id=dg_key,
                             edge_sub_type=DataStreamMappingEdgeEnum.TABLE_FROM_QUERY
                         )
@@ -272,11 +272,11 @@ class QueryScope(SymbolTableScope):
                     add_edge_model_to_graph(self.nodeDgs, edge_model)
 
 
-                    print(f"{symbol_name}<-{source_symbol_key}")
+                    # print(f"{symbol_name}<-{source_symbol_key}")
 
             current_scoop.add_symbol(dg_key,current_scoop.symbol_name(dg_key))
 
-    def find_mapping_source(self, symbol_type:str, symbol_name:str) -> tuple:
+    def find_mapping_source(self, symbol_type:str, symbol_name:str) -> tuple|list[tuple]:
         current_scoop = self
         result = None
         if symbol_type == "table":
@@ -288,8 +288,66 @@ class QueryScope(SymbolTableScope):
              result = current_scoop.current_scope_symbols.get("cte", {}).get(symbol_name)
              if result is not None:
                  break
-
+        if symbol_type in ("column","star"):
+            result = current_scoop.current_scope_symbols.get("table",{}).get(symbol_name,None)
+            if result is None:
+                current_tables = current_scoop.current_scope_symbols.get("table", {})
+                if len(current_tables) == 1:
+                    for table_key in current_tables.values():
+                        result = table_key
+                if symbol_type == "star":
+                    # 只有在select * 的情况下才可能来源于多个表
+                    result = list(current_tables.values())
         return result
+
+    def create_column_relationship_map(self):
+        scoop_root: QueryScope = self
+        while scoop_root.scope_type != ScopeType.QUERY:
+            scoop_root = scoop_root.parent
+        dg_node_order_keys = scoop_root.apply_logical_order()
+        for dg_key in dg_node_order_keys:
+            dg_node  = scoop_root.nodeDgs.nodes[dg_key]
+            current_scoop:QueryScope = dg_node["scope_root_temp"]
+            if dg_node.get("exp_key", "") in ("column","star"):
+                if scoop_root.nodeDgs.nodes.get(dg_key[:-1]).get("exp_key", "") == "column":
+                    # 如果某个星号已经是一个column的一部分，那么就需要跳过relationship构建过程
+                    continue
+                symbol_name = ""
+                if dg_node.get("table","") != "":
+                    table_name = dg_node.get("table","")
+                    symbol_name = table_name
+                    if dg_node.get("schema","") != "":
+                        schema_name = dg_node.get("schema","")
+                        symbol_name = f"{schema_name}.{symbol_name}"
+                        if dg_node.get("catalog","") != "":
+                            catalog_name = dg_node.get("catalog","")
+                            symbol_name = f"{catalog_name}.{symbol_name}"
+                source_symbol_key = current_scoop.find_mapping_source(dg_node.get("exp_key", ""), symbol_name)
+
+                if source_symbol_key is not None:
+                    if  dg_node["output_name"] != "*":
+                        edge_sub_type =  DataStreamMappingEdgeEnum.FIELD_TRACES_FROM_TABLE
+                    else:
+                        edge_sub_type =  DataStreamMappingEdgeEnum.STAR_FIELD_DERIVED_FROM_FIELD
+                    if type(source_symbol_key) is tuple:
+                        edge_model = DataStreamMappingEdge(
+                            source_node_id=source_symbol_key,
+                            target_node_id=dg_key,
+                            edge_sub_type=edge_sub_type
+                        )
+                        add_edge_model_to_graph(self.nodeDgs, edge_model)
+                    else:
+                        # 用于处理 select * from a,b,c 的星号的引用关系
+                        for source_symbol in source_symbol_key:
+                            edge_model = DataStreamMappingEdge(
+                                source_node_id=source_symbol,
+                                target_node_id=dg_key,
+                                edge_sub_type=edge_sub_type
+                            )
+                            add_edge_model_to_graph(self.nodeDgs, edge_model)
+
+
+                print(f"{dg_node["output_name"]}<-{source_symbol_key}")
 
     def init_root_dg_node_model(self):
         return QueryNode(
