@@ -68,7 +68,8 @@ class RuleEngine:
                 # print(f"{node}:{self.current_scope.nodeDgs.nodes[node].get("output_flag",False)}")
                 symbol_name = self.current_scope.nodeDgs.nodes[node]["scope_root_temp"].symbol_name(node)
                 self.current_scope.nodeDgs.nodes[node].get("scope_root_temp").add_symbol(node,symbol_name)
-                print(f"{node}:{symbol_name}")
+                # print(f"{node}:{symbol_name}")
+                print(f"{node}:{self.current_scope.nodeDgs.nodes[node]["exp_stage"]}")
                 # print(f"{node}:{self.current_scope.nodeDgs.nodes[node]["scope_root_temp"].symbol_name(node)}")
 
             else:

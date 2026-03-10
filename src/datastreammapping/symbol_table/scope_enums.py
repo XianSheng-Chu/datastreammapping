@@ -17,7 +17,7 @@ class ScopeType(Enum):
     SCHEMA = ("schema", ScopeCategory.DATABASE, True)  # 模式作用域
 
     # === 查询级别 ===
-    QUERY = ("query", ScopeCategory.QUERY, True)  # 主查询
+    QUERY = ("query", ScopeCategory.QUERY, True)  # 查询脚本，可以包含一个或者多个sql语句
     SELECT = ("select", ScopeCategory.QUERY, True)  # 主查询
     SUBQUERY = ("subquery", ScopeCategory.QUERY, True)  # 普通子查询
     CORRELATED_SUBQUERY = ("correlated_subquery", ScopeCategory.QUERY, True)

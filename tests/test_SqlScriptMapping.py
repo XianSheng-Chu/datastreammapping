@@ -3,6 +3,7 @@ import json
 from sqlglot.expressions import Select
 import sqlglot.dialects
 import  neo4jInstall as ni
+from datastreammapping.models import EdgeMainTypeEnum
 from datastreammapping.sqlscriptmapping import SqlScriptMapping
 
 def myTraverse(tree,temp = ""):
@@ -288,6 +289,10 @@ def test_sqlmapping():
     nodeDgs = nx.relabel_nodes(nodeDg, mapping, copy=True)
     for node, data in nodeDgs.nodes(data=True):
         label = data.get('output',"")
+
+        if label == "":
+            label =  data.get("node_name","")
+
         if label == "":
             label =  data.get("exp_key","")
         if label == "":
@@ -304,6 +309,10 @@ def test_sqlmapping():
 
             # 转换为 PyVis 网络
     net = Network(notebook=True, directed=True, height="1000px", width="100%")
+
+    #移除不需要的边
+    nodeDgs.remove_edges_from([(u, v, k) for (u, v, k) in nodeDgs.edges(keys=True) if k == EdgeMainTypeEnum.CODE_STRUCTURE ])
+
     net.from_nx(nodeDgs)
 
     # 配置选项
@@ -335,12 +344,14 @@ def test_sqlmapping():
     """)
 
     # 添加自定义边标签
-    # for edge in net.edges:
-    #     # 从原始图获取键和权重
-    #     original_data = G.get_edge_data(edge['from'], edge['to'], edge['note'])
-    #     if original_data:
-    #         edge['title'] = f"Key: {edge['key']}\nWeight: {original_data['weight']}"
-    #         edge['label'] = f"{edge['key']}:{original_data['weight']}"
+
+    for edge in net.edges:
+        # 从原始图获取键和权重
+        original_data = nodeDgs.get_edge_data(edge['from'], edge['to'])
+        if original_data:
+            edge['label'] = edge["edge_main_type"]
+            # edge['title'] = f"Key: {edge['key']}\nWeight: {original_data['weight']}"
+            # edge['label'] = f"{edge['key']}:{original_data['weight']}"
     # 保存或显示
     net.show("fixtures/multi_digraph.html")
 

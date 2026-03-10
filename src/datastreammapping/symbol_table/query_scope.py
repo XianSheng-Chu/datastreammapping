@@ -81,17 +81,29 @@ class QueryScope(SymbolTableScope):
                                   exp_key = node.key,
                                   exp_node=node,
                                   exp_stage=stage_name,
-                                  scope_key = self.scope_key,
+                                  # scope_key = self.scope_key,
                                   scope_root_temp = self     #scope_root_temp属性无需进行持久化
                                   )
             for i in range(-1,-len(dg_key),-1):
                 if dg_key[:i] in self.nodeDgs.nodes:
-                    edge_model = CodeStructureEdge(
+                    parent_key = dg_key[:i]
+                    edge_model_code = CodeStructureEdge(
                         source_node_id=dg_key,
-                        target_node_id=dg_key[:i],
+                        target_node_id=parent_key,
                         edge_sub_type=CodeStructureEdgeEnum.SYNTAX_TREE_PARENT
                     )
-                    add_edge_model_to_graph(self.nodeDgs,edge_model)
+                    add_edge_model_to_graph(self.nodeDgs,edge_model_code)
+                    if self.nodeDgs[parent_key].get("stage_name","scope_root") == "scope_root":
+                        pass
+                    else:
+                        edge_model_date = DataStreamMappingEdge(
+                            source_node_id=dg_key,
+                            target_node_id=parent_key,
+                            edge_sub_type=DataStreamMappingEdgeEnum.DATA_STREAM_OTHER
+                        )
+                        add_edge_model_to_graph(self.nodeDgs, edge_model_date)
+
+
                     break
 
         self.data_node_active = dg_key
