@@ -72,18 +72,28 @@ class QueryScope(SymbolTableScope):
             if self.scope_root == node:
                 self.scope_key=dg_key
                 stage_name = "scope_root"
+                node_model = self.init_root_dg_node_model()
+                self.add_scope_node(node_model)
             elif self.scope_key is not None:
                 stage_name = dg_key[len(self.scope_key):][0]
                 if type(stage_name) is  tuple:
                     stage_name = stage_name[0]
-            self.nodeDgs.add_node(
-                                  dg_key,
-                                  exp_key = node.key,
-                                  exp_node=node,
-                                  exp_stage=stage_name,
-                                  # scope_key = self.scope_key,
-                                  scope_root_temp = self     #scope_root_temp属性无需进行持久化
-                                  )
+                node_model = BaseExpressionsNode(
+                    node_id=dg_key,
+                    exp_key=node.key,
+                    exp_node=node,
+                    exp_stage=stage_name,
+                )
+                self.add_scope_node(node_model)
+
+                # self.nodeDgs.add_node(
+                #                       dg_key,
+                #                       exp_key = node.key,
+                #                       exp_node=node,
+                #                       exp_stage=stage_name,
+                #                       # scope_key = self.scope_key,
+                #                       scope_root_temp = self     #scope_root_temp属性无需进行持久化
+                #                       )
             for i in range(-1,-len(dg_key),-1):
                 if dg_key[:i] in self.nodeDgs.nodes:
                     parent_key = dg_key[:i]
@@ -133,7 +143,8 @@ class QueryScope(SymbolTableScope):
 
     def add_node_info(self, node, info:dict):
         for key,value in info.items():
-            self.nodeDgs.nodes[self.data_node_active][key] = value
+            self.nodeDgs.nodes[self.data_node_active]["extra_attrs"][key] = value
+            # self.nodeDgs.nodes[self.data_node_active][key] = value
 
     def is_descendant(self,ast_node:Expression)->bool:
         """检查 ast_node 是否在 该作用域之中"""
@@ -193,29 +204,29 @@ class QueryScope(SymbolTableScope):
 
         # 下列分支是为了表的符号名称
         if dg_node["exp_key"] == "cte":
-            return dg_node["alias"]
+            return dg_node["extra_attrs"]["alias"]
         elif dg_node["exp_key"] == "table":
-            if dg_node["table_alias"] != "":
-                return dg_node["table_alias"]
-            if dg_node["table_name"] == "":
+            if dg_node["extra_attrs"]["table_alias"] != "":
+                return dg_node["extra_attrs"]["table_alias"]
+            if dg_node["extra_attrs"]["table_name"] == "":
                 dg_key_this = list(dg_key)
                 dg_key_this.append("this")
                 dg_key_this = tuple(dg_key_this)
                 return self.symbol_name(dg_key_this)
 
-            symbol_name = dg_node["table_name"]
-            if dg_node["schema"] != "":
-                schema_name = dg_node["schema"]
+            symbol_name = dg_node["extra_attrs"]["table_name"]
+            if dg_node["extra_attrs"]["schema"] != "":
+                schema_name = dg_node["extra_attrs"]["schema"]
                 symbol_name = f"{schema_name}.{symbol_name}"
-            if dg_node["catalog"] != "":
-                catalog_name = dg_node["catalog"]
+            if dg_node["extra_attrs"]["catalog"] != "":
+                catalog_name = dg_node["extra_attrs"]["catalog"]
                 symbol_name = f"{catalog_name}.{symbol_name}"
 
 
             return symbol_name
         elif dg_node["exp_key"] == "subquery":
-            if dg_node.get("alias","") != "":
-                symbol_name = dg_node["alias"]
+            if dg_node["extra_attrs"].get("alias","") != "":
+                symbol_name = dg_node["extra_attrs"]["alias"]
             else:
                 symbol_name = self.scope_logical_order_key(dg_key)
 
@@ -245,23 +256,23 @@ class QueryScope(SymbolTableScope):
                     edge_sub_type=DataStreamMappingEdgeEnum.SUBQUERY_TO_QUERY
                 )
                 add_edge_model_to_graph(self.nodeDgs, edge_model)
-                # print(f"{dg_node.get("exp_key", "")}<-{dg_key+("this",)}")
+                print(f"{dg_node.get("exp_key", "")}<-{dg_key+("this",)}")
 
             if dg_node.get("exp_key","")=="table":
-                if dg_node.get("table_name")=="":
+                if dg_node["extra_attrs"].get("table_name")=="":
                     #此处是处理table为一个func的分支
                     pass
                 else:
-                    symbol_name = dg_node["table_name"]
+                    symbol_name = dg_node["extra_attrs"]["table_name"]
                     table_name = symbol_name
                     schema_name = self.schema
                     catalog_name = self.catalog
 
-                    if dg_node["schema"] != "":
-                        schema_name = dg_node["schema"]
+                    if dg_node["extra_attrs"]["schema"] != "":
+                        schema_name = dg_node["extra_attrs"]["schema"]
                         symbol_name = f"{schema_name}.{symbol_name}"
-                    if dg_node["catalog"] != "":
-                        catalog_name = dg_node["catalog"]
+                    if dg_node["extra_attrs"]["catalog"] != "":
+                        catalog_name = dg_node["extra_attrs"]["catalog"]
                         symbol_name = f"{catalog_name}.{symbol_name}"
                     source_symbol_key = current_scoop.find_mapping_source("table",symbol_name)
                     if source_symbol_key is  None:
@@ -325,19 +336,19 @@ class QueryScope(SymbolTableScope):
                     # 如果某个星号已经是一个column的一部分，那么就需要跳过relationship构建过程
                     continue
                 symbol_name = ""
-                if dg_node.get("table","") != "":
-                    table_name = dg_node.get("table","")
+                if dg_node["extra_attrs"].get("table","") != "":
+                    table_name = dg_node["extra_attrs"].get("table","")
                     symbol_name = table_name
-                    if dg_node.get("schema","") != "":
-                        schema_name = dg_node.get("schema","")
+                    if dg_node["extra_attrs"].get("schema","") != "":
+                        schema_name = dg_node["extra_attrs"].get("schema","")
                         symbol_name = f"{schema_name}.{symbol_name}"
-                        if dg_node.get("catalog","") != "":
-                            catalog_name = dg_node.get("catalog","")
+                        if dg_node["extra_attrs"].get("catalog","") != "":
+                            catalog_name = dg_node["extra_attrs"].get("catalog","")
                             symbol_name = f"{catalog_name}.{symbol_name}"
                 source_symbol_key = current_scoop.find_mapping_source(dg_node.get("exp_key", ""), symbol_name)
 
                 if source_symbol_key is not None:
-                    if  dg_node["output_name"] != "*":
+                    if  dg_node["extra_attrs"]["output_name"] != "*":
                         edge_sub_type =  DataStreamMappingEdgeEnum.FIELD_TRACES_FROM_TABLE
                     else:
                         edge_sub_type =  DataStreamMappingEdgeEnum.STAR_FIELD_DERIVED_FROM_FIELD
@@ -359,7 +370,7 @@ class QueryScope(SymbolTableScope):
                             add_edge_model_to_graph(self.nodeDgs, edge_model)
 
 
-                print(f"{dg_node["output_name"]}<-{source_symbol_key}")
+                print(f"{dg_node["extra_attrs"]["output_name"]}<-{source_symbol_key}")
 
     def init_root_dg_node_model(self):
         return QueryNode(

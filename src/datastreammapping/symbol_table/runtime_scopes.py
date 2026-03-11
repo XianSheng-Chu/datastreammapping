@@ -17,6 +17,7 @@ class SelectScope(QueryScope):
         self.set_scope_root(ast_node)
         self.fetch_columns(ast_node)
 
+
     def fetch_columns(self,ast_node:select):
         node = ast_node
         outputs = node.named_selects
@@ -86,10 +87,10 @@ class SelectScope(QueryScope):
         #以下分支是为表述select字句中的所有列的名称符号
         if dg_node.get("output_flag",False):
             if dg_node["exp_key"] in ("alias", "column","star") :
-                symbol_name = dg_node["output_name"]
+                symbol_name = dg_node["extra_attrs"]["output_name"]
             elif dg_node["exp_key"] == "anonymous":
-                symbol_name = dg_node["func_name"]
-            elif dg_node.get("func_type","")!="":
+                symbol_name = dg_node["extra_attrs"]["func_name"]
+            elif dg_node["extra_attrs"].get("func_type","")!="":
                 symbol_name = dg_node["exp_key"]
             elif dg_node["exp_key"] == "literal":
                 symbol_name = "?column?"
@@ -100,3 +101,10 @@ class SelectScope(QueryScope):
             symbol_name = super().symbol_name(dg_key)
 
         return symbol_name
+
+    def init_root_dg_node_model(self):
+        return SelectScopeNode(
+            node_id = self.scope_key,
+            exp_key = self.scope_root.key,
+            exp_node = self.scope_root
+        )

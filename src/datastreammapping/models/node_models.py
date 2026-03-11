@@ -1,9 +1,9 @@
-
+import sqlglot
 from networkx import MultiDiGraph
-from pydantic import BaseModel, Field, model_validator,field_serializer,PrivateAttr,computed_field
-from typing import Literal, Optional, List,Dict
+from pydantic import BaseModel, Field, model_validator, field_serializer, PrivateAttr, computed_field, SkipValidation
+from typing import Literal, Optional, List, Dict, Any, Annotated
 from datetime import datetime
-from sqlglot import Dialects
+from sqlglot import Dialects, Expression
 
 from enum import StrEnum
 
@@ -11,7 +11,7 @@ from enum import StrEnum
 class BaseNode(BaseModel):
     node_id:tuple = Field(..., description="全局唯一节点ID")
     description:Optional[str] = Field(None, description="节点描述")
-    node_name:Optional[str] = Field(None, description="节点中文名称")
+    node_name:Optional[str] = Field(None, description="节点名称")
 
     @computed_field #computed_field注解的字段在调用model_dump()时会被序列化
     @property
@@ -65,6 +65,9 @@ class BaseNode(BaseModel):
 
         # 去重并返回
         return list(dict.fromkeys(labels))
+
+    # 其他属性
+    extra_attrs:Optional[Dict[str|int, str|int]]= Field(default_factory=dict, description="节点拓展属性")
 
 class BaseEntityNode(BaseNode):
     """
@@ -120,8 +123,7 @@ class CatalogNode(BaseEntityNode):
     ]   = Field(..., description="数据库类型")
 
 
-    # 其他属性
-    extra_attrs:Optional[Dict[str|int, str|int]]= Field(default_factory=dict)
+
 
 
 class SchemaNode(BaseEntityNode):
@@ -137,8 +139,7 @@ class SchemaNode(BaseEntityNode):
     schema_name:str = Field(..., description="schema名称")
     scope_name:str = Field("auto_schema", description="数据定义域的名称,可以写明环境信息等非严格字段")
 
-    # 其他属性
-    extra_attrs: Optional[Dict[str | int, str | int]] = Field(default_factory=dict)
+
 
 
 class QueryNode(BaseEntityNode):
@@ -173,8 +174,7 @@ class TableNode(BaseEntityNode):
     table_source: TableSourceEnum = Field(..., description="主要用于区分表的类型，分为未注册表，物理表，视图，临时表等")
     table_comment: Optional[str] = Field(None, description="表注释（来自元数据）")
 
-    # 其他属性
-    extra_attrs: Optional[Dict[str | int, str | int]] = Field(default_factory=dict)
+
 
 
 class BaseExpressionsNode(BaseNode):
@@ -183,8 +183,11 @@ class BaseExpressionsNode(BaseNode):
     """
     _neo4j_label: str =PrivateAttr(default="Expressions")
     is_entity:Literal[False] = Field(False, description="标识节点是否时一个实体节点")
-    exp_key: str = Field(False, description="Expressions对象的key,通常是小写的类名")
-    exp_stage:str = Field(False, description="节点所在编译阶段的名称，比如where字句，group字句等")
+    exp_key: str = Field(..., description="Expressions对象的key,通常是小写的类名")
+    exp_stage:str = Field(..., description="节点所在编译阶段的名称，比如where字句，group字句等")
+    #SkipValidation将跳过所有的字段校验
+    exp_node:Annotated[SkipValidation,Expression] = Field(None, description="节点挂载的Expression树的位置")
+    output_flag:bool = Field(False, description="标识该节点是否是一个输出字段，能否被父作用域引用，在select中代表该节点是否是一个查询字段")
 
 
 class BaseExpressionsScopeNode(BaseExpressionsNode):
@@ -192,6 +195,25 @@ class BaseExpressionsScopeNode(BaseExpressionsNode):
     所有sql语句内单独的符号表定义域的父节点
     """
     _neo4j_label: str =PrivateAttr(default="ExpressionsScope")
+    exp_stage:Literal["scope_root"] = Field("scope_root", description="对于一个定义域的顶端节点，阶段名称固定为scope_root")
+
+    @model_validator(mode="after")
+    def create_node_name(self) -> "BaseNode":
+        """每次修改模型时自动更新 node_name"""
+        self.node_name = f"{self.exp_key}"
+        return self
+
+
+class SelectScopeNode(BaseExpressionsScopeNode):
+    """
+    select语句节点
+    """
+    _neo4j_label: str =PrivateAttr(default="SelectScope")
+
+
+
+
+
 
 
 
