@@ -13,7 +13,8 @@ class EdgeMainTypeEnum(StrEnum):
 class EntitySubordinationEdgeEnum(StrEnum):
     # 指向父作用域的关系，比如schema与catalog之间的关系
     PARENT_SCOPE = "parent_scope"
-
+    # 指向QUERY_SCOPE的关系，即一个sql文本中多个sql语句都指向sql文本名称的关系
+    PARENT_QUERY_SCOPE = "parent_query_scope"
 
 # 子枚举2：数据流映射（
 class DataStreamMappingEdgeEnum(StrEnum):

@@ -288,14 +288,14 @@ def test_sqlmapping():
     mapping = {node: str(node) for node in nodeDg.nodes}
     nodeDgs = nx.relabel_nodes(nodeDg, mapping, copy=True)
     for node, data in nodeDgs.nodes(data=True):
-        label = data.get('output',"")
+        label = data["extra_attrs"].get('output',None)
 
-        if label == "":
-            label =  data.get("node_name","")
+        if label is None:
+            label =  data.get("node_name",None)
 
-        if label == "":
-            label =  data.get("exp_key","")
-        if label == "":
+        if label is None:
+            label =  data.get("exp_key",None)
+        if label is None:
             label =  str(node)
         data["label"] = label
         data["node_id"] = str(node)
@@ -349,7 +349,7 @@ def test_sqlmapping():
         # 从原始图获取键和权重
         original_data = nodeDgs.get_edge_data(edge['from'], edge['to'])
         if original_data:
-            edge['label'] = edge["edge_main_type"]
+            edge['label'] = "data_map"
             # edge['title'] = f"Key: {edge['key']}\nWeight: {original_data['weight']}"
             # edge['label'] = f"{edge['key']}:{original_data['weight']}"
     # 保存或显示

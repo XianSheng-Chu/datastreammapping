@@ -163,7 +163,7 @@ basic_TableAlias:
         level: "current"
         class_name: "tablealias"
     conditions:
-        - condition_true:
+        - condition_false:
             weight: 2
     actions:
         - add_node:

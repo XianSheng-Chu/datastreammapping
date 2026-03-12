@@ -26,6 +26,17 @@ class SymbolTableScope(ABC):
     def create_root_dg_node(self):
         self.add_scope_node(self.root_dg_node_model)
 
+    def create_parent_relationship(self,edge_sub_type = EntitySubordinationEdgeEnum.PARENT_SCOPE):
+        if self.parent is None:
+            return
+        edge_model = EntitySubordinationEdge(
+            source_node_id=self.scope_key,
+            target_node_id=self.parent.scope_key,
+            edge_sub_type=edge_sub_type
+        )
+        add_edge_model_to_graph(self.nodeDgs, edge_model)
+
+
 
 
     def find_parent_scope(self,scope_type:ScopeType) -> 'SymbolTableScope':

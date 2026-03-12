@@ -29,8 +29,8 @@ class QueryScope(SymbolTableScope):
         if self.scope_type==ScopeType.QUERY:
             self.root_dg_node_model = self.init_root_dg_node_model()
             self.create_root_dg_node()
+            self.create_parent_relationship()
             query_dg_key = self.scope_root_key
-            self.scope_key=self.nodeDgs.nodes[query_dg_key]
             self.query_root_name = query_dg_key
             self.query_count = 0
         else:
@@ -40,6 +40,7 @@ class QueryScope(SymbolTableScope):
         self.data_node_active:tuple
         self.current_stage = None
         self.current_scope_symbols:dict ={}
+
 
     def add_child_scope(self, scope:'QueryScope'):
         self.children.append((scope.scope_type,scope))
@@ -74,6 +75,8 @@ class QueryScope(SymbolTableScope):
                 stage_name = "scope_root"
                 node_model = self.init_root_dg_node_model()
                 self.add_scope_node(node_model)
+                if self.parent.scope_type == ScopeType.QUERY:
+                    self.create_parent_relationship(EntitySubordinationEdgeEnum.PARENT_QUERY_SCOPE)
             elif self.scope_key is not None:
                 stage_name = dg_key[len(self.scope_key):][0]
                 if type(stage_name) is  tuple:
@@ -103,7 +106,7 @@ class QueryScope(SymbolTableScope):
                         edge_sub_type=CodeStructureEdgeEnum.SYNTAX_TREE_PARENT
                     )
                     add_edge_model_to_graph(self.nodeDgs,edge_model_code)
-                    if self.nodeDgs[parent_key].get("stage_name","scope_root") == "scope_root":
+                    if self.nodeDgs.nodes[parent_key].get("exp_stage","scope_root") == "scope_root":
                         pass
                     else:
                         edge_model_date = DataStreamMappingEdge(
@@ -148,7 +151,6 @@ class QueryScope(SymbolTableScope):
 
     def is_descendant(self,ast_node:Expression)->bool:
         """检查 ast_node 是否在 该作用域之中"""
-        # find 返回第一个匹配的节点，如果找到则返回节点本身，否则返回 None
         node = ast_node
         if self.scope_root is None:
             return True
@@ -344,7 +346,6 @@ class QueryScope(SymbolTableScope):
                         symbol_name = f"{schema_name}.{symbol_name}"
                         if dg_node["extra_attrs"].get("catalog","") != "":
                             catalog_name = dg_node["extra_attrs"].get("catalog","")
-                            symbol_name = f"{catalog_name}.{symbol_name}"
                 source_symbol_key = current_scoop.find_mapping_source(dg_node.get("exp_key", ""), symbol_name)
 
                 if source_symbol_key is not None:

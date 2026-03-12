@@ -15,6 +15,7 @@ class SchemaScope(SymbolTableScope):
         super().__init__(scope_name=schema_name,parent=parent, scope_type=scope_type)
         self.root_dg_node_model = self.init_root_dg_node_model()
         self.create_root_dg_node()
+        self.create_parent_relationship()
 
 
     @property

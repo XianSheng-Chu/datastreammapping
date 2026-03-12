@@ -18,6 +18,7 @@ class SelectScope(QueryScope):
         self.fetch_columns(ast_node)
 
 
+
     def fetch_columns(self,ast_node:select):
         node = ast_node
         outputs = node.named_selects
@@ -108,3 +109,5 @@ class SelectScope(QueryScope):
             exp_key = self.scope_root.key,
             exp_node = self.scope_root
         )
+
+
