@@ -89,14 +89,6 @@ class QueryScope(SymbolTableScope):
                 )
                 self.add_scope_node(node_model)
 
-                # self.nodeDgs.add_node(
-                #                       dg_key,
-                #                       exp_key = node.key,
-                #                       exp_node=node,
-                #                       exp_stage=stage_name,
-                #                       # scope_key = self.scope_key,
-                #                       scope_root_temp = self     #scope_root_temp属性无需进行持久化
-                #                       )
             for i in range(-1,-len(dg_key),-1):
                 if dg_key[:i] in self.nodeDgs.nodes:
                     parent_key = dg_key[:i]
@@ -106,15 +98,26 @@ class QueryScope(SymbolTableScope):
                         edge_sub_type=CodeStructureEdgeEnum.SYNTAX_TREE_PARENT
                     )
                     add_edge_model_to_graph(self.nodeDgs,edge_model_code)
+                    parent_attrs = self.nodeDgs.nodes[parent_key]["extra_attrs"]
+
                     if self.nodeDgs.nodes[parent_key].get("exp_stage","scope_root") == "scope_root":
                         pass
+                    elif (parent_attrs.get("predicate_attrs","consume") != "consume" or
+                          (parent_attrs.get("predicate_attrs","") == "consume" and self.nodeDgs.nodes[parent_key]["exp_key"] != "join" ) or
+                        self.nodeDgs.nodes[parent_key]["exp_key"] == "join" and self.find_parent_key(node)== "on"):
+                        edge_model_date = DataStreamMappingEdge(
+                            source_node_id=dg_key,
+                            target_node_id=parent_key,
+                            edge_sub_type=DataStreamMappingEdgeEnum.LOGICAL_LINK
+                        )
+                        add_edge_model_to_graph(self.nodeDgs, edge_model_date)
                     else:
                         edge_model_date = DataStreamMappingEdge(
                             source_node_id=dg_key,
                             target_node_id=parent_key,
                             edge_sub_type=DataStreamMappingEdgeEnum.DATA_STREAM_OTHER
                         )
-                        add_edge_model_to_graph(self.nodeDgs, edge_model_date)
+                        # add_edge_model_to_graph(self.nodeDgs, edge_model_date)
 
 
                     break
@@ -197,6 +200,11 @@ class QueryScope(SymbolTableScope):
             if self.current_scope_symbols.get(symbol_type) is None:
                 self.current_scope_symbols[symbol_type] = {}
             self.current_scope_symbols[symbol_type][symbol_name] = dg_key
+        elif dg_node["exp_key"] in ("subquery",) :
+            symbol_type = "table"
+            if self.current_scope_symbols.get(symbol_type) is None:
+                self.current_scope_symbols[symbol_type] = {}
+            self.current_scope_symbols[symbol_type][symbol_name] = dg_key
 
     def symbol_name(self,dg_key:tuple)->str:
         symbol_name = ""
@@ -245,6 +253,9 @@ class QueryScope(SymbolTableScope):
 
 
         for dg_key in dg_node_order_keys:
+            if self.nodeDgs.nodes[dg_key].get("node_name") is None:
+                # 补充Expression节点的node_name属性
+                self.nodeDgs.nodes[dg_key]["node_name"] = self.get_node_name(dg_key)
             dg_node  = scoop_root.nodeDgs.nodes[dg_key]
             current_scoop:QueryScope = dg_node["scope_root_temp"]
             if not isinstance(current_scoop, QueryScope):
@@ -259,6 +270,8 @@ class QueryScope(SymbolTableScope):
                 )
                 add_edge_model_to_graph(self.nodeDgs, edge_model)
                 print(f"{dg_node.get("exp_key", "")}<-{dg_key+("this",)}")
+            elif dg_node.get("exp_key", "") in ("tablealias",):
+                pass
 
             if dg_node.get("exp_key","")=="table":
                 if dg_node["extra_attrs"].get("table_name")=="":
@@ -314,6 +327,8 @@ class QueryScope(SymbolTableScope):
              if result is not None:
                  break
         if symbol_type in ("column","star"):
+            if symbol_type == "star":#test
+                pass
             result = current_scoop.current_scope_symbols.get("table",{}).get(symbol_name,None)
             if result is None:
                 current_tables = current_scoop.current_scope_symbols.get("table", {})
@@ -346,6 +361,8 @@ class QueryScope(SymbolTableScope):
                         symbol_name = f"{schema_name}.{symbol_name}"
                         if dg_node["extra_attrs"].get("catalog","") != "":
                             catalog_name = dg_node["extra_attrs"].get("catalog","")
+                            symbol_name = f"{catalog_name}.{symbol_name}"
+
                 source_symbol_key = current_scoop.find_mapping_source(dg_node.get("exp_key", ""), symbol_name)
 
                 if source_symbol_key is not None:
@@ -379,7 +396,28 @@ class QueryScope(SymbolTableScope):
             scope_name = self.scope_name
         )
 
+    def create_relationship_map(self):
+        for children_type,children_scoop in  self.children:
+            children_scoop.create_relationship_map()
 
+    def get_node_name(self,dg_key:tuple)->Optional[str]:
+        """获取某个Expression节点的node_name"""
+        result = self.symbol_name(dg_key)
+        if result != "":
+            return result
+        result = None
+        dg_node = self.nodeDgs.nodes[dg_key]
+        if dg_node["exp_key"] in ("alias", "column", "star"):
+            result = dg_node["extra_attrs"]["output_name"]
+        elif dg_node["exp_key"] == "anonymous":
+            result = dg_node["extra_attrs"]["func_name"]
+        elif dg_node["exp_key"] == "literal":
+            result = "?column?"
+        elif dg_node["extra_attrs"].get("func_type", "") != "":
+            result = dg_node["exp_key"]
+
+        
+        return result
 
 
 

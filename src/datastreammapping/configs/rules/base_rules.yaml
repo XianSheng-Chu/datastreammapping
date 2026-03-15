@@ -99,6 +99,10 @@ basic_where:
     actions:
         - add_node:
         - set_stage : where
+        - add_custom_values:
+              #   为图节点添加自定义信息
+              key_name: predicate_attrs
+              value: consume
 
 basic_join:
     pattern:
@@ -121,6 +125,10 @@ basic_join:
                     # value不存在时是否依旧记录该键值对
                     default_value: inner
                     # value不存在时使用的默认值
+        - add_custom_values:
+            #   为图节点添加自定义信息
+            key_name: predicate_attrs
+            value: consume
 
 
 
@@ -251,6 +259,10 @@ basic_having:
     actions:
         - add_node:
         - set_stage : having
+        - add_custom_values:
+              #   为图节点添加自定义信息
+              key_name: predicate_attrs
+              value: consume
 
 
 
@@ -301,6 +313,21 @@ basic_literal:
             - is_string:
                 node_key: is_string
                 keep_missing: false
+
+basic_if:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "if"
+    conditions:
+        - condition_true:
+            weight: 4
+    actions:
+        - add_node:
+        - add_custom_values:
+              #   为图节点添加自定义信息
+              key_name: predicate_attrs
+              value: consume
 
 basic_Anonymous:
     pattern:
@@ -408,6 +435,17 @@ basic_SubqueryPredicate_super:
                 [All,Any,Exists,]
     actions:
         - add_node:
+        - in:
+            #  复合列表中的值的数据被视为有效的
+            match_value: class_name
+            weight: 4
+            value_list: [Exists,]
+            actions:
+                - add_custom_values:
+                      #   为图节点添加自定义信息
+                      key_name: predicate_attrs
+                      value: Predicate
+
 
 basic_Unary_super:
     pattern:
@@ -444,6 +482,11 @@ basic_Predicate_super:
                 [Between,In,]
     actions:
         - add_node:
+        - add_custom_values:
+              #   为图节点添加自定义信息
+              key_name: predicate_attrs
+              value: Predicate
+
 
 basic_Binary_super:
     pattern:
@@ -482,6 +525,10 @@ basic_Binary_Predicate_super:
                 [EQ,NullSafeEQ,NullSafeNEQ,Glob,GT,GTE,ILike,ILikeAny,Is,Like,LikeAny,LT,LTE,NEQ,SimilarTo,]
     actions:
         - add_node:
+        - add_custom_values:
+              #   为图节点添加自定义信息
+              key_name: predicate_attrs
+              value: Binary
 
 basic_Binary_Func_super:
     pattern:
@@ -628,6 +675,10 @@ basic_Connector_super:
                 [And,Or,]
     actions:
         - add_node:
+        - add_custom_values:
+              #   为图节点添加自定义信息
+              key_name: predicate_attrs
+              value: Connector
 
 basic_Func_Connector_super:
     pattern:

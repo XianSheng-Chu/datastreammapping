@@ -38,6 +38,12 @@ class DataStreamMappingEdgeEnum(StrEnum):
     # 表别名
     TABLE_ALIAS_FROM_QUERY = "table_alias_from_query"
 
+    # 逻辑链路,所有的涉及到逻辑关系的判断所包含的关系
+    LOGICAL_LINK = "logical_link"
+
+    # 数据转换流，即在select子句中对输出字段所做的转换操作
+    TRANSFORM_DATE = "transform_date"
+
     # 兜底
     DATA_STREAM_OTHER = "data_stream_other"
 

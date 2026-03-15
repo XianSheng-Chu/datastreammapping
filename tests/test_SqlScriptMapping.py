@@ -349,7 +349,7 @@ def test_sqlmapping():
         # 从原始图获取键和权重
         original_data = nodeDgs.get_edge_data(edge['from'], edge['to'])
         if original_data:
-            edge['label'] = "data_map"
+            edge['label'] = edge['edge_sub_type']
             # edge['title'] = f"Key: {edge['key']}\nWeight: {original_data['weight']}"
             # edge['label'] = f"{edge['key']}:{original_data['weight']}"
     # 保存或显示

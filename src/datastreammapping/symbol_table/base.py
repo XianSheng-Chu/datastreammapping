@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from typing import Set
 
 from .scope_enums import ScopeType
 from ..models.node_models import *
@@ -96,4 +97,32 @@ class SymbolTableScope(ABC):
         add_node_model_to_graph(self.nodeDgs, model, exclude)
         self.nodeDgs.nodes[model.node_id]["scope_root_temp"] = self
 
+    def find_child_nodes(
+            self,
+            target_node: tuple,
+            graph : MultiDiGraph,
+            allowed_edge_types = None
+    ) -> list:
+        """返回以该节点为最终节点的节点key的列表"""
+        if allowed_edge_types is None:
+            allowed_edge_types = {EdgeMainTypeEnum.CODE_STRUCTURE, EdgeMainTypeEnum.ENTITY_SUBORDINATION}
+        result_nodes = set()
+        visited = set()  # 防止环导致无限循环
+        stack = [target_node]  # 用栈实现 DFS，也可以用 deque 实现 BFS
+        result_nodes.add(target_node)
+        while stack:
+            current_node = stack.pop()
+
+            # 遍历当前节点的所有入边（u -> current_node，即 current_node 是目标节点）
+            # MultiDiGraph.in_edges 返回格式：(u, v, key, data)
+            for u, v, key, data in graph.in_edges(current_node, keys=True, data=True):
+                # 检查边类型是否符合要求
+                if key in allowed_edge_types:
+                    # 如果来源节点 u 没被访问过
+                    if u not in visited:
+                        visited.add(u)
+                        result_nodes.add(u)
+                        stack.append(u)  # 继续向上追溯 u 的祖先
+
+        return list(result_nodes)
 

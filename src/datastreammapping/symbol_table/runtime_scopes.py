@@ -91,15 +91,16 @@ class SelectScope(QueryScope):
                 symbol_name = dg_node["extra_attrs"]["output_name"]
             elif dg_node["exp_key"] == "anonymous":
                 symbol_name = dg_node["extra_attrs"]["func_name"]
-            elif dg_node["extra_attrs"].get("func_type","")!="":
-                symbol_name = dg_node["exp_key"]
             elif dg_node["exp_key"] == "literal":
                 symbol_name = "?column?"
-            else:
-                symbol_name = self.scope_logical_order_key(dg_key)
+            elif dg_node["extra_attrs"].get("func_type","")!="":
+                symbol_name = dg_node["exp_key"]
+
 
         if symbol_name == "":
             symbol_name = super().symbol_name(dg_key)
+
+
 
         return symbol_name
 
@@ -109,5 +110,40 @@ class SelectScope(QueryScope):
             exp_key = self.scope_root.key,
             exp_node = self.scope_root
         )
+
+    def create_relationship_map(self):
+        super().create_relationship_map()
+        self.create_output_relationship_map()
+
+    def create_output_relationship_map(self):
+        scope_nodes = self.find_child_nodes(self.scope_key,self.nodeDgs)
+        scope_nodes = [item for item in scope_nodes if self.nodeDgs.nodes[item]["scope_root_temp"]==self]
+
+        testval = (('catalog', 'Undefined'), ('schema', 'master'), ('query', 'Undefined_Query'), ('select', 1), 'with', ('expressions', 1), 'this', ('expressions', 0))
+        if testval in scope_nodes:
+            print(testval)
+        scope_nodes.sort(key=self.scope_logical_order)
+        for node in scope_nodes:
+            if self.nodeDgs.nodes[node]["exp_stage"] == "expressions":
+                for i in range(-1, -len(node), -1):
+                    if node[:i] in self.nodeDgs.nodes:
+                        parent_key = node[:i]
+                        deges = self.nodeDgs.get_edge_data(node,parent_key)
+                        if deges is None or EdgeMainTypeEnum.DATA_STREAM_MAPPING not in deges.keys():
+                            edge_model_date = DataStreamMappingEdge(
+                                source_node_id=node,
+                                target_node_id=parent_key,
+                                edge_sub_type=DataStreamMappingEdgeEnum.TRANSFORM_DATE
+                            )
+                            add_edge_model_to_graph(self.nodeDgs, edge_model_date)
+                        break
+
+
+
+
+
+
+
+
 
 

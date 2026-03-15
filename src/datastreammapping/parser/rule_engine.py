@@ -57,8 +57,14 @@ class RuleEngine:
                     self.current_scope = self.current_scope.parent
                 self.current_scope = actions(item,self.current_scope)
 
+        if self.current_scope.scope_root is not None:
+            item = self.current_scope.scope_root.parent
+            while not self.current_scope.is_descendant(item):
+                self.current_scope = self.current_scope.parent
+
         self.current_scope.create_table_relationship_map()
         self.current_scope.create_column_relationship_map()
+        self.current_scope.create_relationship_map()
 
         # test
         dg_node_keys = self.current_scope.apply_logical_order()
@@ -69,7 +75,7 @@ class RuleEngine:
                 symbol_name = self.current_scope.nodeDgs.nodes[node]["scope_root_temp"].symbol_name(node)
                 self.current_scope.nodeDgs.nodes[node].get("scope_root_temp").add_symbol(node,symbol_name)
                 # print(f"{node}:{symbol_name}")
-                print(f"{node}:{self.current_scope.nodeDgs.nodes[node]["exp_stage"]}")
+                print(f"{node}:{self.current_scope.nodeDgs.nodes[node]["exp_stage"]}:{symbol_name}")
                 # print(f"{node}:{self.current_scope.nodeDgs.nodes[node]["scope_root_temp"].symbol_name(node)}")
 
             else:
