@@ -113,18 +113,20 @@ class SelectScope(QueryScope):
 
     def create_relationship_map(self):
         super().create_relationship_map()
+        self.create_logical_relationship_map()
         self.create_output_relationship_map()
+        self.create_where_relationship_map()
+
 
     def create_output_relationship_map(self):
+        #处理select字句中所有的逻辑流
         scope_nodes = self.find_child_nodes(self.scope_key,self.nodeDgs)
         scope_nodes = [item for item in scope_nodes if self.nodeDgs.nodes[item]["scope_root_temp"]==self]
-
-        testval = (('catalog', 'Undefined'), ('schema', 'master'), ('query', 'Undefined_Query'), ('select', 1), 'with', ('expressions', 1), 'this', ('expressions', 0))
-        if testval in scope_nodes:
-            print(testval)
         scope_nodes.sort(key=self.scope_logical_order)
         for node in scope_nodes:
             if self.nodeDgs.nodes[node]["exp_stage"] == "expressions":
+                if node == (('catalog', 'Undefined'), ('schema', 'master'), ('query', 'Undefined_Query'), ('select', 1), ('expressions', 9)):#test
+                    pass
                 for i in range(-1, -len(node), -1):
                     if node[:i] in self.nodeDgs.nodes:
                         parent_key = node[:i]
@@ -137,6 +139,18 @@ class SelectScope(QueryScope):
                             )
                             add_edge_model_to_graph(self.nodeDgs, edge_model_date)
                         break
+
+    def create_where_relationship_map(self):
+        #处理select字句中所有的逻辑流
+        scope_nodes = self.find_child_nodes(self.scope_key,self.nodeDgs)
+        scope_nodes = [item for item in scope_nodes if self.nodeDgs.nodes[item]["scope_root_temp"]==self]
+        scope_nodes.sort(key=self.scope_logical_order)
+        for node in scope_nodes:
+            if self.nodeDgs.nodes[node]["exp_stage"] == "where":
+                pass
+
+
+
 
 
 
