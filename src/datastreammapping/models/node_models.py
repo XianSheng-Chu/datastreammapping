@@ -188,6 +188,7 @@ class BaseExpressionsNode(BaseNode):
     #SkipValidation将跳过所有的字段校验
     exp_node:Annotated[SkipValidation,Expression] = Field(None, description="节点挂载的Expression树的位置")
     output_flag:bool = Field(False, description="标识该节点是否是一个输出字段，能否被父作用域引用，在select中代表该节点是否是一个查询字段")
+    scope_key:tuple = Field(..., description="节点所在sql定义域的根节点")
 
 
 class BaseExpressionsScopeNode(BaseExpressionsNode):

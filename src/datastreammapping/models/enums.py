@@ -32,7 +32,7 @@ class DataStreamMappingEdgeEnum(StrEnum):
     # 存储来自于CTE表达式的信息
     TABLE_FROM_QUERY = "table_from_query"
 
-    # 存储某个被括号的subquery到subquery或者cte的关系
+    # 存储某个被括号的subquery到subquery或者cte的关系,cte的subquer映射到from字句中的table的关系
     SUBQUERY_TO_QUERY = "subquery_to_query"
 
     # 表别名

@@ -86,6 +86,7 @@ class QueryScope(SymbolTableScope):
                     exp_key=node.key,
                     exp_node=node,
                     exp_stage=stage_name,
+                    scope_key = self.scope_key
                 )
                 self.add_scope_node(node_model)
 
@@ -310,10 +311,8 @@ class QueryScope(SymbolTableScope):
              if result is not None:
                  break
         if symbol_type in ("column","star"):
-            if symbol_type == "star":#test
-                pass
-            result = current_scoop.current_scope_symbols.get("table",{}).get(symbol_name,None)
-            if result is None:
+
+            if symbol_name=="" or symbol_name is None:
                 current_tables = current_scoop.current_scope_symbols.get("table", {})
                 if len(current_tables) == 1:
                     for table_key in current_tables.values():
@@ -321,6 +320,15 @@ class QueryScope(SymbolTableScope):
                 if symbol_type == "star":
                     # 只有在select * 的情况下才可能来源于多个表
                     result = list(current_tables.values())
+
+            if result is None:
+                # sql中字段可以上溯一个父定义域去获取数据，例如exists语句的条件
+                while current_scoop.scope_type != ScopeType.QUERY:
+                    result = current_scoop.current_scope_symbols.get("table", {}).get(symbol_name, None)
+                    if result is not None:
+                        break
+                    current_scoop = current_scoop.parent
+
         return result
 
     def create_column_relationship_map(self):
@@ -333,7 +341,7 @@ class QueryScope(SymbolTableScope):
         for dg_key in dg_node_order_keys:
             dg_node  = scoop_root.nodeDgs.nodes[dg_key]
             current_scoop:QueryScope = dg_node["scope_root_temp"]
-            if dg_node.get("exp_key", "") in ("column","star"):
+            if dg_node.get("exp_key", "") in ("column","star") and dg_node["exp_stage"] not in ("order",):
                 if dg_node.get("exp_key", "")=="star" and scoop_root.nodeDgs.nodes.get(dg_key[:-1]).get("exp_key", "") == "column":
                     # 如果某个星号已经是一个column的一部分，那么就需要跳过relationship构建过程
                     continue
@@ -371,11 +379,8 @@ class QueryScope(SymbolTableScope):
                                 edge_sub_type=edge_sub_type
                             )
                             add_edge_model_to_graph(self.nodeDgs, edge_model)
-                if "first_o.order_id" == dg_node["exp_node"].sql():#test
-                    pass
 
-                current_scoop.add_symbol(dg_key, current_scoop.symbol_name(dg_key))
-                print(f"{dg_node["extra_attrs"]["output_name"]}<-{source_symbol_key}")
+                print(f"{dg_node["extra_attrs"].get("table","?")}.{dg_node["extra_attrs"]["output_name"]}<-{source_symbol_key}")
 
     def init_root_dg_node_model(self):
         return QueryNode(
@@ -389,9 +394,7 @@ class QueryScope(SymbolTableScope):
 
     def get_node_name(self,dg_key:tuple)->Optional[str]:
         """获取某个Expression节点的node_name"""
-        result = self.symbol_name(dg_key)
-        if result != "":
-            return result
+
         result = None
         dg_node = self.nodeDgs.nodes[dg_key]
         if dg_node["exp_key"] in ("alias", "column", "star"):
@@ -399,9 +402,17 @@ class QueryScope(SymbolTableScope):
         elif dg_node["exp_key"] == "anonymous":
             result = dg_node["extra_attrs"]["func_name"]
         elif dg_node["exp_key"] == "literal":
-            result = "?column?"
+            if dg_node["extra_attrs"]["is_string"]:
+                result =  "'"+dg_node["extra_attrs"]["literal_value"]+"'"
+            else:
+                result = dg_node["extra_attrs"]["literal_value"]
         elif dg_node["extra_attrs"].get("func_type", "") != "":
             result = dg_node["exp_key"]
+
+        if result != "":
+            return result
+
+        result = self.symbol_name(dg_key)
 
         
         return result

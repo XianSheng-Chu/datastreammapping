@@ -108,7 +108,8 @@ class SelectScope(QueryScope):
         return SelectScopeNode(
             node_id = self.scope_key,
             exp_key = self.scope_root.key,
-            exp_node = self.scope_root
+            exp_node = self.scope_root,
+            scope_key = self.scope_key
         )
 
     def create_relationship_map(self):
@@ -116,17 +117,16 @@ class SelectScope(QueryScope):
         self.create_logical_relationship_map()
         self.create_output_relationship_map()
         self.create_where_relationship_map()
+        self.create_order_relationship_map()
 
 
     def create_output_relationship_map(self):
         #处理select字句中所有的逻辑流
         scope_nodes = self.find_child_nodes(self.scope_key,self.nodeDgs)
-        scope_nodes = [item for item in scope_nodes if self.nodeDgs.nodes[item]["scope_root_temp"]==self]
+        scope_nodes = [item for item in scope_nodes if self.nodeDgs.nodes[item]["scope_key"]==self.scope_key]
         scope_nodes.sort(key=self.scope_logical_order)
         for node in scope_nodes:
             if self.nodeDgs.nodes[node]["exp_stage"] == "expressions":
-                if node == (('catalog', 'Undefined'), ('schema', 'master'), ('query', 'Undefined_Query'), ('select', 1), ('expressions', 9)):#test
-                    pass
                 for i in range(-1, -len(node), -1):
                     if node[:i] in self.nodeDgs.nodes:
                         parent_key = node[:i]
@@ -143,11 +143,21 @@ class SelectScope(QueryScope):
     def create_where_relationship_map(self):
         #处理select字句中所有的逻辑流
         scope_nodes = self.find_child_nodes(self.scope_key,self.nodeDgs)
-        scope_nodes = [item for item in scope_nodes if self.nodeDgs.nodes[item]["scope_root_temp"]==self]
+        scope_nodes = [item for item in scope_nodes if self.nodeDgs.nodes[item]["scope_key"]==self.scope_key]
         scope_nodes.sort(key=self.scope_logical_order)
         for node in scope_nodes:
             if self.nodeDgs.nodes[node]["exp_stage"] == "where":
                 pass
+
+    def create_order_relationship_map(self):
+        scope_nodes = self.find_child_nodes(self.scope_key, self.nodeDgs)
+        scope_nodes = [item for item in scope_nodes if self.nodeDgs.nodes[item]["scope_key"] == self.scope_key]
+        scope_nodes.sort(key=self.scope_logical_order)
+        for node in scope_nodes:
+            if self.nodeDgs.nodes[node]["exp_stage"] == "order":
+                pass
+
+
 
 
 

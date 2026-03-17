@@ -1,7 +1,5 @@
 from typing import Dict,Any,Callable,List
 
-from twisted.spread.publish import whenReady
-
 from .rule_compile_functions import *
 
 class RuleCompiler:
