@@ -445,7 +445,7 @@ class QueryScope(SymbolTableScope):
                             target_node_id=parent_key,
                             edge_sub_type=DataStreamMappingEdgeEnum.LOGICAL_LINK
                         )
-                        add_edge_model_to_graph(self.nodeDgs, edge_model_date)
-
-                    pass
-
+                        deges = self.nodeDgs.get_edge_data(dg_key,parent_key)
+                        if deges is None or EdgeMainTypeEnum.DATA_STREAM_MAPPING not in deges.keys():
+                            add_edge_model_to_graph(self.nodeDgs, edge_model_date)
+                    break
