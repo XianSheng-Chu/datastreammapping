@@ -16,7 +16,7 @@ class EntitySubordinationEdgeEnum(StrEnum):
     # 指向QUERY_SCOPE的关系，即一个sql文本中多个sql语句都指向sql文本名称的关系
     PARENT_QUERY_SCOPE = "parent_query_scope"
 
-# 子枚举2：数据流映射（
+# 子枚举2：数据流映射
 class DataStreamMappingEdgeEnum(StrEnum):
 
 
@@ -26,8 +26,8 @@ class DataStreamMappingEdgeEnum(StrEnum):
     # 存储的是字段引用表名的关系
     FIELD_TRACES_FROM_TABLE = "field_traces_from_table"
 
-    # 存储的是来自于表或者子查询的 * 号引用
-    STAR_FIELD_DERIVED_FROM_FIELD = "star_derived_from_field"
+    # 存储select字句中表达式到字段别名的关系
+    ALIAS_FROM_EXPRESSION = "alias_from_expression"
 
     # 存储来自于CTE表达式的信息
     TABLE_FROM_QUERY = "table_from_query"
@@ -38,10 +38,20 @@ class DataStreamMappingEdgeEnum(StrEnum):
     # 表别名
     TABLE_ALIAS_FROM_QUERY = "table_alias_from_query"
 
+    # select字句流向外部定义域的数据流
+    EXPRESSION_TO_QUERY = "expression_to_query"
+
+    # 存储一个query字句所输出的数据信息，例如 exists (select 1 from tmp) 这样的关系
+    DATA_FROM_QUERY = "data_from_query"
+
+    # 存储的是来自于表或者子查询的 * 号引用
+    STAR_FIELD_DERIVED_FROM_FIELD = "star_derived_from_field"
+
+    # 以下均为非幂等映射，即数据可能已经经历了转换操作
     # 逻辑链路,所有的涉及到逻辑关系的判断所包含的关系
     LOGICAL_LINK = "logical_link"
 
-    # 数据转换流，即在select子句中对输出字段所做的转换操作
+    # 数据转换流，例如在select子句中对输出字段所做的转换操作，以及某些位置使用的各种函数
     TRANSFORM_DATE = "transform_date"
 
     # 兜底

@@ -56,6 +56,12 @@ class SchemaScope(SymbolTableScope):
             table_comment = table_comment
         )
         self.add_scope_node(table_node)
+        edge_model_date = EntitySubordinationEdge(
+            source_node_id=node_id,
+            target_node_id=self.scope_root_key,
+            edge_sub_type=EntitySubordinationEdgeEnum.PARENT_SCOPE
+        )
+        add_edge_model_to_graph(self.nodeDgs, edge_model_date)
         return node_id
 
 

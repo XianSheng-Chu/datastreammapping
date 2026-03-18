@@ -3551,7 +3551,7 @@
                 "expression": {
                     "class": "Literal",
                     "args": {
-                        "this": "0",
+                        "this": "101",
                         "is_string": false
                     }
                 }

@@ -3,7 +3,7 @@ import json
 from sqlglot.expressions import Select
 import sqlglot.dialects
 import  neo4jInstall as ni
-from datastreammapping.models import EdgeMainTypeEnum
+from datastreammapping.models import EdgeMainTypeEnum, DataStreamMappingEdgeEnum
 from datastreammapping.sqlscriptmapping import SqlScriptMapping
 
 def myTraverse(tree,temp = ""):
@@ -421,9 +421,18 @@ WHERE
 ORDER BY 
     repurchase_order_count DESC,
     user_avg_order_amount DESC
-LIMIT 50 OFFSET 0;
+LIMIT 50 OFFSET 101;
         """)
     nodeDg = compiler.current_query.nodeDgs.copy()
+    # to_remove = [node for node, attrs in nodeDg.nodes(data=True) if attrs.get('exp_stage',"scope_root") not in ("scope_root", 'from', 'from_', 'expressions')]
+    to_remove = [node for node, attrs in nodeDg.nodes(data=True) if attrs.get('exp_key',"root")  in
+                 ("scope_root",'with','with_','from','from_','laterals','join','pivots','sample','prewhere','where',
+                                         'match','connect','group','having','windows','qualify','','operation_modifiers',
+                                         'distinct','distribute','sort','cluster','order','limit','offset','into','locks','format',
+                                         'settings','options',)]
+
+    nodeDg.remove_nodes_from(to_remove)
+
     mapping = {node: str(node) for node in nodeDg.nodes}
     nodeDgs = nx.relabel_nodes(nodeDg, mapping, copy=True)
     for node, data in nodeDgs.nodes(data=True):
@@ -451,35 +460,29 @@ LIMIT 50 OFFSET 0;
 
     #移除不需要的边
     nodeDgs.remove_edges_from([(u, v, k) for (u, v, k) in nodeDgs.edges(keys=True) if k == EdgeMainTypeEnum.CODE_STRUCTURE ])
+    for data in list(nodeDgs.nodes(data=True)):
+        print("---------------"+data[1].get("stage_name","scope_root"))
+
 
     net.from_nx(nodeDgs)
-
+    net.hierarchical = True  # 开启层次布局
     # 配置选项
     net.set_options("""
     {
-      "physics": {
-        "enabled": true,
-        "stabilization": {
-          "iterations": 100
-        }
-      },
-      "edges": {
-        "smooth": {
-          "type": "horizontal",
-          "roundness": 0.2
-        },
-        "arrows": {
-          "to": {
-            "enabled": true,
-            "scaleFactor": 1.5
-          }
-        }
-      },
-      "interaction": {
-        "hover": true,
-        "tooltipDelay": 200
-      }
+  "layout": {
+    "hierarchical": {
+      "enabled": true,
+      "levelSeparation": 200,  
+      "nodeSpacing": 150,      
+      "treeSpacing": 200,      
+      "direction": "LR",        
+      "sortMethod": "directed"  
     }
+  },
+  "physics": {
+    "enabled": true  
+  }
+}
     """)
 
     # 添加自定义边标签

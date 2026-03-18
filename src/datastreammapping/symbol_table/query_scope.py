@@ -434,18 +434,21 @@ class QueryScope(SymbolTableScope):
                     parent_node = self.nodeDgs.nodes[parent_key]
                     parent_attrs = self.nodeDgs.nodes[parent_key]["extra_attrs"]
                     current_node = self.nodeDgs.nodes[dg_key]
-                    if parent_node.get("exp_stage","scope_root") == "scope_root":
-                        pass
-                    elif (parent_attrs.get("predicate_attrs","consume") != "consume" or
+                    edge_type = None
+                    if current_node.get("exp_stage","") == "scope_root":
+                        edge_type = DataStreamMappingEdgeEnum.DATA_FROM_QUERY
+                    elif parent_node.get("exp_key") is not None and (parent_attrs.get("predicate_attrs","consume") != "consume" or
                           (parent_attrs.get("predicate_attrs","") == "consume" and parent_node["exp_key"] != "join" ) or
                           (parent_node["exp_key"] == "join" and self.find_parent_key(current_node["exp_node"])== "on") or
                           parent_node["exp_key"] == "paren" and current_node["extra_attrs"].get("predicate_attrs","") != "" ):
+                        edge_type = DataStreamMappingEdgeEnum.LOGICAL_LINK
+
+                    edges = self.nodeDgs.get_edge_data(dg_key,parent_key)
+                    if edges is None or EdgeMainTypeEnum.DATA_STREAM_MAPPING not in edges.keys() and edge_type is not None:
                         edge_model_date = DataStreamMappingEdge(
                             source_node_id=dg_key,
                             target_node_id=parent_key,
-                            edge_sub_type=DataStreamMappingEdgeEnum.LOGICAL_LINK
+                            edge_sub_type=edge_type
                         )
-                        deges = self.nodeDgs.get_edge_data(dg_key,parent_key)
-                        if deges is None or EdgeMainTypeEnum.DATA_STREAM_MAPPING not in deges.keys():
-                            add_edge_model_to_graph(self.nodeDgs, edge_model_date)
+                        add_edge_model_to_graph(self.nodeDgs, edge_model_date)
                     break

@@ -210,7 +210,7 @@ class SelectScopeNode(BaseExpressionsScopeNode):
     select语句节点
     """
     _neo4j_label: str =PrivateAttr(default="SelectScope")
-
+    output_names:list[str] = Field(default_factory=list, description="select的输出列的列名列表")
 
 
 
