@@ -281,6 +281,29 @@ basic_ordered:
                 node_key: nulls_first
                 keep_missing: false
 
+basic_limit:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "limit"
+    conditions:
+        - condition_true:
+            weight: 2
+    actions:
+        - add_node:
+
+basic_offset:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "offset"
+    conditions:
+        - condition_true:
+            weight: 2
+    actions:
+        - add_node:
+
+
 basic_star:
     pattern:
         type: "node"
@@ -464,6 +487,10 @@ basic_Unary_super:
                 [BitwiseNot,Not,Paren,Neg,]
     actions:
         - add_node:
+        - add_custom_values:
+            #   为图节点添加自定义信息
+            key_name: operators_type
+            value: Unary
 
 basic_Predicate_super:
     pattern:
@@ -506,6 +533,10 @@ basic_Binary_super:
                  PropertyEQ,Distance,Escape,IntDiv,Kwarg,Mod,Mul,Operator,Slice,Sub,]
     actions:
         - add_node:
+        - add_custom_values:
+            #   为图节点添加自定义信息
+            key_name: operators_type
+            value: Binary
 
 basic_Binary_Predicate_super:
     pattern:
@@ -528,7 +559,11 @@ basic_Binary_Predicate_super:
         - add_custom_values:
               #   为图节点添加自定义信息
               key_name: predicate_attrs
-              value: Binary
+              value: Binary_Predicate
+        - add_custom_values:
+            #   为图节点添加自定义信息
+            key_name: operators_type
+            value: Binary_Predicate
 
 basic_Binary_Func_super:
     pattern:

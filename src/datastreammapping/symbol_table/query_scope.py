@@ -395,7 +395,7 @@ class QueryScope(SymbolTableScope):
     def get_node_name(self,dg_key:tuple)->Optional[str]:
         """获取某个Expression节点的node_name"""
 
-        result = None
+        result = ""
         dg_node = self.nodeDgs.nodes[dg_key]
         if dg_node["exp_key"] in ("alias", "column", "star"):
             result = dg_node["extra_attrs"]["output_name"]
@@ -408,7 +408,12 @@ class QueryScope(SymbolTableScope):
                 result = dg_node["extra_attrs"]["literal_value"]
         elif dg_node["extra_attrs"].get("func_type", "") != "":
             result = dg_node["exp_key"]
-
+        elif dg_node["extra_attrs"].get("operators_type", "") != "":
+            operators_node:Expression = dg_node["exp_node"].copy()
+            operators_node.args.clear()
+            result = operators_node.sql()
+        elif dg_node["exp_key"] in ("subquery", ):
+            result = dg_node["exp_key"]
         if result != "":
             return result
 
@@ -441,10 +446,19 @@ class QueryScope(SymbolTableScope):
                           (parent_attrs.get("predicate_attrs","") == "consume" and parent_node["exp_key"] != "join" ) or
                           (parent_node["exp_key"] == "join" and self.find_parent_key(current_node["exp_node"])== "on") or
                           parent_node["exp_key"] == "paren" and current_node["extra_attrs"].get("predicate_attrs","") != "" ):
-                        edge_type = DataStreamMappingEdgeEnum.LOGICAL_LINK
+
+                        if parent_attrs.get("predicate_attrs","") == "Binary_Predicate":
+                            if dg_key[-1:][0]=="this":
+                                edge_type = DataStreamMappingEdgeEnum.LOGICAL_LINK_BINARY_LEFT
+                            elif dg_key[-1:][0]=="expression":
+                                edge_type = DataStreamMappingEdgeEnum.LOGICAL_LINK_BINARY_RIGHT
+                        else:
+                            edge_type = DataStreamMappingEdgeEnum.LOGICAL_LINK
+                    elif parent_node.get("exp_stage","") == "scope_root" and current_node["exp_stage"] not in ("expressions",):
+                        edge_type = DataStreamMappingEdgeEnum.DATA_STREAM_OTHER
 
                     edges = self.nodeDgs.get_edge_data(dg_key,parent_key)
-                    if edges is None or EdgeMainTypeEnum.DATA_STREAM_MAPPING not in edges.keys() and edge_type is not None:
+                    if (edges is None or EdgeMainTypeEnum.DATA_STREAM_MAPPING not in edges.keys()) and edge_type is not None:
                         edge_model_date = DataStreamMappingEdge(
                             source_node_id=dg_key,
                             target_node_id=parent_key,

@@ -51,8 +51,18 @@ class DataStreamMappingEdgeEnum(StrEnum):
     # 逻辑链路,所有的涉及到逻辑关系的判断所包含的关系
     LOGICAL_LINK = "logical_link"
 
+    # 二元比较符的左值链路
+    LOGICAL_LINK_BINARY_LEFT = "logical_link_binary_left"
+
+    # 二元比较符的左值链路
+    LOGICAL_LINK_BINARY_RIGHT = "binary_logical_link_right"
+
     # 数据转换流，例如在select子句中对输出字段所做的转换操作，以及某些位置使用的各种函数
     TRANSFORM_DATE = "transform_date"
+
+
+    # 用于指向执行顺序的流程，例如order中的字段列表，表的join顺序等
+    EXECUTION_SEQUENTIAL = "execution_sequential"
 
     # 兜底
     DATA_STREAM_OTHER = "data_stream_other"

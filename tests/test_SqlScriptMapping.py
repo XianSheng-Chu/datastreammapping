@@ -431,7 +431,7 @@ LIMIT 50 OFFSET 101;
                                          'distinct','distribute','sort','cluster','order','limit','offset','into','locks','format',
                                          'settings','options',)]
 
-    nodeDg.remove_nodes_from(to_remove)
+    # nodeDg.remove_nodes_from(to_remove)
 
     mapping = {node: str(node) for node in nodeDg.nodes}
     nodeDgs = nx.relabel_nodes(nodeDg, mapping, copy=True)
@@ -439,11 +439,11 @@ LIMIT 50 OFFSET 101;
         label = data["extra_attrs"].get('output',None)
 
         if label is None:
-            label =  data.get("node_name",None)
+            label =  data.get("node_name","")
 
-        if label is None:
-            label =  data.get("exp_key",None)
-        if label is None:
+        if label == "":
+            label =  data.get("exp_key","")
+        if label == "":
             label =  str(node)
         data["label"] = label
         data["node_id"] = str(node)
@@ -451,6 +451,7 @@ LIMIT 50 OFFSET 101;
         attrs_to_remove = ["exp_node","scope_root_temp","created_data","last_updated_data","scope_key","node_id"]
         for attr in attrs_to_remove:
             data.pop(attr, None)
+        nodeDgs.nodes[node]["title"] = f"节点key：{node}\n类型：{data.get('exp_key', data.get("node_name"))}\n{data.get('exp_stage', '')}"
         if type(node) is tuple:
             print(data)
 
@@ -460,8 +461,6 @@ LIMIT 50 OFFSET 101;
 
     #移除不需要的边
     nodeDgs.remove_edges_from([(u, v, k) for (u, v, k) in nodeDgs.edges(keys=True) if k == EdgeMainTypeEnum.CODE_STRUCTURE ])
-    for data in list(nodeDgs.nodes(data=True)):
-        print("---------------"+data[1].get("stage_name","scope_root"))
 
 
     net.from_nx(nodeDgs)
@@ -472,16 +471,25 @@ LIMIT 50 OFFSET 101;
   "layout": {
     "hierarchical": {
       "enabled": true,
-      "levelSeparation": 200,  
-      "nodeSpacing": 150,      
-      "treeSpacing": 200,      
       "direction": "LR",        
+      "levelSeparation": 250,   
+      "nodeSpacing": 180,       
       "sortMethod": "directed"  
     }
   },
+    "interaction": {
+    "hover": true,       
+    "tooltipDelay": 100  
+  },
   "physics": {
-    "enabled": true  
-  }
+    "enabled": false  
+  },
+  "edges": {
+    "arrows": { "to": { "enabled": true, "scaleFactor": 1.2 } },
+    "color": { "color": "#ccc", "highlight": "#4285f4" },
+    "width": 2
+  },
+  "interaction": { "hover": true, "zoomView": true }
 }
     """)
 
