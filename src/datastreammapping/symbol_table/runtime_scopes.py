@@ -129,7 +129,10 @@ class SelectScope(QueryScope):
         for node in scope_nodes:
             if self.nodeDgs.nodes[node]["exp_stage"] == "expressions":
                 if self.nodeDgs.nodes[node]["output_flag"]:
-                    self.nodeDgs.nodes[node]["output_names"] = self.symbol_name(node)
+                    output_names = list(self.nodeDgs.nodes[self.scope_key]["output_names"])
+                    output_names.append(self.symbol_name(node))
+                    self.nodeDgs.nodes[self.scope_key]["output_names"] = output_names
+
                 for i in range(-1, -len(node), -1):
                     if node[:i] in self.nodeDgs.nodes:
                         parent_key = node[:i]
@@ -176,25 +179,66 @@ class SelectScope(QueryScope):
         scope_nodes = self.find_child_nodes(self.scope_key, self.nodeDgs)
         scope_nodes = [item for item in scope_nodes if self.nodeDgs.nodes[item]["scope_key"] == self.scope_key]
         scope_nodes.sort(key=self.scope_logical_order)
+        exp_stage = self.scope_key + ("order",)
+
+        if exp_stage not in scope_nodes:
+            return
+        else:
+            exp_stage_in_nodes = [u for u, v, key, attr in self.nodeDgs.in_edges(exp_stage, keys=True, data=True)
+                                  if attr.get('edge_main_type') == EdgeMainTypeEnum.CODE_STRUCTURE]
+            exp_stage_in_nodes.append(exp_stage)
+            exp_stage_in_nodes.sort(key=self.scope_logical_order)
+            edge_type = DataStreamMappingEdgeEnum.EXECUTION_SEQUENTIAL
+            for i in range(0, len(exp_stage_in_nodes) - 1):
+                edge_model_date = DataStreamMappingEdge(
+                    source_node_id=exp_stage_in_nodes[i + 1],
+                    target_node_id=exp_stage_in_nodes[i],
+                    edge_sub_type=edge_type
+                )
+                add_edge_model_to_graph(self.nodeDgs, edge_model_date)
+
         for node in scope_nodes:
-            exp_stage = self.scope_key+("order",)
-            if exp_stage not in scope_nodes:
-                break
-            if self.nodeDgs.nodes[node]["exp_stage"] == "order":
+            if self.nodeDgs.nodes[node]["exp_stage"] == "order" and node not in exp_stage_in_nodes:
                 for i in range(-1, -len(node), -1):
                     if node[:i] in self.nodeDgs.nodes:
                         parent_key = node[:i]
                         if self.nodeDgs.nodes[parent_key]["exp_stage"] == "scope_root":
                             break
+                        current_node = self.nodeDgs.nodes[node]
                         edges = self.nodeDgs.get_edge_data(node, parent_key)
-                        edge_type = DataStreamMappingEdgeEnum.EXECUTION_SEQUENTIAL
+                        output_index = -1
+                        if self.nodeDgs.nodes[parent_key]["exp_key"] == "ordered":
+                            edges = self.nodeDgs.get_edge_data(node, parent_key)
+                            if current_node["exp_key"] == "literal" :
+                                if not self.nodeDgs.nodes[node]["extra_attrs"].get("is_string",True):
+                                    # 此处创建的是Order子句中直接使用数字序号的数据映射
+                                    output_index = current_node["exp_node"].to_py()
+                        if current_node["exp_key"] == "column":
+                            output_index = int(self.nodeDgs.nodes[self.scope_key]["output_names"].index(current_node["extra_attrs"]["output_name"]))
+                        if output_index != -1:
+                            #创建从select子句到order字句内column的映射
+                            source_key = self.scope_key + (("expressions", output_index),)
+                            edge_type = DataStreamMappingEdgeEnum.FIELD_TO_FIELD
+                            if edges is None or EdgeMainTypeEnum.DATA_STREAM_MAPPING not in edges.keys():
+                                edge_model_date = DataStreamMappingEdge(
+                                    source_node_id=source_key,
+                                    target_node_id=node,
+                                    edge_sub_type=edge_type
+                                )
+                                add_edge_model_to_graph(self.nodeDgs, edge_model_date)
+
+                        if self.nodeDgs.nodes[parent_key]["exp_key"] == "ordered":
+                            edge_type = DataStreamMappingEdgeEnum.FIELD_TO_FIELD
+                        else:
+                            edge_type = DataStreamMappingEdgeEnum.TRANSFORM_DATE
                         if edges is None or EdgeMainTypeEnum.DATA_STREAM_MAPPING not in edges.keys():
                             edge_model_date = DataStreamMappingEdge(
                                 source_node_id=node,
                                 target_node_id=parent_key,
                                 edge_sub_type=edge_type
                             )
-                            # add_edge_model_to_graph(self.nodeDgs, edge_model_date)
+                            add_edge_model_to_graph(self.nodeDgs, edge_model_date)
+
                     break
 
     def create_limit_relationship_map(self):

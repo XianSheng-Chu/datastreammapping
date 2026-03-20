@@ -179,7 +179,7 @@ WHERE
 
 ORDER BY 
     repurchase_order_count DESC,
-    user_avg_order_amount DESC
+    user_avg_order_amount DESC,3,5
 LIMIT 50 OFFSET 0;
         
 

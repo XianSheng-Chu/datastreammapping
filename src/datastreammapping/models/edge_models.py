@@ -79,6 +79,12 @@ def add_edge_model_to_graph(
     target = edge_model.target_node_id
     edge_key = edge_model.edge_main_type
 
+    if source not in graph.nodes:
+        raise ValueError("node_key '{}' is not in MultiDiGraph object nodes".format(source))
+
+    if target not in graph.nodes:
+        raise ValueError("node_key '{}' is not in MultiDiGraph object nodes".format(target))
+
     #将模型转换为字典（排除不需要的属性）
 
     edge_attrs = edge_model.model_dump(exclude=exclude_attrs)

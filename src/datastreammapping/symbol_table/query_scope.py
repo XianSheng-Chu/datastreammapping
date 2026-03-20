@@ -222,7 +222,7 @@ class QueryScope(SymbolTableScope):
             if dg_node["extra_attrs"].get("alias","") != "":
                 symbol_name = dg_node["extra_attrs"]["alias"]
             else:
-                symbol_name = self.scope_logical_order_key(dg_key)
+                symbol_name = f"Anonymous:{dg_node["exp_key"]}"
 
         return symbol_name
 
@@ -412,9 +412,7 @@ class QueryScope(SymbolTableScope):
             operators_node:Expression = dg_node["exp_node"].copy()
             operators_node.args.clear()
             result = operators_node.sql()
-        elif dg_node["exp_key"] in ("subquery", ):
-            result = dg_node["exp_key"]
-        if result != "":
+        if result != "" and result is not None:
             return result
 
         result = self.symbol_name(dg_key)

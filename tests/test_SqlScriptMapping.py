@@ -87,56 +87,161 @@ from sqlglot import generator
 def test_sqlmapping():
     # 解析 INSERT 语句
     sql = """
-    --INSERT INTO db1.arget_t (id, name,emp_id)
-    with source_t as (select * from source_ti a),
-    source_user1 as (select * from source_user),
-    source_emp_t as (select * from source_emp_ti),
-    source_user as (select user_id,user_name from source_t group by user_id,user_name,decode(user_type_code,'admin',1,0) having count(*) > 1 and max(user_type)<>min(user_type))
-    SELECT distinct
-        a.user_id AS id,
-        b.user_id,
-        CONCAT(a.first_name, ' ', a.last_name) AS source_names,
-        case when b.emp_id = '01101'
-        then '22331' else a.emp_id end  as user_emp_id,
-        b.emp_id as new_emp_id,
-        b.emp_name,
-        max(b.emp_id)over(partition by a.user_id),
-        row_number()over(partition by dept.dept_id order by user_id desc,a.emp_id ) as rn,
-        1 as bvz_id,
-        '压测区' as bvz_name,
-        'testVale',
-        now() as last_update_date,
-        fun1('a') as user_name, 
-        fun2(b.emp_id) as emp_user_name, 
-        dim.contract_number,
-        ctr.user2.dept.*,*,a.status,
-        (select count(*) from source_t_cte ) as source_user_count,
-        count(*)over(partition by a.user_id,1),
-        ? as test_value,
-        $P_START_DATE as start_date,
-        a."name" as name
-    FROM (
-    with source_t_cte as (select * from source_t_cte1(1,b))
+    -- 电商用户复购行为深度分析（表与子查询多次出现）
+SELECT 
+    -- 主用户信息
+    main_u.user_id,
+    main_u.user_name,
+    main_u.register_time,
     
-    select user_id,first_name,status,emp_id from user1.source_t a left join source_t_cte b on a.user_id = b.cust_id) a join source_emp_t b
-    on a.emp_id = b.emp_id,
-    user1.dim_contract dim,ctr.user2.dept
-     join test3 on a.user_id= test3.test3_id
-    left join (select t4.test4_id from test4 t4) on a.user_id= test4_id
+    -- 首次订单信息（第1次使用 fact_order）
+    first_o.order_id AS "first_order_id",
+    first_o.order_create_time AS first_order_time,
+    first_o_total.amount AS first_order_amount,
     
-    WHERE a.status = 'active'
-    and exists (select 1 from user2.contract_t c where a.contract_id = c.contract_id)
-    and (a.user_id = user2.dim.user_id1(+)
-    and b.dept_id = ctr.user2.dept.dept_id2)
-    order by source_names desc,id desc,emp_name,2 desc
-    union all
-    with table_union_cte as (select *from table_union2)
-    select id,user_id,source_names,user_emp_id,new_emp_id,emp_name,rn1,'1','testVale',last_update_date,user_name,table_union.emp1_user_name,contract_number,*
-    from table_union_cte t2
-    union all
-    select id,user_id,source_names,user_emp_id,new_emp_id,emp_name,rn1,'1','testVale',last_update_date,user_name,emp3_user_name,contract_number,*
-    from (select *from table_union1) sub_table where last_update_date > '2025-04-27'::date
-    ;
+    -- 最近订单信息（第2次使用 fact_order）
+    last_o.order_id AS last_order_id,
+    last_o.order_create_time AS last_order_time,
+    last_o_total.amount AS last_order_amount,
+    
+    -- 复购订单数（第3次使用 fact_order，关联子查询）
+    (SELECT COUNT(*) 
+     FROM fact_order repurchase_o  -- 子查询中再次使用 fact_order
+     WHERE repurchase_o.user_id = main_u.user_id
+       AND repurchase_o.order_create_time > first_o.order_create_time
+       AND repurchase_o.order_status IN ('paid', 'completed')
+    ) AS repurchase_order_count,
+    
+    -- 复购订单总金额（第4次使用 fact_order，相似子查询再次出现）
+    (SELECT SUM(repurchase_detail.price * repurchase_detail.quantity)
+     FROM fact_order repurchase_o2  -- 又一次使用 fact_order
+     INNER JOIN fact_order_detail repurchase_detail
+         ON repurchase_o2.order_id = repurchase_detail.order_id
+     WHERE repurchase_o2.user_id = main_u.user_id
+       AND repurchase_o2.order_create_time > first_o.order_create_time
+       AND repurchase_o2.order_status IN ('paid', 'completed')
+    ) AS repurchase_total_amount,
+    
+    -- 用户平均订单金额（第5次使用 fact_order，子查询中多次关联 dim_user）
+    (SELECT AVG(order_avg.amount)
+     FROM (
+         -- 子查询的子查询，再次使用 fact_order 和 dim_user
+         SELECT 
+             o_inner.user_id,
+             SUM(od_inner.price * od_inner.quantity) AS amount
+         FROM fact_order o_inner  -- 再次使用 fact_order
+         INNER JOIN fact_order_detail od_inner
+             ON o_inner.order_id = od_inner.order_id
+         INNER JOIN dim_user u_inner  -- 再次使用 dim_user
+             ON o_inner.user_id = u_inner.user_id
+         WHERE u_inner.user_id = main_u.user_id
+           AND o_inner.order_status IN ('paid', 'completed')
+         GROUP BY o_inner.user_id
+     ) AS order_avg
+    ) AS user_avg_order_amount,
+    
+    -- 同注册月份用户的平均复购次数（子查询中同时使用 dim_user 和 fact_order 多次）
+    (SELECT AVG(repurchase_count)
+     FROM (
+         SELECT 
+             u_compare.user_id,
+             COUNT(*) AS repurchase_count
+         FROM dim_user u_compare  -- 再次使用 dim_user
+         INNER JOIN fact_order o_compare  -- 再次使用 fact_order
+             ON u_compare.user_id = o_compare.user_id
+         WHERE 
+             DATE_TRUNC('month', u_compare.register_time) = DATE_TRUNC('month', main_u.register_time)
+             AND o_compare.order_create_time > (
+                 -- 子查询的子查询的子查询，fact_order 又出现了
+                 SELECT MIN(first_compare.order_create_time)
+                 FROM fact_order first_compare
+                 WHERE first_compare.user_id = u_compare.user_id
+             )
+         GROUP BY u_compare.user_id
+     ) AS compare_repurchase
+    ) AS cohort_avg_repurchase_count
+
+FROM 
+    dim_user main_u  -- 主表 dim_user
+INNER JOIN (
+    -- 首次订单子查询（第1次嵌套使用 fact_order）
+    SELECT 
+        fo.user_id,
+        fo.order_id,
+        fo.order_create_time
+    FROM fact_order fo
+    INNER JOIN (
+        SELECT user_id, MIN(order_create_time) AS first_time
+        FROM fact_order  -- 子查询中再次使用 fact_order
+        GROUP BY user_id
+    ) AS first_time_o
+        ON fo.user_id = first_time_o.user_id
+        AND fo.order_create_time = first_time_o.first_time
+) AS first_o
+    ON main_u.user_id = first_o.user_id
+INNER JOIN (
+    -- 最近订单子查询（第2次嵌套使用 fact_order，结构与上面相似）
+    SELECT 
+        lo.user_id,
+        lo.order_id,
+        lo.order_create_time
+    FROM fact_order lo
+    INNER JOIN (
+        SELECT user_id, MAX(order_create_time) AS last_time
+        FROM fact_order  -- 又一次使用 fact_order
+        GROUP BY user_id
+    ) AS last_time_o
+        ON lo.user_id = last_time_o.user_id
+        AND lo.order_create_time = last_time_o.last_time
+) AS last_o
+    ON main_u.user_id = last_o.user_id
+INNER JOIN (
+    -- 首次订单金额子查询（第3次嵌套使用 fact_order）
+    SELECT 
+        fo_total.order_id,
+        SUM(od_total.price * od_total.quantity) AS amount
+    FROM fact_order fo_total
+    INNER JOIN fact_order_detail od_total
+        ON fo_total.order_id = od_total.order_id
+    GROUP BY fo_total.order_id
+) AS first_o_total
+    ON first_o.order_id = first_o_total.order_id
+INNER JOIN (
+    -- 最近订单金额子查询（第4次嵌套使用 fact_order，结构与上面相似）
+    SELECT 
+        lo_total.order_id,
+        SUM(od_total2.price * od_total2.quantity) AS amount
+    FROM fact_order lo_total
+    INNER JOIN fact_order_detail od_total2
+        ON lo_total.order_id = od_total2.order_id
+    GROUP BY lo_total.order_id
+) AS last_o_total
+    ON last_o.order_id = last_o_total.order_id
+
+WHERE 
+    main_u.is_deleted = 0
+    AND main_u.user_status = 'active'
+    AND first_o.order_create_time != last_o.order_create_time  -- 排除只有一次订单的用户
+    AND (
+        -- WHERE 子句中也使用子查询，再次关联 fact_order
+        EXISTS (
+            SELECT 1
+            FROM fact_order high_value_o
+            WHERE high_value_o.user_id = main_u.user_id
+              AND high_value_o.order_create_time > first_o.order_create_time
+              AND (
+                  SELECT SUM(price * quantity)
+                  FROM fact_order_detail
+                  WHERE order_id = high_value_o.order_id
+              ) > 1000
+        )
+        OR main_u."register_time" < '2024-06-01'
+    )
+
+ORDER BY 
+    repurchase_order_count DESC,
+    user_avg_order_amount DESC
+LIMIT 50 OFFSET 101;
     """
     parsed = sqlglot.parse_one(sql,read="postgres")
     # write_string_to_file("../temp/语法树JSON.json", json.dumps(parsed.dump(), sort_keys=False, indent=4))
@@ -187,12 +292,6 @@ def test_sqlmapping():
 
 
 
-    for key,value in  var.logicMap[(0,0)]["TableAlias"].items():
-        for item in var.expressionsMapTest(key,value):
-            print(item)
-            pass
-        #print("\n")
-        #print(var.expressionsMapTest(key,value))
     for key,value in var.logicMap.items():
         print(str(key)+":")
         for k1,v1 in value.items():
@@ -420,7 +519,7 @@ WHERE
 
 ORDER BY 
     repurchase_order_count DESC,
-    user_avg_order_amount DESC
+    user_avg_order_amount DESC,3,6
 LIMIT 50 OFFSET 101;
         """)
     nodeDg = compiler.current_query.nodeDgs.copy()

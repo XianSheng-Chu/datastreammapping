@@ -47,6 +47,9 @@ class DataStreamMappingEdgeEnum(StrEnum):
     # 存储的是来自于表或者子查询的 * 号引用
     STAR_FIELD_DERIVED_FROM_FIELD = "star_derived_from_field"
 
+    # 幂等字段映射，例如从select字句到order字句中字段的引用关系
+    FIELD_TO_FIELD = "field_to_field"
+
     # 以下均为非幂等映射，即数据可能已经经历了转换操作
     # 逻辑链路,所有的涉及到逻辑关系的判断所包含的关系
     LOGICAL_LINK = "logical_link"
