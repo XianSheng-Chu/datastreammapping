@@ -117,6 +117,8 @@ class SelectScope(QueryScope):
         self.create_logical_relationship_map()
         self.create_output_relationship_map()
         self.create_where_relationship_map()
+        self.create_clause_general_relationship_map("group")
+
         self.create_order_relationship_map()
         self.create_limit_relationship_map()
 
@@ -158,7 +160,7 @@ class SelectScope(QueryScope):
         scope_nodes = [item for item in scope_nodes if self.nodeDgs.nodes[item]["scope_key"]==self.scope_key]
         scope_nodes.sort(key=self.scope_logical_order)
         for node in scope_nodes:
-            if self.nodeDgs.nodes[node]["exp_stage"] == "where":
+            if self.nodeDgs.nodes[node]["exp_stage"]  in ("where","having"):
                 for i in range(-1, -len(node), -1):
                     if node[:i] in self.nodeDgs.nodes:
                         parent_key = node[:i]
@@ -228,7 +230,7 @@ class SelectScope(QueryScope):
                                 add_edge_model_to_graph(self.nodeDgs, edge_model_date)
 
                         if self.nodeDgs.nodes[parent_key]["exp_key"] == "ordered":
-                            edge_type = DataStreamMappingEdgeEnum.FIELD_TO_FIELD
+                            edge_type = DataStreamMappingEdgeEnum.CLAUSE_PARAMETER
                         else:
                             edge_type = DataStreamMappingEdgeEnum.TRANSFORM_DATE
                         if edges is None or EdgeMainTypeEnum.DATA_STREAM_MAPPING not in edges.keys():
@@ -247,9 +249,43 @@ class SelectScope(QueryScope):
         scope_nodes.sort(key=self.scope_logical_order)
         for node in scope_nodes:
             if self.nodeDgs.nodes[node]["exp_stage"] == "limit":
-                pass
+                for i in range(-1, -len(node), -1):
+                    if node[:i] in self.nodeDgs.nodes:
+                        parent_key = node[:i]
+                        if self.nodeDgs.nodes[parent_key]["exp_key"] == "limit":
+                            edge_type = DataStreamMappingEdgeEnum.CLAUSE_PARAMETER
 
+                        edges = self.nodeDgs.get_edge_data(node, parent_key)
 
+                        if edges is None or EdgeMainTypeEnum.DATA_STREAM_MAPPING not in edges.keys():
+                            edge_model_date = DataStreamMappingEdge(
+                                source_node_id=node,
+                                target_node_id=parent_key,
+                                edge_sub_type=edge_type
+                            )
+                            add_edge_model_to_graph(self.nodeDgs, edge_model_date)
+                        break
+
+    def create_clause_general_relationship_map(self,stage_name:str,stage_root_relationship_type:DataStreamMappingEdgeEnum = DataStreamMappingEdgeEnum.CLAUSE_PARAMETER):
+        scope_nodes = self.find_child_nodes(self.scope_key, self.nodeDgs)
+        scope_nodes = [item for item in scope_nodes if self.nodeDgs.nodes[item]["scope_key"] == self.scope_key]
+        scope_nodes.sort(key=self.scope_logical_order)
+        for node in scope_nodes:
+            if self.nodeDgs.nodes[node]["exp_stage"] == stage_name:
+                for i in range(-1, -len(node), -1):
+                    if node[:i] in self.nodeDgs.nodes:
+                        parent_key = node[:i]
+                        if self.nodeDgs.nodes[parent_key]["exp_key"] == stage_name:
+                            edge_type = stage_root_relationship_type.CLAUSE_PARAMETER
+                        edges = self.nodeDgs.get_edge_data(node, parent_key)
+                        if edges is None or EdgeMainTypeEnum.DATA_STREAM_MAPPING not in edges.keys():
+                            edge_model_date = DataStreamMappingEdge(
+                                source_node_id=node,
+                                target_node_id=parent_key,
+                                edge_sub_type=edge_type
+                            )
+                            add_edge_model_to_graph(self.nodeDgs, edge_model_date)
+                        break
 
 
 

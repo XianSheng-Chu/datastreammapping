@@ -453,7 +453,7 @@ class QueryScope(SymbolTableScope):
                         else:
                             edge_type = DataStreamMappingEdgeEnum.LOGICAL_LINK
                     elif parent_node.get("exp_stage","") == "scope_root" and current_node["exp_stage"] not in ("expressions",):
-                        edge_type = DataStreamMappingEdgeEnum.DATA_STREAM_OTHER
+                        edge_type = DataStreamMappingEdgeEnum.CLAUSE_PARAMETER
 
                     edges = self.nodeDgs.get_edge_data(dg_key,parent_key)
                     if (edges is None or EdgeMainTypeEnum.DATA_STREAM_MAPPING not in edges.keys()) and edge_type is not None:

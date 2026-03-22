@@ -67,6 +67,8 @@ class DataStreamMappingEdgeEnum(StrEnum):
     # 用于指向执行顺序的流程，例如order中的字段列表，表的join顺序等
     EXECUTION_SEQUENTIAL = "execution_sequential"
 
+    # 语句参数与父节点的连接，例如where,group这类子句，所连接到select的关系，或者时limit子句的数据量，order子句中的desc等
+    CLAUSE_PARAMETER = "clause_parameter"
     # 兜底
     DATA_STREAM_OTHER = "data_stream_other"
 
