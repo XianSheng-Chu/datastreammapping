@@ -1,0 +1,738 @@
+# configs/rules/base_rules.yaml
+# version: "1.0"
+
+basic_table:
+#规则值,用于自定义匹配规则
+    pattern:
+    #用于匹配相关的节点
+        type : "node"
+        level: "current"
+        #匹配的节点层级
+        class_name: "table"
+        #匹配的类名
+    conditions:
+    #匹配上的节点继续时所需要满足的条件,对于两个同级的列表项，默认作为or条件使用，只要有一个条件满足就代表该条件校验通过，权重值会直接取所有被满足的条件的最大值
+        - And :
+            - condition_true:
+                weight : 2
+            - parent_class:
+                # 匹配父类是否为某一个特定的类
+                class_name : "Expression"
+                weight : 7
+            - or:
+                - condition_true:
+                    weight: 2
+                - sub_class:
+                    - class_name: "Update"
+                    - weight: 8
+
+
+    actions:
+    #满足条件时执行如下动作
+        - add_node:
+            #add_node将该节点添加至图之中
+        - property_values:
+            #获取@property_value的属性
+            - db: schema
+              #方法名：属性和备注(该名称作为节点的key存储)
+            - catalog: catalog
+            - alias: table_alias
+            - name : table_name
+
+
+basic_select:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "select"
+    conditions:
+        - condition_true:
+            weight: 3
+    actions:
+        - scopes: select
+          # scopes的create只能限定在如下的节点之内 select,delete,update,merge
+        - add_node:
+        - set_stage : select
+
+basic_subquery:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "subquery"
+    conditions:
+        - condition_true:
+            weight: 6
+    actions:
+        - add_node:
+        - args_values:
+              #按照直接获取当前节点的表达式参数值
+              - alias:
+                    #cte表达式的别名
+                    node_key: alias
+                    # 参数值在存储时所用的键值
+                    keep_missing: False
+                    # value不存在时是否依旧记录该键值对
+
+
+
+
+basic_from:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "from"
+    conditions:
+        - condition_true:
+            weight: 2
+    actions:
+        - add_node:
+        - set_stage : from
+
+basic_where:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "where"
+    conditions:
+        - condition_true:
+            weight: 2
+    actions:
+        - add_node:
+        - set_stage : where
+        - add_custom_values:
+              #   为图节点添加自定义信息
+              key_name: predicate_attrs
+              value: consume
+
+basic_join:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "join"
+    conditions:
+        - condition_true:
+            weight: 2
+    actions:
+        - add_node:
+        - set_stage : joins
+        - args_values:
+              #按照直接获取当前节点的表达式参数值
+              - side:
+                #side参数表示两张表join方式
+                    node_key: join_side
+                    # 参数值在存储时所用的键值
+                    keep_missing : True
+                    # value不存在时是否依旧记录该键值对
+                    default_value: inner
+                    # value不存在时使用的默认值
+        - add_custom_values:
+            #   为图节点添加自定义信息
+            key_name: predicate_attrs
+            value: consume
+
+
+
+
+basic_column:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "column"
+    conditions:
+        - condition_true:
+            weight: 3
+    actions:
+        - add_node:
+        - property_values:
+              #获取@property_value的属性
+              - db: schema
+                  #方法名：属性和备注
+              - catalog: catalog
+              - table: table
+              - output_name: output_name
+
+basic_alias:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "alias"
+    conditions:
+        - condition_true:
+            weight: 2
+    actions:
+        - add_node:
+        - property_values:
+              #获取@property_value的属性
+              - output_name: output_name
+
+basic_TableAlias:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "tablealias"
+    conditions:
+        - condition_false:
+            weight: 2
+    actions:
+        - add_node:
+        - property_values:
+              #获取@property_value的属性
+              - output_name: output_name
+
+basic_with:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "with"
+    conditions:
+        - condition_true:
+            weight: 2
+    actions:
+        - add_node:
+        - set_stage: with
+        - property_values:
+              #获取@property_value的属性
+              - recursive: recursive_flag
+                #recursive用来标志改语句是否是递归的
+
+
+
+basic_cte:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "cte"
+    conditions:
+        - condition_true:
+            weight: 3
+    actions:
+        - add_node:
+        - args_values:
+              #按照直接获取当前节点的表达式参数值
+            - alias:
+              #cte表达式的别名
+                  node_key: alias
+                  # 参数值在存储时所用的键值
+                  keep_missing: False
+                  # value不存在时是否依旧记录该键值对
+            - scalar:
+                #search参数用来标记cte是一个标量cte
+                node_key: scalar_flag
+                # 参数值在存储时所用的键值
+                keep_missing: True
+                # value不存在时是否依旧记录该键值对
+
+basic_group:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "group"
+    conditions:
+        - condition_true:
+            weight: 2
+    actions:
+        - add_node:
+        - set_stage : group
+
+
+basic_order:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "order"
+    conditions:
+        - condition_true:
+            weight: 2
+    actions:
+        - add_node:
+        - set_stage : order
+
+
+basic_having:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "having"
+    conditions:
+        - condition_true:
+            weight: 2
+    actions:
+        - add_node:
+        - set_stage : having
+        - add_custom_values:
+              #   为图节点添加自定义信息
+              key_name: predicate_attrs
+              value: consume
+
+
+
+basic_ordered:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "ordered"
+    conditions:
+        - condition_true:
+            weight: 2
+    actions:
+        - add_node:
+        - args_values:
+            - desc :
+                node_key: nulls_first
+                keep_missing: false
+
+basic_limit:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "limit"
+    conditions:
+        - condition_true:
+            weight: 2
+    actions:
+        - add_node:
+
+basic_offset:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "offset"
+    conditions:
+        - condition_true:
+            weight: 2
+    actions:
+        - add_node:
+
+
+basic_star:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "star"
+    conditions:
+        - condition_true:
+            weight: 2
+    actions:
+        - add_node:
+        - property_values:
+              #获取@property_value的属性
+              - output_name: output_name
+
+basic_literal:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "literal"
+    conditions:
+        - condition_true:
+            weight: 3
+    actions:
+        - add_node:
+        - property_values:
+              #获取@property_value的属性
+              - output_name: literal_value
+
+        - args_values:
+            - is_string:
+                node_key: is_string
+                keep_missing: false
+
+basic_if:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "if"
+    conditions:
+        - condition_true:
+            weight: 4
+    actions:
+        - add_node:
+        - add_custom_values:
+              #   为图节点添加自定义信息
+              key_name: predicate_attrs
+              value: consume
+
+basic_Anonymous:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "anonymous"
+#        Anonymous类通常代表解析器无法识别具体类型的函数调用（即未注册的函数），一般是用户自定义的函数
+    conditions:
+        - condition_true:
+            weight: 4
+    actions:
+        - add_node:
+        - property_values:
+              #获取@property_value的属性
+              - name: func_name
+
+        - add_custom_values:
+              #            为图节点添加自定义信息
+              key_name: func_type
+              #                描述函数的类型信息，主要分为以下三类：Scalar_Functions，Aggregate_Functions,Anonymous_Functions
+              value: Anonymous_Functions
+
+basic_func:
+    pattern:
+        type: "node"
+        level: "super"
+#       super代表匹配所有父类为func的节点
+        class_name: 
+            - "Func"
+#       匹配父类时类名是大小写敏感的,由于多继承的存在，匹配的父类可以是一个列表,由于多继承的存在，匹配的父类可以是一个列表
+    conditions:
+        - and :
+            - condition_true:
+                weight: 3
+            - in:
+#                复合列表中的值的数据被视为有效的
+                match_value: class_name
+                weight: 3
+                value_list:
+                    [AggFunc,Abs,Flatten,Transform,Anonymous,Apply,Array,ToArray,List,Pad,ToChar,ToNumber,ToDouble,
+                     Columns,Convert,ConvertTimezone,GenerateSeries,ArrayAll,ArrayAny,ArrayConcat,ArrayConstructCompact,
+                     ArrayFilter,ArrayToString,String,StringToArray,ArraySize,ArraySort,ArraySum,Case,Cast,Try,
+                     CastToStrType,Ceil,Coalesce,Chr,Concat,Contains,ConnectByRoot,Cbrt,CurrentDate,CurrentDatetime,
+                     CurrentTime,CurrentTimestamp,CurrentUser,DateTrunc,Datetime,DayOfWeek,DayOfWeekIso,DayOfMonth,DayOfYear,
+                     ToDays,WeekOfYear,MonthsBetween,MakeInterval,Extract,Timestamp,DateFromParts,TimeFromParts,
+                     DateStrToDate,DateToDateStr,DateToDi,Date,Day,Decode,DiToDate,Encode,Exp,Inline,Floor,FromBase64,
+                     FeaturesAtTime,ToBase64,FromISO8601Timestamp,GapFill,GenerateDateArray,GenerateTimestampArray,Greatest,
+                     Hex,If,Nullif,Initcap,IsAscii,IsNan,Int64,IsInf,JSONObject,JSONArray,JSONArrayAgg,JSONExists,JSONValueArray,
+                     JSONTable,ObjectInsert,OpenJSON,JSONBExists,JSONExtractArray,JSONFormat,ParseJSON,Least,Left,Right,Length,
+                     Levenshtein,Ln,Log,Lower,Map,ToMap,MapFromEntries,StarMap,VarMap,MatchAgainst,MD5,MD5Digest,Month,AddMonths,
+                     Nvl2,Normalize,Overlay,Predict,Quarter,Rand,Randn,RangeN,ReadCSV,Reduce,RegexpExtract,RegexpExtractAll,
+                     RegexpReplace,RegexpSplit,Repeat,Round,RowNumber,SafeDivide,SHA,SHA2,Sign,SortArray,Split,SplitPart,Substring,
+                     StandardHash,StartsWith,StrPosition,StrToDate,StrToTime,StrToUnix,StrToMap,NumberToStr,FromBase,Struct,StructExtract,
+                     Stuff,Sqrt,Time,TimeToStr,TimeToTimeStr,TimeToUnix,TimeStrToDate,TimeStrToTime,TimeStrToUnix,Trim,TsOrDsToDateStr,
+                     TsOrDsToDate,TsOrDsToDatetime,TsOrDsToTime,TsOrDsToTimestamp,TsOrDiToDi,Unhex,Unicode,UnixDate,UnixToStr,
+                     UnixToTime,UnixToTimeStr,UnixSeconds,Uuid,TimestampFromParts,Upper,Week,XMLElement,XMLTable,Year,NextValueFor,]
+    actions:
+        - add_node:
+        - add_custom_values:
+#            为图节点添加自定义信息
+                key_name: func_type
+#                描述函数的类型信息，主要分为以下三类：Scalar_Functions，Aggregate_Functions,Anonymous_Functions
+                value: Scalar_Functions
+
+
+basic_aggFunc:
+    pattern:
+        type: "node"
+        level: "super"
+        #       super代表匹配所有父类为func的节点
+        class_name: 
+            - "AggFunc"
+    #       匹配父类时类名是大小写敏感的,由于多继承的存在，匹配的父类可以是一个列表
+    conditions:
+        - in:
+              #  复合列表中的值的数据被视为有效的
+              match_value: class_name
+              weight: 4
+              value_list:
+                [ParameterizedAgg,ArgMax,ArgMin,ApproxTopK,AnonymousAggFunc,Hll,ApproxDistinct,ArrayAgg,ArrayUniqueAgg,ArrayUnionAgg,
+                 Avg,AnyValue,Lag,Lead,First,Last,FirstValue,LastValue,NthValue,Count,CountIf,GroupConcat,JSONObjectAgg,LogicalOr,
+                 LogicalAnd,Max,Median,Min,PercentileCont,PercentileDisc,Quantile,Sum,Stddev,StddevPop,StddevSamp,Variance,VariancePop,]
+    actions:
+        - add_node:
+        - add_custom_values:
+              #            为图节点添加自定义信息
+              key_name: func_type
+              #                描述函数的类型信息，主要分为以下三类：Scalar_Functions，Aggregate_Functions,Anonymous_Functions
+              value: Aggregate_Functions
+
+basic_SubqueryPredicate_super:
+    pattern:
+        type: "node"
+        level: "super"
+        #       super代表匹配所有父类为func的节点
+        class_name:
+            - "SubqueryPredicate"
+    #       匹配父类时类名是大小写敏感的,由于多继承的存在，匹配的父类可以是一个列表
+    conditions:
+        - in:
+              #  复合列表中的值的数据被视为有效的
+              match_value: class_name
+              weight: 4
+              value_list:
+                [All,Any,Exists,]
+    actions:
+        - add_node:
+        - in:
+            #  复合列表中的值的数据被视为有效的
+            match_value: class_name
+            weight: 4
+            value_list: [Exists,]
+            actions:
+                - add_custom_values:
+                      #   为图节点添加自定义信息
+                      key_name: predicate_attrs
+                      value: Predicate
+
+
+basic_Unary_super:
+    pattern:
+        type: "node"
+        level: "super"
+        #       super代表匹配所有父类为func的节点
+        class_name:
+            - "Unary"
+    #       Unary类表示所有的一元操作符
+    conditions:
+        - in:
+              #  复合列表中的值的数据被视为有效的
+              match_value: class_name
+              weight: 3
+              value_list:
+                [BitwiseNot,Not,Paren,Neg,]
+    actions:
+        - add_node:
+        - add_custom_values:
+            #   为图节点添加自定义信息
+            key_name: operators_type
+            value: Unary
+
+basic_Predicate_super:
+    pattern:
+        type: "node"
+        level: "super"
+        #       super代表匹配所有父类为func的节点
+        class_name:
+            - "Predicate"
+    #       Predicate类表示所有的谓词类
+    conditions:
+        - in:
+              #  复合列表中的值的数据被视为有效的
+              match_value: class_name
+              weight: 3
+              value_list:
+                [Between,In,]
+    actions:
+        - add_node:
+        - add_custom_values:
+              #   为图节点添加自定义信息
+              key_name: predicate_attrs
+              value: Predicate
+
+
+basic_Binary_super:
+    pattern:
+        type: "node"
+        level: "super"
+        #       super代表匹配所有父类为func的节点
+        class_name:
+            - "Binary"
+    #       Binary类表示所有的二元操作符类
+    conditions:
+        - in:
+              #  复合列表中的值的数据被视为有效的
+              match_value: class_name
+              weight: 3
+              value_list:
+                [Add,Connector,BitwiseAnd,BitwiseLeftShift,BitwiseOr,BitwiseRightShift,BitwiseXor,Div,Overlaps,Dot,DPipe,
+                 PropertyEQ,Distance,Escape,IntDiv,Kwarg,Mod,Mul,Operator,Slice,Sub,]
+    actions:
+        - add_node:
+        - add_custom_values:
+            #   为图节点添加自定义信息
+            key_name: operators_type
+            value: Binary
+
+basic_Binary_Predicate_super:
+    pattern:
+        type: "node"
+        level: "super"
+        #       super代表匹配所有父类为func的节点
+        class_name:
+            - "Binary"
+            - "Predicate"
+    #       Binary类表示所有的二元操作符类
+    conditions:
+        - in:
+              #  复合列表中的值的数据被视为有效的
+              match_value: class_name
+              weight: 6
+              value_list:
+                [EQ,NullSafeEQ,NullSafeNEQ,Glob,GT,GTE,ILike,ILikeAny,Is,Like,LikeAny,LT,LTE,NEQ,SimilarTo,]
+    actions:
+        - add_node:
+        - add_custom_values:
+              #   为图节点添加自定义信息
+              key_name: predicate_attrs
+              value: Binary_Predicate
+        - add_custom_values:
+            #   为图节点添加自定义信息
+            key_name: operators_type
+            value: Binary_Predicate
+
+basic_Binary_Func_super:
+    pattern:
+        type: "node"
+        level: "super"
+        #       super代表匹配所有父类为func的节点
+        class_name:
+            - "Binary"
+            - "Func"
+    #       Binary类表示所有的二元操作符类
+    conditions:
+        - in:
+              #  复合列表中的值的数据被视为有效的
+              match_value: class_name
+              weight: 6
+              value_list:
+                [ArrayContains,ArrayContainsAll,ArrayOverlaps,Collate,JSONBContains,JSONExtract,JSONExtractScalar,JSONBExtract,
+                 JSONBExtractScalar,JSONArrayContains,Pow,RegexpLike,RegexpILike,]
+    actions:
+        - add_node:
+        - add_custom_values:
+              #   为图节点添加自定义信息
+              key_name: func_type
+              value: Binary_Functions
+
+basic_Binary_AggFunc_super:
+    pattern:
+        type: "node"
+        level: "super"
+        class_name:
+            - "Binary"
+            - "AggFunc"
+    #       Binary类表示所有的二元操作符类
+    conditions:
+        - in:
+              #  复合列表中的值的数据被视为有效的
+              match_value: class_name
+              weight: 7
+              value_list:
+                [Corr,CovarSamp,CovarPop,]
+    actions:
+        - add_node:
+        - add_custom_values:
+              #   为图节点添加自定义信息
+              key_name: func_type
+              value: Binary_AggFuncs
+
+basic_Func_TimeUnit_super:
+    pattern:
+        type: "node"
+        level: "super"
+        #       super代表匹配所有父类为func的节点
+        class_name:
+            - "Func"
+            - "TimeUnit"
+    #       Binary类表示所有的二元操作符类
+    conditions:
+        - in:
+              #  复合列表中的值的数据被视为有效的
+              match_value: class_name
+              weight: 5
+              value_list:
+                [DateDiff,DatetimeDiff,DatetimeTrunc,LastDay,TimestampAdd,TimestampSub,TimestampDiff,TimestampTrunc,
+                 TimeAdd,TimeSub,TimeDiff,TimeTrunc,TsOrDsAdd,TsOrDsDiff,]
+    actions:
+        - add_node:
+        - add_custom_values:
+              #   为图节点添加自定义信息
+              key_name: func_type
+              value: TimeUnit_Functions
+
+
+basic_Func_IntervalOp_super:
+    pattern:
+        type: "node"
+        level: "super"
+        #       super代表匹配所有父类为func的节点
+        class_name:
+            - "Func"
+            - "IntervalOp"
+    conditions:
+
+        - in:
+              #  复合列表中的值的数据被视为有效的
+              match_value: class_name
+              weight: 6
+              value_list:
+                [DateAdd,DateSub,DatetimeAdd,DatetimeSub,]
+    actions:
+        - add_node:
+        - add_custom_values:
+              #   为图节点添加自定义信息
+              key_name: func_type
+              value: IntervalOp_Functions
+
+basic_window:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "Window"
+    conditions:
+        - condition_true:
+            weight: 3
+    actions:
+        - add_node:
+
+basic_Null:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "Null"
+    conditions:
+        - condition_true:
+            weight: 3
+    actions:
+        - add_node:
+
+basic_Boolean:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "Boolean"
+    conditions:
+        - condition_true:
+            weight: 3
+    actions:
+        - add_node:
+
+
+basic_Connector_super:
+    pattern:
+        type: "node"
+        level: "super"
+        #       super代表匹配所有父类为func的节点
+        class_name:
+            - "Connector"
+    conditions:
+
+        - in:
+              #  复合列表中的值的数据被视为有效的
+              match_value: class_name
+              weight: 6
+              value_list:
+                [And,Or,]
+    actions:
+        - add_node:
+        - add_custom_values:
+              #   为图节点添加自定义信息
+              key_name: predicate_attrs
+              value: Connector
+
+basic_Func_Connector_super:
+    pattern:
+        type: "node"
+        level: "super"
+        #       super代表匹配所有父类为func的节点
+        class_name:
+            - "Func"
+            - "Connector"
+    conditions:
+          - in:
+                #  复合列表中的值的数据被视为有效的
+                match_value: class_name
+                weight: 7
+                value_list:
+                  [ Xor,]
+    actions:
+        - add_node:
+        - add_custom_values:
+              #   为图节点添加自定义信息
+              key_name: func_type
+              value: Connector_Functions
