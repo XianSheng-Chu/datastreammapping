@@ -54,6 +54,20 @@ basic_select:
         - add_node:
         - set_stage : select
 
+basic_insert:
+    pattern:
+        type: "node"
+        level: "current"
+        class_name: "insert"
+    conditions:
+        - condition_true:
+            weight: 3
+    actions:
+        - scopes: insert
+          # scopes的create只能限定在如下的节点之内 select,delete,update,merge
+        - add_node:
+        - set_stage : insert
+
 basic_subquery:
     pattern:
         type: "node"

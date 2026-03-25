@@ -220,6 +220,23 @@ LIMIT 50 OFFSET 0;
             ORDER BY high_earner_count DESC;
             """)
 
+    def test_compile_insert(self):
+        """测试编译器能够正确处理包含具体列名的SELECT语句。"""
+        self.compiler.compile_sql(
+            """
+                    -- 示例：将每个部门中工资高于该部门平均工资的员工插入到 high_salary_employees 表中
+            WITH dept_avg AS (
+                SELECT department_id, AVG(salary) AS avg_salary
+                FROM employees
+                GROUP BY department_id
+            )
+            INSERT INTO ctr.tr.high_salary_employees (employee_id, name, department_id, salary, insert_time)
+            SELECT e.employee_id, e.name, e.department_id, e.salary, NOW()
+            FROM employees e
+            JOIN dept_avg d ON e.department_id = d.department_id
+            WHERE e.salary > d.avg_salary;
+            """)
+
     def test_compile_with_table_alias(self):
         """测试编译器能够正确处理使用表别名的SQL语句。"""
         pass

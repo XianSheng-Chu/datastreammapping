@@ -14,7 +14,10 @@ class QueryScope(SymbolTableScope):
             from .runtime_scopes import SelectScope
             rulest = SelectScope(self,scope_type.str(),ast_node)
             self.add_child_scope(rulest)
-            # print(ast_node.sql)
+        elif scope_type == ScopeType.INSERT:
+            from .runtime_scopes import InsertScope
+            rulest = InsertScope(self, scope_type.str(), ast_node)
+            self.add_child_scope(rulest)
 
         if rulest is not None:
             return rulest
@@ -110,7 +113,7 @@ class QueryScope(SymbolTableScope):
 
     def find_parent_key(self, node: Expression)-> str | tuple:
         result: str | tuple
-
+        current_scope = self
         if node.parent:
             current_parent = node.parent
             for args_key, value in current_parent.args.items():
@@ -124,7 +127,10 @@ class QueryScope(SymbolTableScope):
                         result = args_key
                         return result
         else:
-            return self.scope_name,self.query_count
+            while not current_scope.is_descendant(node.parent):
+                current_scope = current_scope.parent
+
+            return current_scope.scope_name,self.query_count
 
     def set_stage(self,stage_name,ast_node:Expression):
         self.current_stage = stage_name
@@ -464,3 +470,5 @@ class QueryScope(SymbolTableScope):
                         )
                         add_edge_model_to_graph(self.nodeDgs, edge_model_date)
                     break
+
+

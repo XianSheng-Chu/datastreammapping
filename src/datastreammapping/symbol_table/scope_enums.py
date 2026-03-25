@@ -19,6 +19,7 @@ class ScopeType(Enum):
     # === 查询级别 ===
     QUERY = ("query", ScopeCategory.QUERY, True)  # 查询脚本，可以包含一个或者多个sql语句
     SELECT = ("select", ScopeCategory.QUERY, True)  # 主查询
+    INSERT = ("insert", ScopeCategory.QUERY, True)
     SUBQUERY = ("subquery", ScopeCategory.QUERY, True)  # 普通子查询
     CORRELATED_SUBQUERY = ("correlated_subquery", ScopeCategory.QUERY, True)
     CTE = ("cte", ScopeCategory.QUERY, True)  # CTE
