@@ -230,7 +230,7 @@ LIMIT 50 OFFSET 0;
                 FROM employees
                 GROUP BY department_id
             )
-            INSERT INTO ctr.tr.high_salary_employees (employee_id, name, department_id, salary, insert_time)
+            INSERT INTO high_salary_employees (employee_id, name, department_id, salary, insert_time)
             SELECT e.employee_id, e.name, e.department_id, e.salary, NOW()
             FROM employees e
             JOIN dept_avg d ON e.department_id = d.department_id

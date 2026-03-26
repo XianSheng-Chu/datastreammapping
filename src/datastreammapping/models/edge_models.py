@@ -8,7 +8,7 @@ from .enums import (
     EdgeMainTypeEnum,
     EntitySubordinationEdgeEnum,
     DataStreamMappingEdgeEnum,
-    CodeStructureEdgeEnum,
+    CodeStructureEdgeEnum, DataManipulationFlowEdgeEnum,
 )
 
 
@@ -55,6 +55,11 @@ class DataStreamMappingEdge(BaseEdge):
 class CodeStructureEdge(BaseEdge):
     edge_main_type: Literal[EdgeMainTypeEnum.CODE_STRUCTURE] = Field(EdgeMainTypeEnum.CODE_STRUCTURE, description="实体关系类型")
     edge_sub_type:CodeStructureEdgeEnum  = Field(..., description="关系细分类型")
+
+class DataManipulationFlowEdge(BaseEdge):
+    edge_main_type: Literal[EdgeMainTypeEnum.Data_Manipulation_Flow] = Field(EdgeMainTypeEnum.Data_Manipulation_Flow, description="实体关系类型")
+    edge_sub_type:DataManipulationFlowEdgeEnum  = Field(..., description="关系细分类型")
+
 
 
 

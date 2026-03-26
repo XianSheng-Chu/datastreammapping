@@ -107,7 +107,7 @@ class SymbolTableScope(ABC):
             allowed_edge_types = {EdgeMainTypeEnum.CODE_STRUCTURE, EdgeMainTypeEnum.ENTITY_SUBORDINATION}
         result_nodes = set()
         visited = set()  # 防止环导致无限循环
-        stack = [target_node]  # 用栈实现 DFS，也可以用 deque 实现 BFS
+        stack = [target_node]
         result_nodes.add(target_node)
         while stack:
             current_node = stack.pop()

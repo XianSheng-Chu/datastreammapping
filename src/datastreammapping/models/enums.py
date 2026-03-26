@@ -6,6 +6,7 @@ class EdgeMainTypeEnum(StrEnum):
     ENTITY_SUBORDINATION = "entity_subordination"
     DATA_STREAM_MAPPING = "data_stream_mapping"
     CODE_STRUCTURE = "code_structure"
+    Data_Manipulation_Flow = "data_manipulation_flow"
 
 
 
@@ -18,8 +19,6 @@ class EntitySubordinationEdgeEnum(StrEnum):
 
 # 子枚举2：数据流映射
 class DataStreamMappingEdgeEnum(StrEnum):
-
-
     # 存储的是直接引用实体表的数据流
     SQL_REFERENCED_TABLE_FROM_ENTITY = "sql_referenced_table_from_entity"
 
@@ -72,7 +71,8 @@ class DataStreamMappingEdgeEnum(StrEnum):
     # 兜底
     DATA_STREAM_OTHER = "data_stream_other"
 
-
+class DataManipulationFlowEdgeEnum(StrEnum):
+    INSERT_TABLE = "insert_table"
 
 # 子枚举3：代码结构
 class CodeStructureEdgeEnum(StrEnum):

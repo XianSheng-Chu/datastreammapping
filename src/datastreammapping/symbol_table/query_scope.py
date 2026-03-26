@@ -127,7 +127,7 @@ class QueryScope(SymbolTableScope):
                         result = args_key
                         return result
         else:
-            while not current_scope.is_descendant(node.parent):
+            while current_scope.scope_root != node:
                 current_scope = current_scope.parent
 
             return current_scope.scope_name,self.query_count
@@ -284,17 +284,31 @@ class QueryScope(SymbolTableScope):
                         from .schema_scope import SchemaScope
                         current_schema: SchemaScope = self.find_parent_scope(ScopeType.SCHEMA)
                         source_symbol_key = current_schema.find_table(table_name,schema_name,catalog_name)
+                        edge_type = DataStreamMappingEdgeEnum.SQL_REFERENCED_TABLE_FROM_ENTITY
                         edge_model = DataStreamMappingEdge(
                             source_node_id=source_symbol_key,
                             target_node_id=dg_key,
-                            edge_sub_type=DataStreamMappingEdgeEnum.SQL_REFERENCED_TABLE_FROM_ENTITY
+                            edge_sub_type=edge_type
                         )
                     else:
+                        edge_type = DataStreamMappingEdgeEnum.TABLE_FROM_QUERY
                         edge_model = DataStreamMappingEdge(
                             source_node_id=source_symbol_key,
                             target_node_id=dg_key,
-                            edge_sub_type=DataStreamMappingEdgeEnum.TABLE_FROM_QUERY
+                            edge_sub_type=edge_type
                         )
+
+                    if dg_node["scope_root_temp"].scope_type in (ScopeType.INSERT,):
+                        edge_type = DataManipulationFlowEdgeEnum.INSERT_TABLE
+                        temp = source_symbol_key
+                        source_symbol_key = dg_key
+                        dg_key = temp
+                        edge_model = DataManipulationFlowEdge(
+                            source_node_id=source_symbol_key,
+                            target_node_id=dg_key,
+                            edge_sub_type=edge_type
+                        )
+
 
 
                     add_edge_model_to_graph(self.nodeDgs, edge_model)
