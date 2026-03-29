@@ -49,6 +49,9 @@ class DataStreamMappingEdgeEnum(StrEnum):
     # 幂等字段映射，例如从select字句到order字句中字段的引用关系
     FIELD_TO_FIELD = "field_to_field"
 
+    # insert语句中插入目标表名的关系
+    DATA_INSERT = "data_insert"
+
     # 以下均为非幂等映射，即数据可能已经经历了转换操作
     # 逻辑链路,所有的涉及到逻辑关系的判断所包含的关系
     LOGICAL_LINK = "logical_link"

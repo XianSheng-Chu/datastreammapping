@@ -22,8 +22,8 @@ class RuleCompiler:
             for rule_name in file.keys():
 
                 rule = file[rule_name]
-                if str(file_name) == r"D:\Software\Domes\datastreammapping\src\datastreammapping\configs\rules\base_rules.yaml":
-
+                # if str(file_name) == r"D:\Software\Domes\datastreammapping\src\datastreammapping\configs\rules\base_rules.yaml":
+                if file.get("basic_rule") is not None and rule_name!= "basic_rule":
                     rule_node = dict()
                     step_name = "pattern"
                     rule_node[step_name] = self._compile_rule_pattern(rule[step_name])

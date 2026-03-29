@@ -215,7 +215,8 @@ class SelectScope(QueryScope):
                                     # 此处创建的是Order子句中直接使用数字序号的数据映射
                                     output_index = current_node["exp_node"].to_py()
                         if current_node["exp_key"] == "column":
-                            output_index = int(self.nodeDgs.nodes[self.scope_key]["output_names"].index(current_node["extra_attrs"]["output_name"]))
+                            if current_node["extra_attrs"]["output_name"] in self.nodeDgs.nodes[self.scope_key]["output_names"]:
+                                output_index = int(self.nodeDgs.nodes[self.scope_key]["output_names"].index(current_node["extra_attrs"]["output_name"]))
                         if output_index != -1:
                             #创建从select子句到order字句内column的映射
                             source_key = self.scope_key + (("expressions", output_index),)
@@ -306,6 +307,15 @@ class InsertScope(QueryScope):
             scope_key = self.scope_key
         )
 
+    def dg_add_node(self, node: Expression):
+        super().dg_add_node(node)
+        if self.nodeDgs.nodes[self.data_node_active]["exp_key"]=="insert":
+            if node.this.key != "table":
+                insert_names = []
+                for column in node.this.expressions:
+                    insert_names.append(column.output_name)
+                self.nodeDgs.nodes[self.scope_key]["insert_names"] = insert_names
+
     def scope_logical_order_key(self,dg_key:tuple) ->str:
 
         result_parent:tuple = self.parent.scope_logical_order_key(self.scope_key)
@@ -334,6 +344,29 @@ class InsertScope(QueryScope):
             result = result + ":" + item
 
         return result_parent+result
+
+    def create_relationship_map(self):
+        super().create_relationship_map()
+        self.create_logical_relationship_map()
+        self.create_output_relationship_map()
+
+    def create_output_relationship_map(self):
+        # 处理select字句中所有的逻辑流
+        scope_nodes = self.find_child_nodes(self.scope_key, self.nodeDgs)
+        scope_nodes = [item for item in scope_nodes if self.nodeDgs.nodes[item]["scope_key"] == self.scope_key]
+        scope_nodes.sort(key=self.scope_logical_order)
+        for node in scope_nodes:
+            if self.nodeDgs.nodes[node]["exp_stage"] == "this":
+                if self.nodeDgs.nodes[node]["exp_key"] == "table":
+                    current_node = self.nodeDgs.nodes[node]
+                    edge_type = DataStreamMappingEdgeEnum.DATA_INSERT
+
+                    edge_model_date = DataStreamMappingEdge(
+                        source_node_id=self.scope_key,
+                        target_node_id=node,
+                        edge_sub_type=edge_type
+                    )
+                    add_edge_model_to_graph(self.nodeDgs, edge_model_date)
 
 
 

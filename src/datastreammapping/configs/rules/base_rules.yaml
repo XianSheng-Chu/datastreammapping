@@ -1,6 +1,13 @@
 # configs/rules/base_rules.yaml
 # version: "1.0"
 
+basic_rule:
+#规则文件头
+    dialect : ""
+    # 适用的语法方言，为空则表示是通用规则
+
+
+
 basic_table:
 #规则值,用于自定义匹配规则
     pattern:

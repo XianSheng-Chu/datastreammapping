@@ -375,7 +375,7 @@ LIMIT 50 OFFSET 101;
             )
             INSERT INTO high_salary_employees (employee_id, name, department_id, salary, insert_time)
             SELECT e.employee_id, e.name, e.department_id, e.salary, NOW()
-            FROM employees e
+            FROM high_salary_employees e
             JOIN dept_avg d ON e.department_id = d.department_id
             WHERE e.salary > d.avg_salary;
         """)

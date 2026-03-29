@@ -217,6 +217,7 @@ class InsertScopeNode(BaseExpressionsScopeNode):
     select语句节点
     """
     _neo4j_label: str =PrivateAttr(default="InsertScope")
+    insert_names :list[str] = Field(default_factory=list, description="insert语句的插入字段")
 
 
 

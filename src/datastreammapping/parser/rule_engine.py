@@ -57,7 +57,7 @@ class RuleEngine:
                     self.current_scope = self.current_scope.parent
                 self.current_scope = actions(item,self.current_scope)
 
-        if self.current_scope.scope_root is not None:
+        while self.current_scope.scope_root is not None:
             item = self.current_scope.scope_root.parent
             while not self.current_scope.is_descendant(item):
                 self.current_scope = self.current_scope.parent

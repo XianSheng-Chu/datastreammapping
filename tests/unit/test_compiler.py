@@ -213,11 +213,11 @@ LIMIT 50 OFFSET 0;
             SELECT 
                 d.department_name,
                 COUNT(h.id) AS high_earner_count,
-                1,d.*
+                -1,d.*
             FROM (select * from fin_date.departments) d
             LEFT JOIN high_earners h ON d.id = h.department_id
             GROUP BY d.department_name
-            ORDER BY high_earner_count DESC;
+            ORDER BY d.department_order DESC;
             """)
 
     def test_compile_insert(self):

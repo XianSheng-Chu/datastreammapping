@@ -361,7 +361,9 @@ class QueryScope(SymbolTableScope):
         for dg_key in dg_node_order_keys:
             dg_node  = scoop_root.nodeDgs.nodes[dg_key]
             current_scoop:QueryScope = dg_node["scope_root_temp"]
-            if dg_node.get("exp_key", "") in ("column","star") and dg_node["exp_stage"] not in ("order",):
+            # if dg_key ==
+            if dg_node.get("exp_key", "") in ("column","star") and (dg_node["exp_stage"] not in ("order",) or
+                                                                    (dg_node["exp_stage"]  in ("order",) and dg_node["extra_attrs"].get("table","") != "")):
                 if dg_node.get("exp_key", "")=="star" and scoop_root.nodeDgs.nodes.get(dg_key[:-1]).get("exp_key", "") == "column":
                     # 如果某个星号已经是一个column的一部分，那么就需要跳过relationship构建过程
                     continue
@@ -430,7 +432,8 @@ class QueryScope(SymbolTableScope):
             result = dg_node["exp_key"]
         elif dg_node["extra_attrs"].get("operators_type", "") != "":
             operators_node:Expression = dg_node["exp_node"].copy()
-            operators_node.args.clear()
+            if dg_node["exp_key"] not in ("neg",):
+                operators_node.args.clear()
             result = operators_node.sql()
         if result != "" and result is not None:
             return result
